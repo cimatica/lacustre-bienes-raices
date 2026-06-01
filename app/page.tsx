@@ -26,7 +26,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
   // Fetch data in parallel on the server
   const [featured, newProperties] = await Promise.all([
-    getFeaturedProperties(),
+    getFeaturedProperties(3),
     getNewProperties(page, PAGE_SIZE, saleType),
   ]);
 
@@ -43,18 +43,18 @@ export default async function Home({ searchParams }: HomeProps) {
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-bold text-mosque">Colecciones Destacadas</h2>
-              <p className="text-nordic-muted mt-1 text-sm">Propiedades curadas para el ojo exigente.</p>
+              <p className="text-nordic-muted mt-1 text-sm">Propiedades seleccionadas cuidadosamente para el ojo exigente.</p>
             </div>
             <Link
               className="hidden sm:flex items-center gap-1 text-sm font-medium text-mosque hover:opacity-70 transition-opacity"
-              href="#"
+              href="/colecciones-destacadas"
             >
               Ver todas <span className="material-icons text-sm">arrow_forward</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featured.map((property) => (
-              <PropertyCard key={property.id} property={property} />
+              <PropertyCard key={property.id} property={property} variant="featured" />
             ))}
           </div>
         </section>
@@ -80,11 +80,10 @@ export default async function Home({ searchParams }: HomeProps) {
                   key={tab}
                   href={tab === "Todos" ? "/?page=1" : `/?tipo=${tab}&page=1`}
                   id={`filter-tab-${tab.toLowerCase()}`}
-                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
-                    activeTab === tab
-                      ? "bg-nordic-dark text-white shadow-sm"
-                      : "text-nordic-muted hover:text-nordic-dark"
-                  }`}
+                  className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === tab
+                    ? "bg-nordic-dark text-white shadow-sm"
+                    : "text-nordic-muted hover:text-nordic-dark"
+                    }`}
                 >
                   {tab}
                 </Link>
@@ -94,7 +93,7 @@ export default async function Home({ searchParams }: HomeProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {newProperties.data.map((property) => (
-              <PropertyCard key={property.id} property={property} />
+              <PropertyCard key={property.id} property={property} variant="standard" />
             ))}
           </div>
 

@@ -2,10 +2,11 @@ import { Property } from "../../lib/supabase";
 
 interface PropertyCardProps {
   property: Property;
+  variant?: "featured" | "standard";
 }
 
-export default function PropertyCard({ property }: PropertyCardProps) {
-  if (property.type === "featured") {
+export default function PropertyCard({ property, variant = "standard" }: PropertyCardProps) {
+  if (variant === "featured") {
     return (
       <div className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer">
         <div className="aspect-[4/3] w-full overflow-hidden relative">

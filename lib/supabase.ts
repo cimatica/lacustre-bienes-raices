@@ -17,6 +17,7 @@ export type Property = {
   image_url: string;
   image_alt: string;
   badge: string;
+  is_featured: boolean;
   type: "featured" | "new";
   sale_type: "Venta" | "Renta";
   created_at: string;
@@ -52,12 +53,13 @@ function buildUrl(params: Record<string, string | undefined>): string {
 
 // ─── Data access ─────────────────────────────────────────────────────────────
 
-/** Fetch featured properties (always shown in full, no pagination). */
-export async function getFeaturedProperties(): Promise<Property[]> {
+/** Fetch featured properties. */
+export async function getFeaturedProperties(limit?: number): Promise<Property[]> {
   const url = buildUrl({
     select: "*",
-    type: "eq.featured",
+    is_featured: "eq.true",
     order: "created_at.asc",
+    ...(limit ? { limit: limit.toString() } : {})
   });
 
   const res = await fetch(url, {
