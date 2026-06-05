@@ -5,6 +5,16 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export type PropertyImage = {
+  id: string;
+  property_id: string;
+  image_url: string;
+  image_alt: string;
+  is_main: boolean;
+  order_index: number;
+  created_at: string;
+};
+
 export type Property = {
   id: string;
   title: string;
@@ -21,6 +31,10 @@ export type Property = {
   type: "featured" | "new";
   sale_type: "Venta" | "Renta";
   created_at: string;
+  slug: string;
+  latitude: number | null;
+  longitude: number | null;
+  property_images?: PropertyImage[];
 };
 
 export type PaginatedProperties = {
@@ -64,8 +78,8 @@ export async function getFeaturedProperties(limit?: number): Promise<Property[]>
 
   const res = await fetch(url, {
     headers: apiHeaders(),
-    // Revalidate every 60 seconds (ISR-style caching)
-    next: { revalidate: 60 },
+    // Revalidate 0 temporalmente para limpiar la caché de Next.js
+    next: { revalidate: 0 },
   });
 
   if (!res.ok) throw new Error(`Supabase error: ${res.status} ${res.statusText}`);
@@ -114,4 +128,22 @@ export async function getNewProperties(
     pageSize,
     totalPages: Math.ceil(total / pageSize),
   };
+}
+
+/** Fetch property by Slug including related images */
+export async function getPropertyBySlug(slug: string): Promise<Property | null> {
+  const url = buildUrl({
+    select: "*, property_images(*)",
+    slug: `eq.${slug}`,
+  });
+
+  const res = await fetch(url, {
+    headers: apiHeaders(),
+    next: { revalidate: 0 },
+  });
+
+  if (!res.ok) throw new Error(`Supabase error: ${res.status} ${res.statusText}`);
+
+  const data: Property[] = await res.json();
+  return data.length > 0 ? data[0] : null;
 }

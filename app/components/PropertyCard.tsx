@@ -1,4 +1,5 @@
 import { Property } from "../../lib/supabase";
+import Link from "next/link";
 
 interface PropertyCardProps {
   property: Property;
@@ -8,7 +9,7 @@ interface PropertyCardProps {
 export default function PropertyCard({ property, variant = "standard" }: PropertyCardProps) {
   if (variant === "featured") {
     return (
-      <div className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer">
+      <Link href={`/propiedad/${property.slug}`} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer block">
         <div className="aspect-[4/3] w-full overflow-hidden relative">
           <img
             alt={property.image_alt}
@@ -48,13 +49,13 @@ export default function PropertyCard({ property, variant = "standard" }: Propert
             </div>
           </div>
         </div>
-      </div>
+      </Link>
     );
   }
 
   // Normal Card (New in Market)
   return (
-    <article className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col">
+    <Link href={`/propiedad/${property.slug}`} className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col block">
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           alt={property.image_alt}
@@ -95,6 +96,6 @@ export default function PropertyCard({ property, variant = "standard" }: Propert
           </div>
         </div>
       </div>
-    </article>
+    </Link>
   );
 }
