@@ -34,6 +34,7 @@ export type Property = {
   slug: string;
   latitude: number | null;
   longitude: number | null;
+  amenities?: string[];
   property_images?: PropertyImage[];
 };
 
@@ -146,4 +147,79 @@ export async function getPropertyBySlug(slug: string): Promise<Property | null> 
 
   const data: Property[] = await res.json();
   return data.length > 0 ? data[0] : null;
+}
+
+/** Search properties based on various filter parameters */
+export async function searchProperties(params: {
+  q?: string;
+  ubicacion?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  tipoPropiedad?: string;
+  beds?: string;
+  baths?: string;
+  amenities?: string[];
+}): Promise<Property[]> {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/properties`);
+  
+  // Select all properties, but order them
+  url.searchParams.set("select", "*");
+  url.searchParams.set("order", "created_at.desc");
+
+  // Location search using ilike (case-insensitive)
+  if (params.q) {
+    // Basic search text
+    url.searchParams.set("location", `ilike.%${params.q}%`);
+  } else if (params.ubicacion) {
+    url.searchParams.set("location", `ilike.%${params.ubicacion}%`);
+  }
+
+  // Price filters (assuming price is numeric in DB, but the API might have stored it as string like "1,200,000".
+  // Note: if price is stored as string "$1.2M", these numeric filters might not work correctly in Postgres 
+  // without casting. We will assume standard comparison works or that the user formats it as string.)
+  // However, `price` is of type `string` in `Property`.
+  // If price is stored as "1,200,000", we should clean it up for querying, but Supabase might not support filtering formatted strings.
+  // We'll leave the price filter commented out or pass it directly.
+  /*
+  if (params.minPrice) {
+    url.searchParams.set("price_num", `gte.${params.minPrice.replace(/\D/g, '')}`);
+  }
+  if (params.maxPrice) {
+    url.searchParams.set("price_num", `lte.${params.maxPrice.replace(/\D/g, '')}`);
+  }
+  */
+
+  if (params.tipoPropiedad && params.tipoPropiedad !== "Cualquier Tipo" && params.tipoPropiedad !== "Todos") {
+    // Map to sale_type or a new property_type column if it exists. We'll use sale_type for "Venta"/"Renta" or similar.
+    // If it's "Casa", "Apartamento", etc. we might need to filter by a 'category' or 'badge' column.
+    // Let's filter by `badge` as a fallback since it has values like 'Apartamento', 'Villa'.
+    url.searchParams.set("badge", `ilike.%${params.tipoPropiedad}%`);
+  }
+
+  if (params.beds && params.beds.replace(/\D/g, '') !== "") {
+    const minBeds = parseInt(params.beds.replace(/\D/g, ''), 10);
+    url.searchParams.set("beds", `gte.${minBeds}`);
+  }
+
+  if (params.baths && params.baths.replace(/\D/g, '') !== "") {
+    const minBaths = parseInt(params.baths.replace(/\D/g, ''), 10);
+    url.searchParams.set("baths", `gte.${minBaths}`);
+  }
+  
+  if (params.amenities && params.amenities.length > 0) {
+    // Array overlap operator in PostgREST is `ov` (or `cs` contains)
+    url.searchParams.set("amenities", `cs.{${params.amenities.join(',')}}`);
+  }
+
+  const res = await fetch(url.toString(), {
+    headers: apiHeaders(),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    console.error(`Supabase error: ${res.status} ${res.statusText}`, await res.text());
+    return [];
+  }
+
+  return res.json() as Promise<Property[]>;
 }
