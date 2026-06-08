@@ -36,6 +36,7 @@ export type Property = {
   longitude: number | null;
   amenities?: string[];
   property_images?: PropertyImage[];
+  property_type?: string;
 };
 
 export type PaginatedProperties = {
@@ -190,10 +191,7 @@ export async function searchProperties(params: {
   */
 
   if (params.tipoPropiedad && params.tipoPropiedad !== "Cualquier Tipo" && params.tipoPropiedad !== "Todos") {
-    // Map to sale_type or a new property_type column if it exists. We'll use sale_type for "Venta"/"Renta" or similar.
-    // If it's "Casa", "Apartamento", etc. we might need to filter by a 'category' or 'badge' column.
-    // Let's filter by `badge` as a fallback since it has values like 'Apartamento', 'Villa'.
-    url.searchParams.set("badge", `ilike.%${params.tipoPropiedad}%`);
+    url.searchParams.set("property_type", `eq.${params.tipoPropiedad}`);
   }
 
   if (params.beds && params.beds.replace(/\D/g, '') !== "") {

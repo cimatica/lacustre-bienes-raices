@@ -7,24 +7,42 @@ import SearchFiltersModal from "./SearchFiltersModal";
 export default function HeroSection() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [propertyType, setPropertyType] = useState("Todos");
   const router = useRouter();
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    
+    const params = new URLSearchParams();
+    
     if (searchQuery.trim()) {
-      router.push(`/buscar?q=${encodeURIComponent(searchQuery)}`);
-    } else {
-      router.push(`/buscar`);
+      params.append("q", searchQuery.trim());
     }
+    
+    if (propertyType !== "Todos") {
+      params.append("tipoPropiedad", propertyType);
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `/buscar?${queryString}` : "/buscar");
   };
 
   const handleQuickFilter = (type: string) => {
-    if (type === "Todos") {
-      router.push(`/buscar`);
-    } else {
-      router.push(`/buscar?tipoPropiedad=${encodeURIComponent(type)}`);
+    setPropertyType(type);
+    
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) {
+      params.append("q", searchQuery.trim());
     }
+    if (type !== "Todos") {
+      params.append("tipoPropiedad", type);
+    }
+    
+    const queryString = params.toString();
+    router.push(queryString ? `/buscar?${queryString}` : "/buscar");
   };
+
+  const propertyTypes = ["Todos", "Casa", "Apartamento", "Villa", "Penthouse"];
 
   return (
     <section className="py-12 md:py-16">
@@ -53,21 +71,20 @@ export default function HeroSection() {
         </form>
         
         <div className="flex items-center justify-center gap-3 overflow-x-auto hide-scroll py-2 px-4 -mx-4">
-          <button onClick={() => handleQuickFilter("Todos")} className="whitespace-nowrap px-5 py-2 rounded-full bg-nordic-dark text-white text-sm font-medium shadow-lg shadow-nordic-dark/10 transition-transform hover:-translate-y-0.5">
-            Todos
-          </button>
-          <button onClick={() => handleQuickFilter("Casa")} className="whitespace-nowrap px-5 py-2 rounded-full bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 text-sm font-medium transition-all hover:bg-mosque/5">
-            Casa
-          </button>
-          <button onClick={() => handleQuickFilter("Apartamento")} className="whitespace-nowrap px-5 py-2 rounded-full bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 text-sm font-medium transition-all hover:bg-mosque/5">
-            Apartamento
-          </button>
-          <button onClick={() => handleQuickFilter("Villa")} className="whitespace-nowrap px-5 py-2 rounded-full bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 text-sm font-medium transition-all hover:bg-mosque/5">
-            Villa
-          </button>
-          <button onClick={() => handleQuickFilter("Penthouse")} className="whitespace-nowrap px-5 py-2 rounded-full bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 text-sm font-medium transition-all hover:bg-mosque/5">
-            Penthouse
-          </button>
+          {propertyTypes.map((type) => (
+            <button 
+              key={type}
+              onClick={() => handleQuickFilter(type)} 
+              type="button"
+              className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                propertyType === type
+                  ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
+                  : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
+              }`}
+            >
+              {type}
+            </button>
+          ))}
           <div className="w-px h-6 bg-nordic-dark/10 mx-2"></div>
           <button 
             onClick={() => setIsFiltersOpen(true)}
