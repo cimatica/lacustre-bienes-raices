@@ -50,20 +50,20 @@ export default async function PropertyPage({ params }: Props) {
     }
   }
 
-  // Use main image url if property_images is empty
+  // Always include the main image url, and append gallery images if they exist
+  const mainImageObj = {
+    id: 'main',
+    property_id: property.id,
+    image_url: property.image_url,
+    image_alt: property.image_alt || "Main property image",
+    is_main: true,
+    order_index: 0,
+    created_at: property.created_at
+  };
+
   const imagesToPass = property.property_images && property.property_images.length > 0 
-    ? property.property_images 
-    : [
-        {
-          id: 'main',
-          property_id: property.id,
-          image_url: property.image_url,
-          image_alt: property.image_alt,
-          is_main: true,
-          order_index: 0,
-          created_at: property.created_at
-        }
-      ];
+    ? [mainImageObj, ...property.property_images] 
+    : [mainImageObj];
 
   return (
     <div className="bg-clear-day text-nordic min-h-screen selection:bg-mosque/20">
