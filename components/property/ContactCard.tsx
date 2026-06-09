@@ -1,18 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { formatUF, formatCLP } from "../../lib/currency";
 
 type Props = {
-  price: string;
+  price: number;
+  clpPrice: number;
   location: string;
   dict?: any;
 };
 
-export default function ContactCard({ price, location, dict }: Props) {
+export default function ContactCard({ price, clpPrice, location, dict }: Props) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-mosque/5">
       <div className="mb-4">
-        <h1 className="text-4xl font-display font-light text-nordic mb-2">{price}</h1>
+        <h1 className="text-4xl font-display font-bold text-nordic leading-tight">{formatUF(price)}</h1>
+        <p className="text-xl font-medium text-nordic/60 mb-2">{formatCLP(clpPrice)}</p>
         <p className="text-nordic/60 font-medium flex items-center gap-1">
           <span className="material-icons text-mosque text-sm">location_on</span>
           {location}

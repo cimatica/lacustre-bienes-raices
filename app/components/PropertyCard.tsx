@@ -1,5 +1,6 @@
 import { Property } from "../../lib/supabase";
 import Link from "next/link";
+import { getUfValue, formatUF, formatCLP } from "../../lib/currency";
 
 interface PropertyCardProps {
   property: Property;
@@ -7,7 +8,10 @@ interface PropertyCardProps {
   dict?: any; // Accepting dict prop for translations
 }
 
-export default function PropertyCard({ property, variant = "standard", dict }: PropertyCardProps) {
+export default async function PropertyCard({ property, variant = "standard", dict }: PropertyCardProps) {
+  const ufValue = await getUfValue();
+  const clpValue = property.price * ufValue;
+
   if (variant === "featured") {
     return (
       <Link href={`/propiedad/${property.slug}`} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer block">
@@ -36,7 +40,10 @@ export default function PropertyCard({ property, variant = "standard", dict }: P
                 <span className="material-icons text-sm">place</span> {property.location}
               </p>
             </div>
-            <span className="text-xl font-semibold text-mosque">{property.price}</span>
+            <div className="flex flex-col items-end">
+              <span className="text-xl font-bold text-mosque">{formatUF(property.price)}</span>
+              <span className="text-sm font-medium text-nordic-muted">{formatCLP(clpValue)}</span>
+            </div>
           </div>
           <div className="flex items-center gap-6 mt-6 pt-6 border-t border-nordic-dark/5">
             <div className="flex items-center gap-2 text-nordic-muted text-sm">
@@ -76,12 +83,15 @@ export default function PropertyCard({ property, variant = "standard", dict }: P
       </div>
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-baseline mb-2">
-          <h3 className="font-bold text-lg text-nordic-dark">
-            {property.price}
-            {property.price_per_month && (
-              <span className="text-sm font-normal text-nordic-muted">{dict?.propertyCard?.month || "/mes"}</span>
-            )}
-          </h3>
+          <div className="flex flex-col">
+            <h3 className="font-bold text-xl text-nordic-dark leading-tight">
+              {formatUF(property.price)}
+              {property.price_per_month && (
+                <span className="text-sm font-normal text-nordic-muted ml-1">{dict?.propertyCard?.month || "/mes"}</span>
+              )}
+            </h3>
+            <span className="text-sm font-medium text-nordic-muted">{formatCLP(clpValue)}</span>
+          </div>
         </div>
         <h4 className="text-nordic-dark font-medium truncate mb-1">{property.title}</h4>
         <p className="text-nordic-muted text-xs mb-4">{property.location}</p>

@@ -11,6 +11,7 @@ import ContactCard from '@/components/property/ContactCard';
 
 import PropertyMap from '@/components/property/PropertyMap';
 import { getDictionary } from '@/lib/i18n';
+import { getUfValue, formatUF, formatCLP } from '@/lib/currency';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -30,8 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   return {
-    title: `${property.title} en ${property.location} - ${property.price}`,
-    description: `Propiedad de ${property.beds}D/${property.baths}B en ${property.location}. Precio: ${property.price}`,
+    title: `${property.title} en ${property.location} - ${formatUF(property.price)}`,
+    description: `Propiedad de ${property.beds}D/${property.baths}B en ${property.location}. Precio: ${formatUF(property.price)}`,
     openGraph: {
       images: [property.image_url],
     },
@@ -41,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function PropertyPage({ params }: Props) {
   const resolvedParams = await params;
   const dict = await getDictionary();
+  const ufValue = await getUfValue();
   let property = await getPropertyBySlug(resolvedParams.slug);
 
   // Mock data fallback for visualization if DB is empty
@@ -82,7 +84,7 @@ export default async function PropertyPage({ params }: Props) {
           {/* Right Column */}
           <div className="lg:col-span-4 relative">
             <div className="sticky top-28 space-y-6">
-              <ContactCard price={property.price} location={property.location} dict={dict} />
+              <ContactCard price={property.price} clpPrice={property.price * ufValue} location={property.location} dict={dict} />
               <PropertyMap latitude={property.latitude} longitude={property.longitude} />
             </div>
           </div>
@@ -123,7 +125,7 @@ function getMockProperty(slug: string): Property {
     id: 'mock-id',
     title: 'Modern luxury home',
     location: '1234 Serenity Lane, Palo Alto, CA',
-    price: '$1,250,000',
+    price: 32894,
     price_per_month: false,
     beds: 4,
     baths: 3,

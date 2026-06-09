@@ -19,7 +19,7 @@ export type Property = {
   id: string;
   title: string;
   location: string;
-  price: string;
+  price: number;
   price_per_month: boolean;
   beds: number;
   baths: number;
@@ -175,20 +175,12 @@ export async function searchProperties(params: {
     url.searchParams.set("location", `ilike.%${params.ubicacion}%`);
   }
 
-  // Price filters (assuming price is numeric in DB, but the API might have stored it as string like "1,200,000".
-  // Note: if price is stored as string "$1.2M", these numeric filters might not work correctly in Postgres 
-  // without casting. We will assume standard comparison works or that the user formats it as string.)
-  // However, `price` is of type `string` in `Property`.
-  // If price is stored as "1,200,000", we should clean it up for querying, but Supabase might not support filtering formatted strings.
-  // We'll leave the price filter commented out or pass it directly.
-  /*
   if (params.minPrice) {
-    url.searchParams.set("price_num", `gte.${params.minPrice.replace(/\D/g, '')}`);
+    url.searchParams.append("price", `gte.${params.minPrice.replace(/\D/g, '')}`);
   }
   if (params.maxPrice) {
-    url.searchParams.set("price_num", `lte.${params.maxPrice.replace(/\D/g, '')}`);
+    url.searchParams.append("price", `lte.${params.maxPrice.replace(/\D/g, '')}`);
   }
-  */
 
   if (params.tipoPropiedad && params.tipoPropiedad !== "Cualquier Tipo" && params.tipoPropiedad !== "Todos") {
     url.searchParams.set("property_type", `eq.${params.tipoPropiedad}`);
