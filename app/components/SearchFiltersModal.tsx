@@ -151,11 +151,11 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   value={tipoPropiedad}
                   onChange={e => setTipoPropiedad(e.target.value)}
                 >
-                  <option>{dict.filters.anyType}</option>
-                  <option>Casa</option>
-                  <option>Apartamento</option>
-                  <option>Villa</option>
-                  <option>Penthouse</option>
+                  <option value={dict.filters.anyType}>{dict.filters.anyType}</option>
+                  <option value="Casa">{dict.hero?.types?.Casa || "Casa"}</option>
+                  <option value="Apartamento">{dict.hero?.types?.Apartamento || "Apartamento"}</option>
+                  <option value="Villa">{dict.hero?.types?.Villa || "Villa"}</option>
+                  <option value="Penthouse">{dict.hero?.types?.Penthouse || "Penthouse"}</option>
                 </select>
                 <span className="material-icons absolute right-3 top-3 text-gray-400 pointer-events-none">expand_more</span>
               </div>

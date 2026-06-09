@@ -76,7 +76,7 @@ export default async function PropertyPage({ params }: Props) {
           
           {/* Left Column */}
           <div className="lg:col-span-8 space-y-4">
-            <ImageGallery images={imagesToPass} />
+            <ImageGallery images={imagesToPass} badge={property.badge} />
           </div>
 
           {/* Right Column */}

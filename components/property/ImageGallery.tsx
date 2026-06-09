@@ -12,9 +12,10 @@ type PropertyImage = {
 
 type Props = {
   images: PropertyImage[];
+  badge?: string;
 };
 
-export default function ImageGallery({ images }: Props) {
+export default function ImageGallery({ images, badge }: Props) {
   const dict = useTranslation();
 
   if (!images || images.length === 0) {
@@ -37,12 +38,11 @@ export default function ImageGallery({ images }: Props) {
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
         <div className="absolute top-4 left-4 flex gap-2">
-          <span className="bg-mosque text-white text-xs font-medium px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-            Premium
-          </span>
-          <span className="bg-white/90 backdrop-blur text-nordic text-xs font-medium px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
-            New
-          </span>
+          {badge && (
+            <span className="bg-mosque text-white text-xs font-medium px-3 py-1.5 rounded-full uppercase tracking-wider shadow-sm">
+              {badge}
+            </span>
+          )}
         </div>
         <button className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-nordic px-4 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur transition-all flex items-center gap-2">
           <span className="material-icons text-sm">grid_view</span>
