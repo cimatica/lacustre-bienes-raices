@@ -1,13 +1,14 @@
 'use client';
 
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 const languages = [
-  { code: 'es', label: 'Español' },
-  { code: 'en', label: 'English' },
-  { code: 'pt', label: 'Português' },
-  { code: 'fr', label: 'Français' },
+  { code: 'es', label: 'Español', flagUrl: 'https://flagcdn.com/w20/es.png' },
+  { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
+  { code: 'pt', label: 'Português', flagUrl: 'https://flagcdn.com/w20/br.png' },
+  { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },
 ];
 
 export default function LanguageSelector({ currentLanguage }: { currentLanguage: string }) {
@@ -37,9 +38,11 @@ export default function LanguageSelector({ currentLanguage }: { currentLanguage:
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 text-sm font-medium text-nordic-dark/70 hover:text-mosque transition-colors py-2 px-3 rounded-md hover:bg-black/5"
+        className="flex items-center gap-2 text-sm font-medium text-nordic-dark/70 hover:text-mosque transition-colors py-2 px-3 rounded-md hover:bg-black/5"
       >
-        <span className="material-symbols-outlined text-[20px]">language</span>
+        <div className="relative w-5 h-[15px] overflow-hidden rounded-sm shadow-sm border border-black/10">
+          <Image src={activeLang.flagUrl} alt={activeLang.label} fill unoptimized className="object-cover" />
+        </div>
         <span className="hidden sm:inline-block">{activeLang.label}</span>
       </button>
 
@@ -49,12 +52,15 @@ export default function LanguageSelector({ currentLanguage }: { currentLanguage:
             <button
               key={lang.code}
               onClick={() => changeLanguage(lang.code)}
-              className={`block w-full text-left px-4 py-2 text-sm transition-colors ${
+              className={`flex items-center gap-2.5 w-full text-left px-4 py-2 text-sm transition-colors ${
                 currentLanguage === lang.code
                   ? 'bg-mosque/10 text-mosque font-medium'
                   : 'text-nordic-dark hover:bg-black/5 hover:text-mosque'
               }`}
             >
+              <div className="relative w-5 h-[15px] overflow-hidden rounded-sm shadow-sm border border-black/10">
+                <Image src={lang.flagUrl} alt={lang.label} fill unoptimized className="object-cover" />
+              </div>
               {lang.label}
             </button>
           ))}
