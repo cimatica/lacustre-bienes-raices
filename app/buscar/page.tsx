@@ -4,6 +4,7 @@ import PropertyCard from "../components/PropertyCard";
 import { searchProperties } from "../../lib/supabase";
 import Link from "next/link";
 import { getDictionary } from "../../lib/i18n";
+import SortDropdown from "../components/SortDropdown";
 
 interface BuscarProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -23,6 +24,7 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
   const baths = typeof resolvedParams.baths === "string" ? resolvedParams.baths : undefined;
   const amenitiesParam = typeof resolvedParams.amenities === "string" ? resolvedParams.amenities : undefined;
   const amenities = amenitiesParam ? amenitiesParam.split(',') : undefined;
+  const sort = typeof resolvedParams.sort === "string" ? resolvedParams.sort : undefined;
 
   const results = await searchProperties({
     q,
@@ -33,6 +35,7 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
     beds,
     baths,
     amenities,
+    sort,
   });
 
   return (
@@ -46,11 +49,14 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
           <h1 className="text-3xl font-bold text-mosque">
             {dict.search.searchResults}
           </h1>
-          <p className="text-nordic-muted mt-2">
-            {results.length === 1 
-              ? dict.search.foundOne 
-              : dict.search.foundMultiple.replace("{count}", results.length.toString())}
-          </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-4">
+            <p className="text-nordic-muted">
+              {results.length === 1 
+                ? dict.search.foundOne 
+                : dict.search.foundMultiple.replace("{count}", results.length.toString())}
+            </p>
+            {results.length > 0 && <SortDropdown dict={dict} />}
+          </div>
         </div>
 
         {results.length > 0 ? (

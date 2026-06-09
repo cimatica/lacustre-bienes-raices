@@ -160,12 +160,18 @@ export async function searchProperties(params: {
   beds?: string;
   baths?: string;
   amenities?: string[];
+  sort?: string;
 }): Promise<Property[]> {
   const url = new URL(`${SUPABASE_URL}/rest/v1/properties`);
   
   // Select all properties, but order them
   url.searchParams.set("select", "*");
-  url.searchParams.set("order", "created_at.desc");
+  
+  if (params.sort === "price_desc") {
+    url.searchParams.set("order", "price.desc");
+  } else {
+    url.searchParams.set("order", "price.asc");
+  }
 
   // Location search using ilike (case-insensitive)
   if (params.q) {
