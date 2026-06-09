@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslation } from "@/app/components/I18nProvider";
 
 type PropertyImage = {
   id: string;
@@ -14,6 +15,8 @@ type Props = {
 };
 
 export default function ImageGallery({ images }: Props) {
+  const dict = useTranslation();
+
   if (!images || images.length === 0) {
     return <div className="aspect-[16/10] bg-slate-200 rounded-xl animate-pulse"></div>;
   }
@@ -43,7 +46,7 @@ export default function ImageGallery({ images }: Props) {
         </div>
         <button className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-nordic px-4 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur transition-all flex items-center gap-2">
           <span className="material-icons text-sm">grid_view</span>
-          View All Photos
+          {dict?.property?.viewAllPhotos || "View All Photos"}
         </button>
       </div>
 

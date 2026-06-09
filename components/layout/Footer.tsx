@@ -1,9 +1,12 @@
-export default function Footer() {
+import { getDictionary } from '@/lib/i18n';
+
+export default async function Footer() {
+  const dict = await getDictionary();
   return (
     <footer className="bg-white border-t border-slate-200 mt-12 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="text-sm text-nordic/50">
-          © 2023 LuxeEstate Inc. All rights reserved.
+          {dict?.footer?.rights || "© 2023 LuxeEstate Inc. All rights reserved."}
         </div>
         <div className="flex gap-6">
           <a className="text-nordic/40 hover:text-mosque transition-colors" href="#">

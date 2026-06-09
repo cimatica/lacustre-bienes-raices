@@ -10,6 +10,7 @@ import ImageGallery from '@/components/property/ImageGallery';
 import ContactCard from '@/components/property/ContactCard';
 
 import PropertyMap from '@/components/property/PropertyMap';
+import { getDictionary } from '@/lib/i18n';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -39,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PropertyPage({ params }: Props) {
   const resolvedParams = await params;
+  const dict = await getDictionary();
   let property = await getPropertyBySlug(resolvedParams.slug);
 
   // Mock data fallback for visualization if DB is empty
@@ -80,7 +82,7 @@ export default async function PropertyPage({ params }: Props) {
           {/* Right Column */}
           <div className="lg:col-span-4 relative">
             <div className="sticky top-28 space-y-6">
-              <ContactCard price={property.price} location={property.location} />
+              <ContactCard price={property.price} location={property.location} dict={dict} />
               <PropertyMap latitude={property.latitude} longitude={property.longitude} />
             </div>
           </div>
@@ -89,9 +91,9 @@ export default async function PropertyPage({ params }: Props) {
         {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
-            <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} />
-            <PropertyDescription />
-            <PropertyAmenities />
+            <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} dict={dict} />
+            <PropertyDescription dict={dict} />
+            <PropertyAmenities dict={dict} />
             
             <div className="bg-mosque/5 p-6 rounded-xl border border-mosque/10 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="flex items-start gap-4">
@@ -99,12 +101,12 @@ export default async function PropertyPage({ params }: Props) {
                   <span className="material-icons">calculate</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-nordic">Estimated Payment</h3>
-                  <p className="text-sm text-nordic/60">Starting from <strong className="text-mosque">$5,430/mo</strong> with 20% down</p>
+                  <h3 className="font-semibold text-nordic">{dict.property.estimatedPayment}</h3>
+                  <p className="text-sm text-nordic/60">{dict.property.startingFrom} <strong className="text-mosque">$5,430{dict.propertyCard.month}</strong> {dict.property.with20Down}</p>
                 </div>
               </div>
               <button className="whitespace-nowrap px-4 py-2 bg-white border border-nordic/10 rounded-lg text-sm font-semibold hover:border-mosque transition-colors text-nordic">
-                Calculate Mortgage
+                {dict.property.calculateMortgage}
               </button>
             </div>
           </div>

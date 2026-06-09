@@ -1,0 +1,104 @@
+{
+  "navbar": {
+    "buy": "Acheter",
+    "rent": "Louer",
+    "sell": "Vendre",
+    "saved": "Sauvegardés"
+  },
+  "home": {
+    "featuredCollections": "Collections en Vedette",
+    "featuredSubtitle": "Des propriétés soigneusement sélectionnées pour les plus exigeants.",
+    "viewAll": "Voir tout",
+    "newInMarket": "Nouveautés sur le Marché",
+    "newSubtitle": "De nouvelles opportunités ajoutées cette semaine.",
+    "propertiesCount": "propriétés",
+    "all": "Tous",
+    "sale": "Vente",
+    "rent": "Location",
+    "noProperties": "Aucune propriété disponible avec ce filtre."
+  },
+  "hero": {
+    "findYour": "Trouvez votre ",
+    "sanctuary": "sanctuaire",
+    "searchPlaceholder": "Rechercher par ville, quartier ou adresse...",
+    "searchBtn": "Rechercher",
+    "filters": "Filtres",
+    "types": {
+      "Todos": "Tous",
+      "Casa": "Maison",
+      "Apartamento": "Appartement",
+      "Villa": "Villa",
+      "Penthouse": "Penthouse"
+    }
+  },
+  "propertyCard": {
+    "month": "/mois"
+  },
+  "search": {
+    "backToHome": "Retour à l'accueil",
+    "searchResults": "Résultats de la Recherche",
+    "foundOne": "1 propriété trouvée.",
+    "foundMultiple": "{count} propriétés trouvées.",
+    "noProperties": "Aucune propriété trouvée",
+    "noPropertiesDesc": "Essayez d'ajuster vos filtres de recherche, de réduire le nombre de commodités requises ou d'élargir la fourchette de prix.",
+    "clearSearch": "Effacer la Recherche"
+  },
+  "filters": {
+    "title": "Filtres",
+    "location": "Emplacement",
+    "locationPlaceholder": "Ville, quartier ou adresse",
+    "priceRange": "Gamme de Prix",
+    "minPrice": "Prix Min",
+    "maxPrice": "Prix Max",
+    "unlimited": "Illimité",
+    "propertyType": "Type de Propriété",
+    "anyType": "Tout Type",
+    "beds": "Chambres",
+    "baths": "Salles de Bain",
+    "amenitiesTitle": "Commodités et Caractéristiques",
+    "amenities": {
+      "pool": "Piscine",
+      "gym": "Gym",
+      "parking": "Parking",
+      "ac": "Climatisation",
+      "wifi": "Wifi Rapide",
+      "patio": "Patio / Terrasse"
+    },
+    "clearFilters": "Effacer les filtres",
+    "searchBtn": "Rechercher des Propriétés"
+  },
+  "collections": {
+    "title": "Collections en Vedette",
+    "subtitle": "Explorez toutes nos propriétés soigneusement sélectionnées pour les plus exigeants.",
+    "empty": "Aucune collection en vedette disponible pour le moment."
+  },
+  "property": {
+    "notFoundTitle": "Propriété non trouvée",
+    "featuresTitle": "Caractéristiques de la Propriété",
+    "sqm": "Mètres Carrés",
+    "bedrooms": "Chambres",
+    "bathrooms": "Salles de Bain",
+    "garage": "Garage",
+    "aboutHome": "À propos de cette propriété",
+    "readMore": "Lire la suite",
+    "amenitiesTitle": "Commodités",
+    "topRatedAgent": "Agent Mieux Noté",
+    "scheduleVisit": "Planifier une Visite",
+    "contactAgent": "Contacter l'Agent",
+    "estimatedPayment": "Paiement Estimé",
+    "startingFrom": "À partir de",
+    "with20Down": "avec 20% d'acompte",
+    "calculateMortgage": "Calculer l'Hypothèque",
+    "descP1": "Vivez le luxe moderne dans cette maison à l'architecture époustouflante située au cœur de Palo Alto. Conçue pour mettre en valeur la vie intérieur-extérieur, la résidence dispose de murs en verre du sol au plafond qui inondent les intérieurs de lumière naturelle.",
+    "descP2": "La cuisine à aire ouverte est équipée d'appareils haut de gamme et de meubles sur mesure, parfaits pour les passionnés de cuisine. Retirez-vous dans la suite principale, un sanctuaire de détente avec un bain inspiré d'un spa et un balcon privé.",
+    "amenityList": [
+      "Système de Maison Intelligente",
+      "Piscine",
+      "Chauffage et Climatisation Centrale",
+      "Recharge pour Véhicules Électriques",
+      "Gym Privé",
+      "Cave à Vin"
+    ],
+    "viewAllPhotos": "Voir Toutes les Photos"
+  }
+}

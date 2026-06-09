@@ -4,9 +4,10 @@ import Link from "next/link";
 interface PropertyCardProps {
   property: Property;
   variant?: "featured" | "standard";
+  dict?: any; // Accepting dict prop for translations
 }
 
-export default function PropertyCard({ property, variant = "standard" }: PropertyCardProps) {
+export default function PropertyCard({ property, variant = "standard", dict }: PropertyCardProps) {
   if (variant === "featured") {
     return (
       <Link href={`/propiedad/${property.slug}`} className="group relative rounded-xl overflow-hidden shadow-soft bg-white cursor-pointer block">
@@ -78,7 +79,7 @@ export default function PropertyCard({ property, variant = "standard" }: Propert
           <h3 className="font-bold text-lg text-nordic-dark">
             {property.price}
             {property.price_per_month && (
-              <span className="text-sm font-normal text-nordic-muted">/mes</span>
+              <span className="text-sm font-normal text-nordic-muted">{dict?.propertyCard?.month || "/mes"}</span>
             )}
           </h3>
         </div>

@@ -1,0 +1,104 @@
+{
+  "navbar": {
+    "buy": "Buy",
+    "rent": "Rent",
+    "sell": "Sell",
+    "saved": "Saved Homes"
+  },
+  "home": {
+    "featuredCollections": "Featured Collections",
+    "featuredSubtitle": "Carefully selected properties for the discerning eye.",
+    "viewAll": "View all",
+    "newInMarket": "New in Market",
+    "newSubtitle": "New opportunities added this week.",
+    "propertiesCount": "properties",
+    "all": "All",
+    "sale": "Sale",
+    "rent": "Rent",
+    "noProperties": "No properties available with that filter."
+  },
+  "hero": {
+    "findYour": "Find your ",
+    "sanctuary": "sanctuary",
+    "searchPlaceholder": "Search by city, neighborhood, or address...",
+    "searchBtn": "Search",
+    "filters": "Filters",
+    "types": {
+      "Todos": "All",
+      "Casa": "House",
+      "Apartamento": "Apartment",
+      "Villa": "Villa",
+      "Penthouse": "Penthouse"
+    }
+  },
+  "propertyCard": {
+    "month": "/month"
+  },
+  "search": {
+    "backToHome": "Back to Home",
+    "searchResults": "Search Results",
+    "foundOne": "1 property found.",
+    "foundMultiple": "{count} properties found.",
+    "noProperties": "No properties found",
+    "noPropertiesDesc": "Try adjusting your search filters, reducing required amenities, or expanding the price range.",
+    "clearSearch": "Clear Search"
+  },
+  "filters": {
+    "title": "Filters",
+    "location": "Location",
+    "locationPlaceholder": "City, neighborhood, or address",
+    "priceRange": "Price Range",
+    "minPrice": "Min Price",
+    "maxPrice": "Max Price",
+    "unlimited": "Unlimited",
+    "propertyType": "Property Type",
+    "anyType": "Any Type",
+    "beds": "Bedrooms",
+    "baths": "Bathrooms",
+    "amenitiesTitle": "Amenities & Features",
+    "amenities": {
+      "pool": "Pool",
+      "gym": "Gym",
+      "parking": "Parking",
+      "ac": "A/C",
+      "wifi": "Fast Wifi",
+      "patio": "Patio / Terrace"
+    },
+    "clearFilters": "Clear filters",
+    "searchBtn": "Search Properties"
+  },
+  "collections": {
+    "title": "Featured Collections",
+    "subtitle": "Explore all our carefully selected properties for the discerning eye.",
+    "empty": "No featured collections available at the moment."
+  },
+  "property": {
+    "notFoundTitle": "Property not found",
+    "featuresTitle": "Property Features",
+    "sqm": "Square Meters",
+    "bedrooms": "Bedrooms",
+    "bathrooms": "Bathrooms",
+    "garage": "Garage",
+    "aboutHome": "About this home",
+    "readMore": "Read more",
+    "amenitiesTitle": "Amenities",
+    "topRatedAgent": "Top Rated Agent",
+    "scheduleVisit": "Schedule Visit",
+    "contactAgent": "Contact Agent",
+    "estimatedPayment": "Estimated Payment",
+    "startingFrom": "Starting from",
+    "with20Down": "with 20% down",
+    "calculateMortgage": "Calculate Mortgage",
+    "descP1": "Experience modern luxury in this architecturally stunning home located in the heart of Palo Alto. Designed with an emphasis on indoor-outdoor living, the residence features floor-to-ceiling glass walls that flood the interiors with natural light.",
+    "descP2": "The open-concept kitchen is equipped with top-of-the-line appliances and custom cabinetry, perfect for culinary enthusiasts. Retreat to the primary suite, a sanctuary of relaxation with a spa-inspired bath and private balcony.",
+    "amenityList": [
+      "Smart Home System",
+      "Swimming Pool",
+      "Central Heating & Cooling",
+      "Electric Vehicle Charging",
+      "Private Gym",
+      "Wine Cellar"
+    ],
+    "viewAllPhotos": "View All Photos"
+  }
+}

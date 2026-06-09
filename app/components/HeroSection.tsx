@@ -3,12 +3,14 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchFiltersModal from "./SearchFiltersModal";
+import { useTranslation } from "./I18nProvider";
 
 export default function HeroSection() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("Todos");
   const router = useRouter();
+  const dict = useTranslation();
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -48,8 +50,8 @@ export default function HeroSection() {
     <section className="py-12 md:py-16">
       <div className="max-w-3xl mx-auto text-center space-y-8">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-mosque leading-tight">
-          Encuentra tu <span className="relative inline-block">
-            <span className="relative z-10 font-extrabold">santuario</span>
+          {dict.hero.findYour} <span className="relative inline-block">
+            <span className="relative z-10 font-extrabold">{dict.hero.sanctuary}</span>
             <span className="absolute bottom-2 left-0 w-full h-3 bg-mosque/20 -rotate-1 z-0"></span>
           </span>.
         </h1>
@@ -60,13 +62,13 @@ export default function HeroSection() {
           </div>
           <input 
             className="block w-full pl-12 pr-4 py-4 rounded-xl border-none bg-white text-nordic-dark shadow-soft placeholder-nordic-muted/60 focus:ring-2 focus:ring-mosque focus:bg-white transition-all text-lg focus:outline-none" 
-            placeholder="Buscar por ciudad, vecindario o dirección..." 
+            placeholder={dict.hero.searchPlaceholder}
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <button type="submit" className="absolute inset-y-2 right-2 px-6 bg-mosque hover:bg-mosque/90 text-white font-medium rounded-lg transition-colors flex items-center justify-center shadow-lg shadow-mosque/20">
-            Buscar
+            {dict.hero.searchBtn}
           </button>
         </form>
         
@@ -82,7 +84,7 @@ export default function HeroSection() {
                   : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
               }`}
             >
-              {type}
+              {dict.hero.types[type]}
             </button>
           ))}
           <div className="w-px h-6 bg-nordic-dark/10 mx-2"></div>
@@ -90,7 +92,7 @@ export default function HeroSection() {
             onClick={() => setIsFiltersOpen(true)}
             className="whitespace-nowrap flex items-center gap-1 px-4 py-2 rounded-full text-nordic-dark font-medium text-sm hover:bg-black/5 transition-colors"
           >
-            <span className="material-icons text-base">tune</span> Filtros
+            <span className="material-icons text-base">tune</span> {dict.hero.filters}
           </button>
         </div>
       </div>

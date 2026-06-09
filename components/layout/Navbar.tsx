@@ -1,7 +1,12 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { getDictionary, getCurrentLanguage } from '@/lib/i18n';
+import LanguageSelector from '@/app/components/LanguageSelector';
 
-export default function Navbar() {
+export default async function Navbar() {
+  const dict = await getDictionary();
+  const currentLanguage = await getCurrentLanguage();
+
   return (
     <nav className="sticky top-0 z-50 bg-clear-day border-b border-mosque/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,14 +17,15 @@ export default function Navbar() {
           </Link>
           <div className="hidden md:flex items-center space-x-10">
             <Link className="relative text-sm font-semibold text-nordic hover:text-mosque transition-colors py-2" href="#">
-              Buy
+              {dict.navbar.buy}
               <span className="absolute bottom-0 left-0 w-full h-0.5 bg-mosque"></span>
             </Link>
-            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">Rent</Link>
-            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">Sell</Link>
-            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">Saved Homes</Link>
+            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">{dict.navbar.rent}</Link>
+            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">{dict.navbar.sell}</Link>
+            <Link className="text-sm font-semibold text-nordic/70 hover:text-mosque transition-colors py-2" href="#">{dict.navbar.saved}</Link>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector currentLanguage={currentLanguage} />
             <button className="p-2 text-nordic hover:text-mosque transition-colors">
               <span className="material-symbols-outlined">search</span>
             </button>

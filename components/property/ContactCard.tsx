@@ -5,9 +5,10 @@ import Image from "next/image";
 type Props = {
   price: string;
   location: string;
+  dict?: any;
 };
 
-export default function ContactCard({ price, location }: Props) {
+export default function ContactCard({ price, location, dict }: Props) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-mosque/5">
       <div className="mb-4">
@@ -32,7 +33,7 @@ export default function ContactCard({ price, location }: Props) {
           <h3 className="font-semibold text-nordic">Sarah Jenkins</h3>
           <div className="flex items-center gap-1 text-xs text-mosque font-medium">
             <span className="material-icons text-[14px]">star</span>
-            <span>Top Rated Agent</span>
+            <span>{dict?.property?.topRatedAgent || "Top Rated Agent"}</span>
           </div>
         </div>
         <div className="ml-auto flex gap-2">
@@ -47,11 +48,11 @@ export default function ContactCard({ price, location }: Props) {
       <div className="space-y-3">
         <button className="w-full bg-mosque hover:bg-primary-hover text-white py-4 px-6 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center gap-2 group">
           <span className="material-icons text-xl group-hover:scale-110 transition-transform">calendar_today</span>
-          Schedule Visit
+          {dict?.property?.scheduleVisit || "Schedule Visit"}
         </button>
         <button className="w-full bg-transparent border border-nordic/10 hover:border-mosque text-nordic/80 hover:text-mosque py-4 px-6 rounded-lg font-medium transition-all flex items-center justify-center gap-2">
           <span className="material-icons text-xl">mail_outline</span>
-          Contact Agent
+          {dict?.property?.contactAgent || "Contact Agent"}
         </button>
       </div>
     </div>
