@@ -117,10 +117,20 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   <span className="text-gray-400 mr-1">$</span>
                   <input 
                     className="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0 text-sm focus:outline-none" 
-                    type="number" 
+                    type="text" 
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder="0"
                     value={minPrice}
-                    onChange={e => setMinPrice(e.target.value)}
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setMinPrice(val);
+                    }}
+                    onBlur={() => {
+                      if (minPrice && maxPrice && parseInt(minPrice) > parseInt(maxPrice)) {
+                        setMinPrice(maxPrice);
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -130,10 +140,20 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   <span className="text-gray-400 mr-1">$</span>
                   <input 
                     className="w-full bg-transparent border-0 p-0 text-gray-900 dark:text-white font-medium focus:ring-0 text-sm focus:outline-none" 
-                    type="number" 
+                    type="text" 
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     placeholder={dict.filters.unlimited}
                     value={maxPrice}
-                    onChange={e => setMaxPrice(e.target.value)}
+                    onChange={e => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      setMaxPrice(val);
+                    }}
+                    onBlur={() => {
+                      if (minPrice && maxPrice && parseInt(minPrice) > parseInt(maxPrice)) {
+                        setMaxPrice(minPrice);
+                      }
+                    }}
                   />
                 </div>
               </div>
@@ -173,7 +193,7 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   >
                     <span className="material-icons text-base">remove</span>
                   </button>
-                  <span className="text-sm font-semibold w-4 text-center">{beds}{beds !== "0" && "+"}</span>
+                  <span className="text-sm font-semibold w-4 text-center text-gray-900 dark:text-white">{beds}</span>
                   <button 
                     onClick={() => setBeds(prev => (parseInt(prev) + 1).toString())}
                     className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center text-mosque hover:bg-mosque hover:text-white transition-colors"
@@ -193,7 +213,7 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   >
                     <span className="material-icons text-base">remove</span>
                   </button>
-                  <span className="text-sm font-semibold w-4 text-center">{baths}{baths !== "0" && "+"}</span>
+                  <span className="text-sm font-semibold w-4 text-center text-gray-900 dark:text-white">{baths}</span>
                   <button 
                     onClick={() => setBaths(prev => (parseInt(prev) + 1).toString())}
                     className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 shadow-sm flex items-center justify-center text-mosque hover:bg-mosque hover:text-white transition-colors"
