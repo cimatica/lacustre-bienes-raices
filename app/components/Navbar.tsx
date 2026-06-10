@@ -9,6 +9,18 @@ export default async function Navbar() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
+  let userRole = 'usuario';
+  if (user) {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (roleData) {
+      userRole = roleData.role;
+    }
+  }
+
   return (
     <nav className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-nordic-dark/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,18 +56,31 @@ export default async function Navbar() {
                   )}
                 </button>
                 <div className="absolute top-full right-0 pt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 min-w-[220px] z-50 translate-y-[-10px] group-hover:translate-y-0">
-                  <form action="/auth/signout" method="post" className="bg-white shadow-soft rounded-xl overflow-hidden border border-gray-100 p-1.5">
+                  <div className="bg-white shadow-soft rounded-xl overflow-hidden border border-gray-100 p-1.5 flex flex-col">
                     <div className="px-3 py-2 border-b border-gray-100 mb-1.5">
                       <p className="text-xs text-nordic-dark/50 font-medium uppercase tracking-wider mb-0.5">{dict.auth?.loggedInAs || "Conectado como"}</p>
                       <p className="text-sm text-nordic-dark font-medium truncate">
                         {user.email}
                       </p>
+                      <div className="mt-1.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600 capitalize">
+                          {userRole}
+                        </span>
+                      </div>
                     </div>
-                    <button type="submit" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg w-full text-left transition-colors">
-                      <span className="material-symbols-outlined text-[18px]">logout</span>
-                      {dict.auth?.logout || "Cerrar sesión"}
-                    </button>
-                  </form>
+                    {userRole === 'administrador' && (
+                      <Link href="/admin" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                        <span className="material-icons text-[18px]">admin_panel_settings</span>
+                        Panel Admin
+                      </Link>
+                    )}
+                    <form action="/auth/signout" method="post" className="w-full">
+                      <button type="submit" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg w-full text-left transition-colors">
+                        <span className="material-symbols-outlined text-[18px]">logout</span>
+                        {dict.auth?.logout || "Cerrar sesión"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             ) : (
