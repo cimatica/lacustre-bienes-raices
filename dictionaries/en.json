@@ -100,5 +100,20 @@
       "Wine Cellar"
     ],
     "viewAllPhotos": "View All Photos"
+  },
+  "auth": {
+    "login": "Sign In",
+    "logout": "Sign Out",
+    "loggedInAs": "Logged in as",
+    "welcome": "Welcome to Lacustre",
+    "unlock": "Unlock exclusive properties worldwide.",
+    "continueGoogle": "Continue with Google",
+    "continueGithub": "Continue with GitHub",
+    "redirecting": "Redirecting...",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "help": "Help Center"
   }
 }

@@ -100,5 +100,20 @@
       "Bodega de Vinos"
     ],
     "viewAllPhotos": "Ver Todas las Fotos"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Cerrar sesión",
+    "loggedInAs": "Conectado como",
+    "welcome": "Bienvenido a Lacustre",
+    "unlock": "Desbloquea propiedades exclusivas en todo el mundo.",
+    "continueGoogle": "Continuar con Google",
+    "continueGithub": "Continuar con GitHub",
+    "redirecting": "Redirigiendo...",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Regístrate",
+    "privacy": "Política de Privacidad",
+    "terms": "Términos de Servicio",
+    "help": "Centro de Ayuda"
   }
 }

@@ -100,5 +100,20 @@
       "Adega de Vinhos"
     ],
     "viewAllPhotos": "Ver Todas as Fotos"
+  },
+  "auth": {
+    "login": "Entrar",
+    "logout": "Sair",
+    "loggedInAs": "Logado como",
+    "welcome": "Bem-vindo a Lacustre",
+    "unlock": "Desbloqueie propriedades exclusivas em todo o mundo.",
+    "continueGoogle": "Continuar com o Google",
+    "continueGithub": "Continuar com o GitHub",
+    "redirecting": "Redirecionando...",
+    "noAccount": "Não tem uma conta?",
+    "signUp": "Inscreva-se",
+    "privacy": "Política de Privacidade",
+    "terms": "Termos de Serviço",
+    "help": "Centro de Ajuda"
   }
 }

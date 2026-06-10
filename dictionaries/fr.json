@@ -100,5 +100,20 @@
       "Cave à Vin"
     ],
     "viewAllPhotos": "Voir Toutes les Photos"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
+    "loggedInAs": "Connecté en tant que",
+    "welcome": "Bienvenue à Lacustre",
+    "unlock": "Débloquez des propriétés exclusives dans le monde entier.",
+    "continueGoogle": "Continuer avec Google",
+    "continueGithub": "Continuer avec GitHub",
+    "redirecting": "Redirection...",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "signUp": "S'inscrire",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "help": "Centre d'aide"
   }
 }

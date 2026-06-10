@@ -35,19 +35,33 @@ export default async function Navbar() {
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
             </button>
             {user ? (
-              <button className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2">
-                <div className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center">
+              <div className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 relative group py-2">
+                <button className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center cursor-pointer">
                   {user.user_metadata?.avatar_url ? (
                     <img alt="Perfil" className="w-full h-full object-cover" src={user.user_metadata.avatar_url} />
                   ) : (
                     <span className="material-icons text-gray-500">person</span>
                   )}
+                </button>
+                <div className="absolute top-full right-0 pt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 min-w-[220px] z-50 translate-y-[-10px] group-hover:translate-y-0">
+                  <form action="/auth/signout" method="post" className="bg-white shadow-soft rounded-xl overflow-hidden border border-gray-100 p-1.5">
+                    <div className="px-3 py-2 border-b border-gray-100 mb-1.5">
+                      <p className="text-xs text-nordic-dark/50 font-medium uppercase tracking-wider mb-0.5">{dict.auth?.loggedInAs || "Conectado como"}</p>
+                      <p className="text-sm text-nordic-dark font-medium truncate">
+                        {user.email}
+                      </p>
+                    </div>
+                    <button type="submit" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg w-full text-left transition-colors">
+                      <span className="material-symbols-outlined text-[18px]">logout</span>
+                      {dict.auth?.logout || "Cerrar sesión"}
+                    </button>
+                  </form>
                 </div>
-              </button>
+              </div>
             ) : (
               <div className="pl-2 border-l border-nordic-dark/10 ml-2 flex items-center">
                 <Link href="/login" className="text-sm font-medium text-mosque hover:text-nordic-dark transition-colors">
-                  Entrar
+                  {dict.auth?.login || "Entrar"}
                 </Link>
               </div>
             )}
