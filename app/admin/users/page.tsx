@@ -1,17 +1,36 @@
 import { createClient } from '@/utils/supabase/server';
 import UserRoleSelect from './UserRoleSelect';
+import AdminSearch from '../components/AdminSearch';
+import AdminPagination from '../components/AdminPagination';
+import AddUserModal from './AddUserModal';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const supabase = await createClient();
-  const { data: users, error } = await supabase
+  const resolvedSearchParams = await searchParams;
+  
+  const query = typeof resolvedSearchParams.query === 'string' ? resolvedSearchParams.query : '';
+  const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
+  const itemsPerPage = 10;
+  
+  let userQuery = supabase
     .from('user_roles')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*', { count: 'exact' });
+    
+  if (query) {
+    userQuery = userQuery.or(`email.ilike.%${query}%,full_name.ilike.%${query}%`);
+  }
+  
+  const { data: users, error, count } = await userQuery
+    .order('created_at', { ascending: false })
+    .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
-  // Get user details from auth (we might not have access to auth.users table directly without service role, 
-  // but we can map the data we have)
+  const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
   return (
     <main className="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-12 space-y-4">
@@ -22,16 +41,8 @@ export default async function AdminUsersPage() {
             <p className="text-[#19322F]/60 mt-1 text-sm">Gestiona el acceso y roles de los usuarios de tu plataforma.</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-            <div className="relative group w-full md:w-80">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span className="material-icons text-[#19322F]/40 group-focus-within:text-[#006655] text-xl">search</span>
-              </div>
-              <input className="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-white text-[#19322F] shadow-sm placeholder-[#19322F]/30 focus:ring-2 focus:ring-[#006655] focus:bg-white transition-all text-sm" placeholder="Buscar por email..." type="text" />
-            </div>
-            <button className="inline-flex items-center justify-center px-4 py-2.5 border border-[#006655] text-sm font-medium rounded-lg text-[#006655] bg-transparent hover:bg-[#006655]/5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#006655] transition-colors whitespace-nowrap">
-              <span className="material-icons text-lg mr-2">add</span>
-              Añadir Usuario
-            </button>
+            <AdminSearch placeholder="Buscar por email o nombre..." />
+            <AddUserModal />
           </div>
         </div>
         <div className="mt-8 flex gap-6 border-b border-[#19322F]/10 overflow-x-auto">
@@ -49,11 +60,12 @@ export default async function AdminUsersPage() {
         <div className="col-span-2 text-right">Acciones</div>
       </div>
 
-      {users?.map((u: any) => {
+      {users?.map((u: any, index: number) => {
         const shortId = u.id.split('-')[0].toUpperCase();
+        const displayName = u.full_name || u.email.split('@')[0];
         
         return (
-          <div key={u.id} className="user-card group relative bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:bg-[#D9ECC8]/30 transition-colors flex flex-col md:grid md:grid-cols-12 gap-4 items-center z-10">
+          <div key={u.id} style={{ zIndex: 50 - index }} className="user-card group relative bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:bg-[#D9ECC8]/30 transition-colors flex flex-col md:grid md:grid-cols-12 gap-4 items-center">
             <div className="col-span-12 md:col-span-4 flex items-center w-full">
               <div className="relative flex-shrink-0">
                 <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white">
@@ -62,7 +74,7 @@ export default async function AdminUsersPage() {
                 <span className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white ${u.status === 'Active' || !u.status ? 'bg-green-400' : 'bg-gray-400'}`}></span>
               </div>
               <div className="ml-4 overflow-hidden">
-                <div className="text-sm font-bold text-[#19322F] truncate">{u.email.split('@')[0]}</div>
+                <div className="text-sm font-bold text-[#19322F] truncate">{displayName}</div>
                 <div className="text-xs text-[#19322F]/60 truncate">{u.email}</div>
                 <div className="mt-1 text-[10px] px-2 py-0.5 inline-block bg-gray-50 rounded text-[#19322F]/50 group-hover:bg-white/50 transition-colors">ID: #USR-{shortId}</div>
               </div>
@@ -105,22 +117,11 @@ export default async function AdminUsersPage() {
       
       {(!users || users.length === 0) && (
         <div className="py-12 text-center text-gray-500 bg-white rounded-xl">
-          No hay usuarios registrados aún.
+          {query ? 'No se encontraron usuarios para tu búsqueda.' : 'No hay usuarios registrados aún.'}
         </div>
       )}
 
-      {/* Pagination Container */}
-      <footer className="mt-8 border-t border-[#19322F]/5 py-6">
-        <div className="flex items-center justify-between">
-          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-[#19322F]/60">
-                Mostrando <span className="font-medium text-[#19322F]">1</span> a <span className="font-medium text-[#19322F]">{users?.length || 0}</span> de <span className="font-medium text-[#19322F]">{users?.length || 0}</span> usuarios
-              </p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <AdminPagination currentPage={page} totalPages={totalPages} totalItems={count || 0} />
     </main>
   );
 }

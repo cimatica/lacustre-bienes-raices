@@ -1,18 +1,41 @@
 import { createClient } from '@/utils/supabase/server';
 import { formatUF } from '@/lib/currency';
+import AdminSearch from '../components/AdminSearch';
+import AdminPagination from '../components/AdminPagination';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPropertiesPage() {
+export default async function AdminPropertiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
   const supabase = await createClient();
-  const { data: properties, error } = await supabase
+  const resolvedSearchParams = await searchParams;
+  
+  const query = typeof resolvedSearchParams.query === 'string' ? resolvedSearchParams.query : '';
+  const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
+  const itemsPerPage = 10;
+  
+  // Base query for properties
+  let propQuery = supabase
     .from('properties')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .select('*', { count: 'exact' });
+    
+  if (query) {
+    propQuery = propQuery.ilike('title', `%${query}%`);
+  }
+  
+  const { data: properties, error, count } = await propQuery
+    .order('created_at', { ascending: false })
+    .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
-  const totalListings = properties?.length || 0;
-  const activeProperties = properties?.filter(p => p.status === 'active' || p.status === undefined).length || totalListings; // Default to active
-  const pendingSale = 0; // Static for now as we don't have this status
+  // Overall stats (we do a separate count for total and active for the top cards without pagination limit)
+  const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true });
+  const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'active');
+  const pendingSale = 0; // Static for now
+
+  const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
   return (
     <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -37,7 +60,7 @@ export default async function AdminPropertiesPage() {
         <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">Total Propiedades</p>
-            <p className="text-2xl font-bold text-[#19322F] mt-1">{totalListings}</p>
+            <p className="text-2xl font-bold text-[#19322F] mt-1">{totalListings || 0}</p>
           </div>
           <div className="h-10 w-10 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
             <span className="material-icons">apartment</span>
@@ -46,7 +69,7 @@ export default async function AdminPropertiesPage() {
         <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">Propiedades Activas</p>
-            <p className="text-2xl font-bold text-[#19322F] mt-1">{activeProperties}</p>
+            <p className="text-2xl font-bold text-[#19322F] mt-1">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
           </div>
           <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
             <span className="material-icons">check_circle</span>
@@ -61,6 +84,10 @@ export default async function AdminPropertiesPage() {
             <span className="material-icons">pending</span>
           </div>
         </div>
+      </div>
+
+      <div className="mb-6 flex">
+        <AdminSearch placeholder="Buscar por título de propiedad..." />
       </div>
 
       {/* Property List Container */}
@@ -127,23 +154,12 @@ export default async function AdminPropertiesPage() {
         ))}
         {(!properties || properties.length === 0) && (
           <div className="py-12 text-center text-gray-500">
-            No hay propiedades registradas aún.
-          </div>
-        )}
-
-        {/* Pagination (Static UI representation) */}
-        {properties && properties.length > 0 && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/50">
-            <div className="text-sm text-gray-500">
-              Mostrando <span className="font-medium text-[#19322F]">1</span> a <span className="font-medium text-[#19322F]">{properties.length}</span> de <span className="font-medium text-[#19322F]">{properties.length}</span> propiedades
-            </div>
-            <div className="flex gap-2">
-              <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Anterior</button>
-              <button className="px-3 py-1 text-sm border border-gray-200 rounded-md text-gray-600 hover:bg-white disabled:opacity-50" disabled>Siguiente</button>
-            </div>
+            {query ? 'No se encontraron propiedades para tu búsqueda.' : 'No hay propiedades registradas aún.'}
           </div>
         )}
       </div>
+      
+      <AdminPagination currentPage={page} totalPages={totalPages} totalItems={count || 0} />
     </main>
   );
 }
