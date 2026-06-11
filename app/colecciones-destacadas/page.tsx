@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import PropertyCard from "../components/PropertyCard";
 import { getFeaturedProperties } from "../../lib/supabase";
 import Link from "next/link";
@@ -33,6 +34,7 @@ export default async function ColeccionesDestacadas() {
           </div>
         )}
       </main>
+      <Footer />
     </>
   );
 }

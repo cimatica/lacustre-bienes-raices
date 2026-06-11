@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 const languages = [
-  { code: 'es', label: 'Español', flagUrl: 'https://flagcdn.com/w20/es.png' },
+  { code: 'es', label: 'Español', flagUrl: 'https://flagcdn.com/w20/cl.png' },
   { code: 'en', label: 'English', flagUrl: 'https://flagcdn.com/w20/us.png' },
   { code: 'pt', label: 'Português', flagUrl: 'https://flagcdn.com/w20/br.png' },
   { code: 'fr', label: 'Français', flagUrl: 'https://flagcdn.com/w20/fr.png' },

@@ -1,8 +1,8 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getPropertyBySlug, Property, PropertyImage } from '@/lib/supabase';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import Navbar from '@/app/components/Navbar';
+import Footer from '@/app/components/Footer';
 import PropertyFeatures from '@/components/property/PropertyFeatures';
 import PropertyDescription from '@/components/property/PropertyDescription';
 import PropertyAmenities from '@/components/property/PropertyAmenities';
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   if (!property) {
-    return { title: 'Propiedad no encontrada | LuxeEstate' };
+    return { title: 'Propiedad no encontrada | Lacustre - Bienes Raíces' };
   }
 
   return {

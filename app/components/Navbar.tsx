@@ -25,12 +25,18 @@ export default async function Navbar() {
     <nav className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-nordic-dark/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
-            <div className="w-8 h-8 rounded-lg bg-nordic-dark flex items-center justify-center">
-              <span className="material-icons text-white text-lg">apartment</span>
+          <Link href="/" className="flex-shrink-0 flex items-center gap-3 cursor-pointer group">
+            <img src="/img/logo_navbar.png" alt="Logo" className="h-9 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform duration-300 ease-out" />
+            <div className="flex items-center">
+              <span className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-mosque to-nordic-dark">
+                Lacustre
+              </span>
+              <span className="mx-2 text-nordic-dark/20 font-light text-xl mb-0.5">|</span>
+              <span className="text-[0.65rem] font-bold tracking-[0.15em] text-nordic-dark/70 uppercase mt-1 hidden sm:inline-block">
+                Bienes Raíces
+              </span>
             </div>
-            <span className="text-xl font-semibold tracking-tight text-nordic-dark">Lacustre - Bienes Raíces</span>
-          </div>
+          </Link>
           <div className="hidden md:flex items-center space-x-8">
             <Link className="text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1" href="#">{dict.navbar.buy}</Link>
             <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.rent}</Link>
@@ -39,9 +45,7 @@ export default async function Navbar() {
           </div>
           <div className="flex items-center space-x-4">
             <LanguageSelector currentLanguage={currentLanguage} />
-            <button className="text-nordic-dark hover:text-mosque transition-colors">
-              <span className="material-icons">search</span>
-            </button>
+
             <button className="text-nordic-dark hover:text-mosque transition-colors relative">
               <span className="material-icons">notifications_none</span>
               <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>

@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import PropertyCard from "../components/PropertyCard";
 import { searchProperties } from "../../lib/supabase";
 import Link from "next/link";
@@ -78,6 +79,7 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
           </div>
         )}
       </main>
+      <Footer />
     </>
   );
 }

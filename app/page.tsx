@@ -1,4 +1,5 @@
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import HeroSection from "./components/HeroSection";
 import PropertyCard from "./components/PropertyCard";
 import Pagination from "./components/Pagination";
@@ -118,6 +119,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </Suspense>
         </section>
       </main>
+      <Footer />
     </>
   );
 }

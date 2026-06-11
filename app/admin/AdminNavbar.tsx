@@ -17,8 +17,8 @@ export default function AdminNavbar({ user, userRole }: { user: any, userRole: s
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
-              <div className="w-8 h-8 rounded bg-[#006655] flex items-center justify-center text-white font-bold text-lg">L</div>
-              <span className="font-bold text-xl tracking-tight text-[#19322F]">Lacustre Admin</span>
+              <img src="/img/logo_navbar.png" alt="Logo" className="h-8 w-auto object-contain" />
+              <span className="font-bold text-xl tracking-tight text-[#19322F]">Lacustre - Bienes Raíces Admin</span>
             </div>
             <div className="hidden md:ml-10 md:flex md:space-x-8">
               {navLinks.map((link) => {
