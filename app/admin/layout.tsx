@@ -15,7 +15,7 @@ export default function AdminLayout({
           </div>
           <nav className="flex-1 p-4 space-y-2">
             <Link 
-              href="/admin" 
+              href="/admin/properties" 
               className="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg text-gray-700 hover:bg-gray-50 hover:text-[#006655] transition-colors"
             >
               <span className="material-icons text-[20px]">home</span>

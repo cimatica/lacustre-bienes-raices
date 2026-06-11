@@ -69,7 +69,7 @@ export default async function Navbar() {
                       </div>
                     </div>
                     {userRole === 'administrador' && (
-                      <Link href="/admin" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                      <Link href="/admin/properties" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
                         <span className="material-icons text-[18px]">admin_panel_settings</span>
                         Panel Admin
                       </Link>
