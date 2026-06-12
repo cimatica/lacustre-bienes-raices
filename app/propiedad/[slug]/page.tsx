@@ -3,13 +3,13 @@ import { notFound } from 'next/navigation';
 import { getPropertyBySlug, Property, PropertyImage } from '@/lib/supabase';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
-import PropertyFeatures from '@/components/property/PropertyFeatures';
-import PropertyDescription from '@/components/property/PropertyDescription';
-import PropertyAmenities from '@/components/property/PropertyAmenities';
-import ImageGallery from '@/components/property/ImageGallery';
-import ContactCard from '@/components/property/ContactCard';
+import PropertyFeatures from '@/app/propiedad/components/PropertyFeatures';
+import PropertyDescription from '@/app/propiedad/components/PropertyDescription';
+import PropertyAmenities from '@/app/propiedad/components/PropertyAmenities';
+import ImageGallery from '@/app/propiedad/components/ImageGallery';
+import ContactCard from '@/app/propiedad/components/ContactCard';
 
-import PropertyMap from '@/components/property/PropertyMap';
+import PropertyMap from '@/app/propiedad/components/PropertyMap';
 import { getDictionary } from '@/lib/i18n';
 import { getUfValue, formatUF, formatCLP } from '@/lib/currency';
 
