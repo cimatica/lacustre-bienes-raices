@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server';
 import { formatUF } from '@/lib/currency';
 import AdminSearch from '../components/AdminSearch';
 import AdminPagination from '../components/AdminPagination';
+import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,9 +50,9 @@ export default async function AdminPropertiesPage({
           <button className="bg-white border border-gray-200 text-[#19322F] hover:bg-gray-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
             <span className="material-icons text-base">filter_list</span> Filtros
           </button>
-          <button className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+          <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
             <span className="material-icons text-base">add</span> Nueva Propiedad
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -143,9 +144,9 @@ export default async function AdminPropertiesPage({
 
             {/* Actions */}
             <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-2">
-              <button className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
+              <Link href={`/admin/properties/${prop.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
                 <span className="material-icons text-xl">edit</span>
-              </button>
+              </Link>
               <button className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar Propiedad">
                 <span className="material-icons text-xl">delete_outline</span>
               </button>

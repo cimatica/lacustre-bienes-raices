@@ -37,6 +37,9 @@ export type Property = {
   amenities?: string[];
   property_images?: PropertyImage[];
   property_type?: string;
+  description?: string;
+  year_built?: number;
+  parking?: number;
 };
 
 export type PaginatedProperties = {

@@ -94,8 +94,8 @@ export default async function PropertyPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
             <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} dict={dict} />
-            <PropertyDescription dict={dict} />
-            <PropertyAmenities dict={dict} />
+            <PropertyDescription dict={dict} description={property.description || ""} />
+            <PropertyAmenities dict={dict} amenities={property.amenities} />
             
             <div className="bg-mosque/5 p-6 rounded-xl border border-mosque/10 flex flex-col sm:flex-row items-center justify-between gap-6">
               <div className="flex items-start gap-4">

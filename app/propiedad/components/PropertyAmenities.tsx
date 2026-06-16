@@ -1,4 +1,4 @@
-export default function PropertyAmenities({ dict }: { dict?: any }) {
+export default function PropertyAmenities({ dict, amenities: propAmenities }: { dict?: any, amenities?: string[] }) {
   const defaultAmenities = [
     "Smart Home System",
     "Swimming Pool",
@@ -8,13 +8,13 @@ export default function PropertyAmenities({ dict }: { dict?: any }) {
     "Wine Cellar",
   ];
 
-  const amenities: string[] = dict?.property?.amenityList || defaultAmenities;
+  const amenitiesToUse: string[] = propAmenities && propAmenities.length > 0 ? propAmenities : (dict?.property?.amenityList || defaultAmenities);
 
   return (
     <div className="bg-white p-8 rounded-xl shadow-sm border border-mosque/5">
       <h2 className="text-lg font-semibold mb-6 text-nordic">{dict?.property?.amenitiesTitle || "Amenities"}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8">
-        {amenities.map((item, i) => (
+        {amenitiesToUse.map((item, i) => (
           <div key={i} className="flex items-center gap-3 text-nordic/70">
             <span className="material-icons text-mosque/60 text-sm">check_circle</span>
             <span>{item}</span>
