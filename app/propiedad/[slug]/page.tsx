@@ -19,12 +19,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
-  let property = await getPropertyBySlug(resolvedParams.slug);
-  
-  // Only for development visualization if DB is empty
-  if (!property && process.env.NODE_ENV === 'development') {
-    property = getMockProperty(resolvedParams.slug);
-  }
+  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+  const property = await getPropertyBySlug(decodedSlug);
 
   if (!property) {
     return { title: 'Propiedad no encontrada | Lacustre - Bienes Raíces' };
@@ -43,15 +39,11 @@ export default async function PropertyPage({ params }: Props) {
   const resolvedParams = await params;
   const dict = await getDictionary();
   const ufValue = await getUfValue();
-  let property = await getPropertyBySlug(resolvedParams.slug);
+  const decodedSlug = decodeURIComponent(resolvedParams.slug);
+  const property = await getPropertyBySlug(decodedSlug);
 
-  // Mock data fallback for visualization if DB is empty
   if (!property) {
-    if (process.env.NODE_ENV === 'development') {
-      property = getMockProperty(resolvedParams.slug);
-    } else {
-      notFound();
-    }
+    notFound();
   }
 
   // Always include the main image url, and append gallery images if they exist
@@ -130,33 +122,4 @@ export default async function PropertyPage({ params }: Props) {
       <Footer />
     </div>
   );
-}
-
-function getMockProperty(slug: string): Property {
-  return {
-    id: 'mock-id',
-    title: 'Modern luxury home',
-    location: '1234 Serenity Lane, Palo Alto, CA',
-    price: 32894,
-    price_per_month: false,
-    beds: 4,
-    baths: 3,
-    area: 240,
-    image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBjNDU9iE4zwPuWeg-CjIrLI-87GF24_LgOggcXT0vmUYfMx2q1dJAheiqWqVN-39uiwyLKEfP18FsG1vtUyAPX902OhGEfM4clcQiDsJW7MBbc_BoMtZXtqIeFKIfkHnkIPwmFbQg8Eaan6ULV99T8AUVUuKsro0HoTMrIaxw5pp1uSuQlF8X5Dait4US1W4vmyZnVioXbFnCoaOOZ0LPorb0rVGAIQd9reWcpqq27C0oO4ltnsCTHIcjIm0xp-2qVbRJSIZzWPv0',
-    image_alt: 'Modern luxury house exterior',
-    badge: 'Premium',
-    is_featured: true,
-    type: 'new',
-    sale_type: 'Venta',
-    created_at: new Date().toISOString(),
-    slug: slug,
-    latitude: -33.42628,
-    longitude: -70.61217,
-    property_images: [
-       { id: '1', property_id: 'mock-id', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBjNDU9iE4zwPuWeg-CjIrLI-87GF24_LgOggcXT0vmUYfMx2q1dJAheiqWqVN-39uiwyLKEfP18FsG1vtUyAPX902OhGEfM4clcQiDsJW7MBbc_BoMtZXtqIeFKIfkHnkIPwmFbQg8Eaan6ULV99T8AUVUuKsro0HoTMrIaxw5pp1uSuQlF8X5Dait4US1W4vmyZnVioXbFnCoaOOZ0LPorb0rVGAIQd9reWcpqq27C0oO4ltnsCTHIcjIm0xp-2qVbRJSIZzWPv0', image_alt: 'Exterior', is_main: true, order_index: 0, created_at: '' },
-       { id: '2', property_id: 'mock-id', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvpJBMaiXUL25hHYwLa_0R6dPhLLM1EuhEt-AVtOy8qSnEi9IcA_RzD5s5ThawY3XG2qw8h4kPqvfP18EY1E5vgA8fs6v7RefCMJ1gY8Gt4uyXGJ85-lcIvL18v8Nlc-U-VOwn1h54yjjg4-KXHt1N5DfuTkQUBdldSELRZeJ6zuZ087NCJ7dDIDaXKJpPgulmd6JC6zD1-Kq00Sb4VXIhVR3IQ1Hd8S6xZkd17QvMHSNqbtKG849PRqHZX3nKLHEWYWWPvbL5_Gs', image_alt: 'Exterior side', is_main: false, order_index: 1, created_at: '' },
-       { id: '3', property_id: 'mock-id', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAbloTFAmeq6ugmfkwyqn3NMGn11PMk4FU0EIHRHvfYB8nw_-iH5TLps5ig3zipLPoKVZZKO8fOvEVJIwp3MQ9wrS4Dzhgw6ypUDhsycDc-YsboVBbRrXxKOYl-77zNHX9E4hynYyJfVVzXn7ldtURk3Ij3pHIMwqzfDdUxyhYaIJe5dRYa0JN5RpHbPNaV33TcM-IoYW11wNUCKkivtfgC3tk7hkKa3gue7ZTjLhR1ZOE_A1MvMZ3rgBxGDg-HFASH4YP6jI3rwMM', image_alt: 'Living', is_main: false, order_index: 2, created_at: '' },
-       { id: '4', property_id: 'mock-id', image_url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDRCEooMTK0GZV_7SdAorgeIN1pNz3R9YsLv-2pv39FOje7BUWCWPnKOSA1f6rlYcw7IoJ8NxUp4OU-MAk5_ucnykEtps56-kR6DtQ9JgLlCNyiuazO87fy-xCtXVNROT9kquBZ2JUvUtNGRwWiBaK1DnXOHSxp3ELHbLK8MNS-Ht3Gw8dXgNbya4bZiHZ7C-YnCJfwPjX25zrrQypfbiJsS8jjxFq3--uC264Zbhxp8XCsqDid3BIaJ8RdNMRze6lVvpg49N7Z0tI', image_alt: 'Kitchen', is_main: false, order_index: 3, created_at: '' },
-    ]
-  };
 }
