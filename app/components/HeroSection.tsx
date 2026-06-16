@@ -1,16 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import SearchFiltersModal from "./SearchFiltersModal";
 import { useTranslation } from "./I18nProvider";
+import { createClient } from "@/utils/supabase/client";
 
 export default function HeroSection() {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("Todos");
+  const [propertyTypes, setPropertyTypes] = useState<{id: string, name: string}[]>([]);
   const router = useRouter();
   const dict = useTranslation();
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchTypes() {
+      const { data } = await supabase.from('property_types').select('id, name').order('name');
+      if (data) setPropertyTypes(data);
+    }
+    fetchTypes();
+  }, []);
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -44,11 +55,9 @@ export default function HeroSection() {
     router.push(queryString ? `/buscar?${queryString}` : "/buscar");
   };
 
-  const propertyTypes = ["Todos", "Casa", "Apartamento", "Villa", "Penthouse"];
-
   return (
     <section className="py-12 md:py-16">
-      <div className="max-w-3xl mx-auto text-center space-y-8">
+      <div className="max-w-5xl mx-auto text-center space-y-8 px-4">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-mosque leading-tight">
           {dict.hero.findYour} <span className="relative inline-block">
             <span className="relative z-10 font-extrabold">{dict.hero.sanctuary}</span>
@@ -72,21 +81,36 @@ export default function HeroSection() {
           </button>
         </form>
         
-        <div className="flex items-center justify-center gap-3 overflow-x-auto hide-scroll py-2 px-4 -mx-4">
-          {propertyTypes.map((type) => (
-            <button 
-              key={type}
-              onClick={() => handleQuickFilter(type)} 
-              type="button"
-              className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
-                propertyType === type
-                  ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
-                  : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
-              }`}
-            >
-              {dict.hero.types[type]}
-            </button>
-          ))}
+        <div className="flex items-center justify-start xl:justify-center gap-3 overflow-x-auto hide-scroll py-2 pb-4">
+          <button 
+            onClick={() => handleQuickFilter("Todos")} 
+            type="button"
+            className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
+              propertyType === "Todos"
+                ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
+                : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
+            }`}
+          >
+            {dict.hero.types["Todos"] || "Todos"}
+          </button>
+          {["Casa", "Departamento", "Parcela de Agrado", "Terreno", "Oficina"].map((name) => {
+            const type = propertyTypes.find(pt => pt.name === name);
+            if (!type) return null;
+            return (
+              <button 
+                key={type.id}
+                onClick={() => handleQuickFilter(type.id)} 
+                type="button"
+                className={`whitespace-nowrap px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                  propertyType === type.id
+                    ? "bg-nordic-dark text-white shadow-lg shadow-nordic-dark/10 hover:-translate-y-0.5"
+                    : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
+                }`}
+              >
+                {type.name}
+              </button>
+            );
+          })}
           <div className="w-px h-6 bg-nordic-dark/10 mx-2"></div>
           <button 
             onClick={() => setIsFiltersOpen(true)}

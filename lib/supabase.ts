@@ -15,6 +15,11 @@ export type PropertyImage = {
   created_at: string;
 };
 
+export type PropertyType = {
+  id: string;
+  name: string;
+};
+
 export type Property = {
   id: string;
   title: string;
@@ -36,7 +41,8 @@ export type Property = {
   longitude: number | null;
   amenities?: string[];
   property_images?: PropertyImage[];
-  property_type?: string;
+  property_type?: string; // This will hold the UUID
+  property_types?: PropertyType; // When doing foreign key join
   description?: string;
   year_built?: number;
   parking?: number;
@@ -75,7 +81,7 @@ function buildUrl(params: Record<string, string | undefined>): string {
 /** Fetch featured properties. */
 export async function getFeaturedProperties(limit?: number): Promise<Property[]> {
   const url = buildUrl({
-    select: "*",
+    select: "*, property_types(id, name)",
     is_featured: "eq.true",
     order: "created_at.asc",
     ...(limit ? { limit: limit.toString() } : {})
@@ -102,7 +108,7 @@ export async function getNewProperties(
   const to = from + pageSize - 1;
 
   const url = buildUrl({
-    select: "*",
+    select: "*, property_types(id, name)",
     type: "eq.new",
     ...(saleType ? { sale_type: `eq.${saleType}` } : {}),
     order: "created_at.asc",
@@ -138,7 +144,7 @@ export async function getNewProperties(
 /** Fetch property by Slug including related images */
 export async function getPropertyBySlug(slug: string): Promise<Property | null> {
   const url = buildUrl({
-    select: "*, property_images(*)",
+    select: "*, property_images(*), property_types(id, name)",
     slug: `eq.${slug}`,
   });
 
@@ -168,7 +174,7 @@ export async function searchProperties(params: {
   const url = new URL(`${SUPABASE_URL}/rest/v1/properties`);
   
   // Select all properties, but order them
-  url.searchParams.set("select", "*");
+  url.searchParams.set("select", "*, property_types(id, name)");
   
   if (params.sort === "price_desc") {
     url.searchParams.set("order", "price.desc");
@@ -221,4 +227,20 @@ export async function searchProperties(params: {
   }
 
   return res.json() as Promise<Property[]>;
+}
+
+/** Fetch property types */
+export async function getPropertyTypes(): Promise<PropertyType[]> {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/property_types`);
+  url.searchParams.set("select", "id, name");
+  url.searchParams.set("order", "name.asc");
+
+  const res = await fetch(url.toString(), {
+    headers: apiHeaders(),
+    next: { revalidate: 3600 }, // Cache for 1 hour since types rarely change
+  });
+
+  if (!res.ok) throw new Error(`Supabase error: ${res.status} ${res.statusText}`);
+
+  return res.json() as Promise<PropertyType[]>;
 }

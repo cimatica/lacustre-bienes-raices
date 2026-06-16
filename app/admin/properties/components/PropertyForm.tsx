@@ -34,7 +34,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
     price: initialData?.price || 0,
     price_per_month: initialData?.price_per_month || false,
     sale_type: initialData?.sale_type || "Venta",
-    property_type: initialData?.property_type || "apartment",
+    property_type: initialData?.property_type || "",
     description: initialData?.description || "",
     location: initialData?.location || "",
     latitude: initialData?.latitude || null,
@@ -56,6 +56,21 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
   const [gallery, setGallery] = useState<GalleryImageState[]>(
     initialData?.property_images?.map(img => ({ id: img.id, url: img.image_url })) || []
   );
+
+  const [propertyTypes, setPropertyTypes] = useState<{ id: string, name: string }[]>([]);
+
+  useEffect(() => {
+    async function fetchTypes() {
+      const { data } = await supabase.from('property_types').select('id, name').order('name');
+      if (data) {
+        setPropertyTypes(data);
+        if (!initialData?.property_type && data.length > 0) {
+          setFormData(prev => ({ ...prev, property_type: data[0].id }));
+        }
+      }
+    }
+    fetchTypes();
+  }, []);
 
   // Handlers for inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -326,11 +341,9 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
               <div>
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="property_type">Tipo de Propiedad</label>
                 <select value={formData.property_type} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="property_type">
-                  <option value="apartment">Departamento</option>
-                  <option value="house">Casa</option>
-                  <option value="villa">Villa</option>
-                  <option value="commercial">Comercial</option>
-                  <option value="land">Terreno</option>
+                  {propertyTypes.map(pt => (
+                    <option key={pt.id} value={pt.id}>{pt.name}</option>
+                  ))}
                 </select>
               </div>
             </div>

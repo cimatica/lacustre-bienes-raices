@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "./I18nProvider";
+import { createClient } from "@/utils/supabase/client";
 
 interface SearchFiltersModalProps {
   isOpen: boolean;
@@ -21,6 +22,16 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
   const [beds, setBeds] = useState("0");
   const [baths, setBaths] = useState("0");
   const [amenities, setAmenities] = useState<string[]>([]);
+  const [propertyTypes, setPropertyTypes] = useState<{id: string, name: string}[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function fetchTypes() {
+      const { data } = await supabase.from('property_types').select('id, name').order('name');
+      if (data) setPropertyTypes(data);
+    }
+    fetchTypes();
+  }, []);
 
   // Prevent scrolling when modal is open
   useEffect(() => {
@@ -172,10 +183,9 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                   onChange={e => setTipoPropiedad(e.target.value)}
                 >
                   <option value={dict.filters.anyType}>{dict.filters.anyType}</option>
-                  <option value="Casa">{dict.hero?.types?.Casa || "Casa"}</option>
-                  <option value="Apartamento">{dict.hero?.types?.Apartamento || "Apartamento"}</option>
-                  <option value="Villa">{dict.hero?.types?.Villa || "Villa"}</option>
-                  <option value="Penthouse">{dict.hero?.types?.Penthouse || "Penthouse"}</option>
+                  {propertyTypes.map(pt => (
+                    <option key={pt.id} value={pt.id}>{pt.name}</option>
+                  ))}
                 </select>
                 <span className="material-icons absolute right-3 top-3 text-gray-400 pointer-events-none">expand_more</span>
               </div>

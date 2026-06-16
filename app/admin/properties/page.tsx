@@ -21,7 +21,7 @@ export default async function AdminPropertiesPage({
   // Base query for properties
   let propQuery = supabase
     .from('properties')
-    .select('*', { count: 'exact' });
+    .select('*, property_types(id, name)', { count: 'exact' });
     
   if (query) {
     propQuery = propQuery.ilike('title', `%${query}%`);
@@ -117,7 +117,7 @@ export default async function AdminPropertiesPage({
               </div>
               <div>
                 <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer">{prop.title}</h3>
-                <p className="text-sm text-gray-500">{prop.location}</p>
+                <p className="text-sm text-gray-500">{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
                 <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
                   <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bed</span> {prop.bedrooms || 0} Camas</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300"></span>
