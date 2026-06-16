@@ -78,6 +78,18 @@ export default async function PropertyPage({ params }: Props) {
           
           {/* Left Column */}
           <div className="lg:col-span-8 space-y-4">
+            <div className="mb-6">
+              <div className="flex items-center gap-2 text-mosque font-medium mb-2 uppercase tracking-wide text-sm">
+                <span>{property.property_types?.name ? (dict.hero?.types?.[property.property_types.name] || property.property_types.name) : ""}</span>
+                {property.sale_type && (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-mosque/40"></span>
+                    <span>{property.sale_type === "Venta" ? dict.home?.sale : dict.home?.rent}</span>
+                  </>
+                )}
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold text-nordic-dark">{property.title}</h1>
+            </div>
             <ImageGallery images={imagesToPass} badge={property.badge} />
           </div>
 
@@ -93,7 +105,7 @@ export default async function PropertyPage({ params }: Props) {
         {/* Bottom Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 space-y-8">
-            <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} dict={dict} />
+            <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} parking={property.parking} dict={dict} />
             <PropertyDescription dict={dict} description={property.description || ""} />
             <PropertyAmenities dict={dict} amenities={property.amenities} />
             
