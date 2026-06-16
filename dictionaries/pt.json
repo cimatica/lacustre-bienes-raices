@@ -27,8 +27,15 @@
       "Todos": "Todos",
       "Casa": "Casa",
       "Apartamento": "Apartamento",
+      "Departamento": "Apartamento",
       "Villa": "Villa",
-      "Penthouse": "Cobertura"
+      "Penthouse": "Cobertura",
+      "Parcela de Agrado": "Chácara",
+      "Terreno": "Terreno",
+      "Oficina": "Escritório",
+      "Bodega": "Armazém",
+      "Estacionamiento": "Estacionamento",
+      "Local Comercial": "Ponto Comercial"
     }
   },
   "propertyCard": {

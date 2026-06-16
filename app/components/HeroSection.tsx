@@ -107,7 +107,7 @@ export default function HeroSection() {
                     : "bg-white border border-nordic-dark/5 text-nordic-muted hover:text-nordic-dark hover:border-mosque/50 hover:bg-mosque/5"
                 }`}
               >
-                {type.name}
+                {dict.hero.types[type.name] || type.name}
               </button>
             );
           })}

@@ -24,11 +24,18 @@
     "searchBtn": "Rechercher",
     "filters": "Filtres",
     "types": {
-      "Todos": "Tous",
+      "Todos": "Tout",
       "Casa": "Maison",
       "Apartamento": "Appartement",
+      "Departamento": "Appartement",
       "Villa": "Villa",
-      "Penthouse": "Penthouse"
+      "Penthouse": "Penthouse",
+      "Parcela de Agrado": "Domaine de campagne",
+      "Terreno": "Terrain",
+      "Oficina": "Bureau",
+      "Bodega": "Entrepôt",
+      "Estacionamiento": "Parking",
+      "Local Comercial": "Local Commercial"
     }
   },
   "propertyCard": {

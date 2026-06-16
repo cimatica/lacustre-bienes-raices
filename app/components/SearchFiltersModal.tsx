@@ -184,7 +184,7 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
                 >
                   <option value={dict.filters.anyType}>{dict.filters.anyType}</option>
                   {propertyTypes.map(pt => (
-                    <option key={pt.id} value={pt.id}>{pt.name}</option>
+                    <option key={pt.id} value={pt.id}>{dict.hero?.types?.[pt.name] || pt.name}</option>
                   ))}
                 </select>
                 <span className="material-icons absolute right-3 top-3 text-gray-400 pointer-events-none">expand_more</span>
