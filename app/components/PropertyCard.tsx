@@ -31,16 +31,17 @@ export default async function PropertyCard({ property, variant = "standard", dic
           <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
         </div>
         <div className="p-6 relative">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="text-xl font-medium text-nordic-dark group-hover:text-mosque transition-colors">
+          <div className="flex justify-between items-start mb-2 gap-4">
+            <div className="flex-1 min-w-0">
+              <h3 className="text-xl font-medium text-nordic-dark group-hover:text-mosque transition-colors truncate">
                 {property.title}
               </h3>
               <p className="text-nordic-muted text-sm flex items-center gap-1 mt-1">
-                <span className="material-icons text-sm">place</span> {property.location}
+                <span className="material-icons text-sm shrink-0">place</span> 
+                <span className="truncate">{property.location}</span>
               </p>
             </div>
-            <div className="flex flex-col items-end">
+            <div className="flex flex-col items-end shrink-0">
               <span className="text-xl font-bold text-mosque">{formatUF(property.price)}</span>
               <span className="text-sm font-medium text-nordic-muted">{formatCLP(clpValue)}</span>
             </div>
@@ -94,7 +95,7 @@ export default async function PropertyCard({ property, variant = "standard", dic
           </div>
         </div>
         <h4 className="text-nordic-dark font-medium truncate mb-1">{property.title}</h4>
-        <p className="text-nordic-muted text-xs mb-4">{property.location}</p>
+        <p className="text-nordic-muted text-xs mb-4 truncate">{property.location}</p>
         <div className="mt-auto flex items-center justify-between pt-3 border-t border-gray-100">
           <div className="flex items-center gap-1 text-nordic-muted text-xs">
             <span className="material-icons text-sm text-mosque/80">king_bed</span> {property.beds}

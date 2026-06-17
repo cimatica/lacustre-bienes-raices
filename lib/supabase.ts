@@ -42,6 +42,7 @@ export type Property = {
   amenities?: string[];
   property_images?: PropertyImage[];
   property_type?: string; // This will hold the UUID
+  is_active?: boolean;
   property_types?: PropertyType; // When doing foreign key join
   description?: string;
   year_built?: number;
@@ -83,6 +84,7 @@ export async function getFeaturedProperties(limit?: number): Promise<Property[]>
   const url = buildUrl({
     select: "*, property_types(id, name)",
     is_featured: "eq.true",
+    is_active: "eq.true",
     order: "created_at.asc",
     ...(limit ? { limit: limit.toString() } : {})
   });
@@ -110,6 +112,7 @@ export async function getNewProperties(
   const url = buildUrl({
     select: "*, property_types(id, name)",
     type: "eq.new",
+    is_active: "eq.true",
     ...(saleType ? { sale_type: `eq.${saleType}` } : {}),
     order: "created_at.asc",
   });
@@ -146,6 +149,7 @@ export async function getPropertyBySlug(slug: string): Promise<Property | null> 
   const url = buildUrl({
     select: "*, property_images(*), property_types(id, name)",
     slug: `eq.${slug}`,
+    is_active: "eq.true",
   });
 
   const res = await fetch(url, {
@@ -181,6 +185,9 @@ export async function searchProperties(params: {
   } else {
     url.searchParams.set("order", "price.asc");
   }
+
+  // Only active properties
+  url.searchParams.set("is_active", "eq.true");
 
   // Location search using ilike (case-insensitive)
   if (params.q) {

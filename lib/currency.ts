@@ -3,14 +3,21 @@ export async function getUfValue(): Promise<number> {
     const res = await fetch("https://mindicador.cl/api/uf", {
       next: { revalidate: 3600 } // Cache for 1 hour
     });
-    if (!res.ok) throw new Error("Failed to fetch UF");
+    
+    if (!res.ok) {
+      console.warn(`UF API returned status: ${res.status}`);
+      return 38000;
+    }
+    
     const data = await res.json();
     if (data && data.serie && data.serie.length > 0) {
       return data.serie[0].valor;
     }
-    throw new Error("Invalid data format");
+    
+    console.warn("Invalid UF data format");
+    return 38000;
   } catch (error) {
-    console.error("Error fetching UF:", error);
+    console.warn("Error fetching UF:", error instanceof Error ? error.message : "Unknown error");
     return 38000; // Fallback value if API fails
   }
 }

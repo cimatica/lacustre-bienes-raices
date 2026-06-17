@@ -3,6 +3,7 @@ import { formatUF } from '@/lib/currency';
 import AdminSearch from '../components/AdminSearch';
 import AdminPagination from '../components/AdminPagination';
 import Link from 'next/link';
+import { PropertyActions } from './components/PropertyActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,11 +30,12 @@ export default async function AdminPropertiesPage({
   
   const { data: properties, error, count } = await propQuery
     .order('created_at', { ascending: false })
+    .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
   // Overall stats (we do a separate count for total and active for the top cards without pagination limit)
   const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true });
-  const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('status', 'active');
+  const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true);
   const pendingSale = 0; // Static for now
 
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
@@ -136,20 +138,19 @@ export default async function AdminPropertiesPage({
 
             {/* Status */}
             <div className="col-span-6 md:col-span-2">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#D9ECC8] text-[#006655] border border-[#006655]/10">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#006655] mr-1.5"></span>
-                Activa
+              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+                prop.is_active 
+                  ? "bg-[#D9ECC8] text-[#006655] border-[#006655]/10" 
+                  : "bg-gray-100 text-gray-500 border-gray-200"
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${prop.is_active ? "bg-[#006655]" : "bg-gray-400"}`}></span>
+                {prop.is_active ? 'Activa' : 'Inactiva'}
               </span>
             </div>
 
             {/* Actions */}
-            <div className="col-span-12 md:col-span-2 flex items-center justify-end gap-2">
-              <Link href={`/admin/properties/${prop.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
-                <span className="material-icons text-xl">edit</span>
-              </Link>
-              <button className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Eliminar Propiedad">
-                <span className="material-icons text-xl">delete_outline</span>
-              </button>
+            <div className="col-span-12 md:col-span-2">
+              <PropertyActions property={prop} />
             </div>
           </div>
         ))}
