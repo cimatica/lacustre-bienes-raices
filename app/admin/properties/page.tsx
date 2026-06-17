@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { formatUF } from '@/lib/currency';
-import AdminSearch from '../components/AdminSearch';
+import AdminFilters from '../components/AdminFilters';
 import AdminPagination from '../components/AdminPagination';
 import Link from 'next/link';
 import { PropertyActions } from './components/PropertyActions';
@@ -17,6 +17,9 @@ export default async function AdminPropertiesPage({
   
   const query = typeof resolvedSearchParams.query === 'string' ? resolvedSearchParams.query : '';
   const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
+  const status = typeof resolvedSearchParams.status === 'string' ? resolvedSearchParams.status : 'all';
+  const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type : 'all';
+  
   const itemsPerPage = 10;
   
   // Base query for properties
@@ -26,6 +29,14 @@ export default async function AdminPropertiesPage({
     
   if (query) {
     propQuery = propQuery.ilike('title', `%${query}%`);
+  }
+  if (status === 'active') {
+    propQuery = propQuery.eq('is_active', true);
+  } else if (status === 'inactive') {
+    propQuery = propQuery.eq('is_active', false);
+  }
+  if (type !== 'all') {
+    propQuery = propQuery.eq('sale_type', type);
   }
   
   const { data: properties, error, count } = await propQuery
@@ -49,9 +60,6 @@ export default async function AdminPropertiesPage({
           <p className="text-gray-500 mt-1">Gestiona tu portafolio y monitorea el rendimiento.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="bg-white border border-gray-200 text-[#19322F] hover:bg-gray-50 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-sm inline-flex items-center gap-2">
-            <span className="material-icons text-base">filter_list</span> Filtros
-          </button>
           <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
             <span className="material-icons text-base">add</span> Nueva Propiedad
           </Link>
@@ -89,9 +97,7 @@ export default async function AdminPropertiesPage({
         </div>
       </div>
 
-      <div className="mb-6 flex">
-        <AdminSearch placeholder="Buscar por título de propiedad..." />
-      </div>
+      <AdminFilters />
 
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -121,11 +127,13 @@ export default async function AdminPropertiesPage({
                 <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer">{prop.title}</h3>
                 <p className="text-sm text-gray-500">{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
                 <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bed</span> {prop.bedrooms || 0} Camas</span>
+                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">king_bed</span> {prop.beds || 0} Camas</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bathtub</span> {prop.bathrooms || 0} Baños</span>
+                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bathtub</span> {prop.baths || 0} Baños</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span>{prop.surface_area || 0} m²</span>
+                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">directions_car</span> {prop.parking || 0} Estac.</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">square_foot</span> {prop.area || 0} m²</span>
                 </div>
               </div>
             </div>

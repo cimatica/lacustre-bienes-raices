@@ -16,7 +16,7 @@ export default async function EditPropertyPage({
   const supabase = await createClient();
   const { data: property, error } = await supabase
     .from('properties')
-    .select('*')
+    .select('*, property_images(*)')
     .eq('id', id)
     .single();
 

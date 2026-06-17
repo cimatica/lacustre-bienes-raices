@@ -19,6 +19,7 @@ type GalleryImageState = {
   url: string; // Public URL or Object URL for preview
   file?: File; // The actual file if it's new
   isDeleted?: boolean; // Mark for deletion
+  isMovedToMain?: boolean; // Mark if it was promoted to main image
 };
 
 export default function PropertyForm({ initialData, propertyId }: PropertyFormProps) {
@@ -158,6 +159,37 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
     setGallery(newGallery);
   };
 
+  const setAsMain = (index: number) => {
+    const selected = gallery[index];
+    if (!selected || selected.isDeleted || selected.isMovedToMain) return;
+
+    const oldMainPreview = mainImagePreview;
+    const oldMainFile = mainImage;
+
+    // Set selected as main
+    setMainImagePreview(selected.url);
+    setMainImage(selected.file || null);
+
+    const newGallery = [...gallery];
+
+    // Mark the selected one as moved to main
+    if (selected.id) {
+       newGallery[index] = { ...selected, isMovedToMain: true };
+    } else {
+       newGallery.splice(index, 1);
+    }
+    
+    // Add the old main image back to the gallery
+    if (oldMainPreview) {
+       newGallery.push({
+          url: oldMainPreview,
+          file: oldMainFile || undefined,
+       });
+    }
+
+    setGallery(newGallery);
+  };
+
   const extractPathFromUrl = (url: string) => {
     const parts = url.split('/property_images/');
     return parts.length > 1 ? parts[1] : null;
@@ -209,19 +241,25 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
       const actualPropertyId = isEditing ? propertyId : crypto.randomUUID();
       let mainImageUrl = initialData?.image_url || "";
 
-      // 1. Upload new main image
+      // 1. Upload new main image OR use swapped URL
       if (mainImage) {
         const uploadedUrl = await uploadImage(mainImage, 'main');
         if (uploadedUrl) {
           mainImageUrl = uploadedUrl;
-          // Optionally delete old main image if editing and it's changed
-          if (isEditing && initialData?.image_url) {
-            const oldPath = extractPathFromUrl(initialData.image_url);
-            if (oldPath) await supabase.storage.from('property_images').remove([oldPath]);
-          }
         } else {
           throw new Error("No se pudo subir la imagen principal");
         }
+      } else if (mainImagePreview && mainImagePreview !== initialData?.image_url) {
+        mainImageUrl = mainImagePreview;
+      }
+      
+      // Cleanup old main image if changed AND it's not currently in the active gallery
+      if (isEditing && initialData?.image_url && mainImageUrl !== initialData.image_url) {
+          const isStillInGallery = gallery.some(g => !g.isDeleted && !g.isMovedToMain && g.url === initialData.image_url);
+          if (!isStillInGallery) {
+             const oldPath = extractPathFromUrl(initialData.image_url);
+             if (oldPath) await supabase.storage.from('property_images').remove([oldPath]);
+          }
       }
 
       const slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
@@ -270,16 +308,30 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
           }
           // Delete from db
           await supabase.from('property_images').delete().eq('id', item.id);
-        } else if (item.file && !item.isDeleted) {
-          // Upload new gallery image
-          const uploadedUrl = await uploadImage(item.file, 'gallery');
-          if (uploadedUrl) {
+        } else if (item.isMovedToMain && item.id) {
+          // Only delete DB row because it's now the main image
+          await supabase.from('property_images').delete().eq('id', item.id);
+        } else if (!item.isDeleted && !item.isMovedToMain) {
+          if (item.file) {
+            // Upload new gallery image
+            const uploadedUrl = await uploadImage(item.file, 'gallery');
+            if (uploadedUrl) {
+              await supabase.from('property_images').insert([{
+                property_id: actualPropertyId,
+                image_url: uploadedUrl,
+                image_alt: formData.title + ' gallery image',
+                is_main: false,
+                order_index: 0
+              }]);
+            }
+          } else if (!item.id && item.url) {
+            // Existing URL added to gallery
             await supabase.from('property_images').insert([{
-              property_id: actualPropertyId,
-              image_url: uploadedUrl,
-              image_alt: formData.title + ' gallery image',
-              is_main: false,
-              order_index: 0
+                property_id: actualPropertyId,
+                image_url: item.url,
+                image_alt: formData.title + ' gallery image',
+                is_main: false,
+                order_index: 0
             }]);
           }
         }
@@ -297,7 +349,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
   };
 
   const commonAmenities = ["Piscina", "Jardín", "Aire Acondicionado", "Smart Home", "Seguridad 24/7", "Gimnasio", "Quincho"];
-  const activeGallery = gallery.map((item, i) => ({ ...item, originalIndex: i })).filter(item => !item.isDeleted);
+  const activeGallery = gallery.map((item, i) => ({ ...item, originalIndex: i })).filter(item => !item.isDeleted && !item.isMovedToMain);
 
   return (
     <form onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start pb-20">
@@ -356,7 +408,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="type">Clasificación</label>
                 <select value={formData.type} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="type">
                   <option value="new">Nuevo</option>
-                  <option value="featured">Destacado</option>
+                  <option value="featured">Colección</option>
                 </select>
               </div>
               <div className="flex items-center mt-7">
@@ -424,7 +476,10 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
                 <div key={item.originalIndex} className="aspect-square rounded-lg overflow-hidden relative group shadow-sm bg-gray-100 border border-gray-200">
                   <img src={item.url} alt="Gallery" className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-[#19322F]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-[2px]">
-                    <button type="button" onClick={() => markGalleryImageDeleted(item.originalIndex)} className="w-8 h-8 rounded-full bg-white text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors">
+                    <button type="button" onClick={() => setAsMain(item.originalIndex)} className="w-8 h-8 rounded-full bg-white text-[#006655] hover:bg-[#D9ECC8] flex items-center justify-center transition-colors" title="Hacer Principal">
+                      <span className="material-icons text-sm">star</span>
+                    </button>
+                    <button type="button" onClick={() => markGalleryImageDeleted(item.originalIndex)} className="w-8 h-8 rounded-full bg-white text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors" title="Eliminar Imagen">
                       <span className="material-icons text-sm">delete</span>
                     </button>
                   </div>

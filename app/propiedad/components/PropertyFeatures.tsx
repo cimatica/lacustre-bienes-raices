@@ -17,12 +17,12 @@ export default function PropertyFeatures({ area, beds, baths, parking = 0, dict 
           <span className="text-xs uppercase tracking-wider text-nordic/50">{dict?.property?.sqm || "Square Meters"}</span>
         </div>
         <div className="flex flex-col items-center justify-center p-4 bg-mosque/5 rounded-lg border border-mosque/10">
-          <span className="material-icons text-mosque text-2xl mb-2">bed</span>
+          <span className="material-icons text-mosque text-2xl mb-2">king_bed</span>
           <span className="text-xl font-bold text-nordic">{beds}</span>
           <span className="text-xs uppercase tracking-wider text-nordic/50">{dict?.property?.bedrooms || "Bedrooms"}</span>
         </div>
         <div className="flex flex-col items-center justify-center p-4 bg-mosque/5 rounded-lg border border-mosque/10">
-          <span className="material-icons text-mosque text-2xl mb-2">shower</span>
+          <span className="material-icons text-mosque text-2xl mb-2">bathtub</span>
           <span className="text-xl font-bold text-nordic">{baths}</span>
           <span className="text-xs uppercase tracking-wider text-nordic/50">{dict?.property?.bathrooms || "Bathrooms"}</span>
         </div>
