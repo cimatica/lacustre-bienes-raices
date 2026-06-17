@@ -29,6 +29,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [formData, setFormData] = useState({
     title: initialData?.title || "",
@@ -337,8 +338,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         }
       }
 
-      router.push("/admin/properties");
-      router.refresh();
+      setShowSuccessModal(true);
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Error al guardar la propiedad");
@@ -352,6 +352,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
   const activeGallery = gallery.map((item, i) => ({ ...item, originalIndex: i })).filter(item => !item.isDeleted && !item.isMovedToMain);
 
   return (
+    <>
     <form onSubmit={handleSubmit} className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start pb-20">
       {error && (
         <div className="xl:col-span-12 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
@@ -601,5 +602,44 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         </div>
       </div>
     </form>
+    
+    {showSuccessModal && (
+      <div className="fixed inset-0 bg-[#19322F]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl flex flex-col items-center text-center animate-in fade-in zoom-in duration-200">
+          <div className="w-16 h-16 bg-[#D9ECC8] text-[#006655] rounded-full flex items-center justify-center mb-6">
+            <span className="material-icons text-3xl">check_circle</span>
+          </div>
+          <h3 className="text-xl font-bold text-[#19322F] mb-2">¡Éxito!</h3>
+          <p className="text-gray-500 mb-8">
+            Los datos de la propiedad se han {isEditing ? "actualizado" : "registrado"} correctamente.
+          </p>
+          <div className="flex gap-3 w-full">
+            {isEditing && (
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  router.refresh();
+                }}
+                className="flex-1 py-2.5 border border-gray-200 text-gray-600 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+              >
+                Seguir editando
+              </button>
+            )}
+            <button 
+              type="button"
+              onClick={() => {
+                router.push("/admin/properties");
+                router.refresh();
+              }}
+              className="flex-1 py-2.5 bg-[#006655] text-white rounded-lg font-medium hover:bg-[#004d40] shadow-md transition-colors"
+            >
+              Volver al panel
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
