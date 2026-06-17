@@ -47,6 +47,7 @@ export type Property = {
   description?: string;
   year_built?: number;
   parking?: number;
+  host_id?: string;
 };
 
 export type PaginatedProperties = {
@@ -55,6 +56,35 @@ export type PaginatedProperties = {
   page: number;
   pageSize: number;
   totalPages: number;
+};
+
+export type UserProfile = {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url?: string;
+  location?: string;
+  member_since: string;
+  preferences?: Record<string, any>;
+};
+
+export type Favorite = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  created_at: string;
+  property?: Property;
+};
+
+export type Visit = {
+  id: string;
+  user_id: string;
+  property_id: string;
+  visit_date: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  message?: string;
+  created_at: string;
+  property?: Property;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -250,4 +280,91 @@ export async function getPropertyTypes(): Promise<PropertyType[]> {
   if (!res.ok) throw new Error(`Supabase error: ${res.status} ${res.statusText}`);
 
   return res.json() as Promise<PropertyType[]>;
+}
+
+// ─── User, Favorites and Visits ──────────────────────────────────────────────
+
+/** Fetch user profile */
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
+  const url = buildUrl({ select: "*" });
+  const finalUrl = url.replace('/properties?', '/user_profiles?id=eq.' + userId + '&');
+  
+  const res = await fetch(finalUrl, {
+    headers: apiHeaders(),
+    cache: "no-store",
+  });
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.length > 0 ? data[0] : null;
+}
+
+/** Fetch user favorites */
+export async function getUserFavorites(userId: string): Promise<Favorite[]> {
+  const url = buildUrl({ select: "*, property:properties(*, property_images(*), property_types(id, name))" });
+  const finalUrl = url.replace('/properties?', '/favorites?user_id=eq.' + userId + '&');
+  
+  const res = await fetch(finalUrl, {
+    headers: apiHeaders(),
+    cache: "no-store",
+  });
+
+  if (!res.ok) return [];
+  return res.json() as Promise<Favorite[]>;
+}
+
+/** Fetch user visits */
+export async function getUserVisits(userId: string): Promise<Visit[]> {
+  const url = buildUrl({ select: "*, property:properties(*, property_images(*), property_types(id, name))" });
+  const finalUrl = url.replace('/properties?', '/visits?user_id=eq.' + userId + '&order=visit_date.asc&status=eq.scheduled&');
+  
+  const res = await fetch(finalUrl, {
+    headers: apiHeaders(),
+    cache: "no-store",
+  });
+
+  if (!res.ok) return [];
+  return res.json() as Promise<Visit[]>;
+}
+
+/** Schedule a visit */
+export async function scheduleVisit(visit: Omit<Visit, 'id' | 'created_at'>): Promise<boolean> {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/visits`);
+  
+  const res = await fetch(url.toString(), {
+    method: 'POST',
+    headers: {
+      ...apiHeaders(),
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify(visit)
+  });
+
+  return res.ok;
+}
+
+/** Toggle favorite */
+export async function toggleFavorite(userId: string, propertyId: string, isCurrentlyFavorite: boolean): Promise<boolean> {
+  const url = new URL(`${SUPABASE_URL}/rest/v1/favorites`);
+  
+  if (isCurrentlyFavorite) {
+    url.searchParams.set("user_id", `eq.${userId}`);
+    url.searchParams.set("property_id", `eq.${propertyId}`);
+    
+    const res = await fetch(url.toString(), {
+      method: 'DELETE',
+      headers: apiHeaders()
+    });
+    return res.ok;
+  } else {
+    const res = await fetch(url.toString(), {
+      method: 'POST',
+      headers: {
+        ...apiHeaders(),
+        "Prefer": "return=minimal"
+      },
+      body: JSON.stringify({ user_id: userId, property_id: propertyId })
+    });
+    return res.ok;
+  }
 }

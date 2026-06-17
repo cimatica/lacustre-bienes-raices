@@ -122,5 +122,63 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
     "help": "Help Center"
+  },
+  "userProfile": {
+    "title": "User Profile",
+    "memberSince": "Member since",
+    "saved": "Saved",
+    "visits": "Visits",
+    "sold": "Sold",
+    "savedProperties": "Saved Properties",
+    "scheduledVisits": "Scheduled Visits",
+    "preferences": "Preferences",
+    "upcomingVisits": "Upcoming Visits",
+    "reschedule": "Reschedule",
+    "getDirections": "Get Directions",
+    "accountPreferences": "Account Preferences",
+    "accountPreferencesDesc": "Manage your account settings and email preferences",
+    "viewAllSettings": "View all settings",
+    "emailAddress": "Email Address",
+    "change": "Change",
+    "notifications": "Notifications",
+    "propertyAlerts": "New Property Alerts"
+  },
+  "favorites": {
+    "title": "Your Favorites",
+    "subtitle": "You have {count} saved properties waiting for you.",
+    "sortBy": "Sort by: {sort}",
+    "dateAdded": "Date Added",
+    "newListing": "New Listing",
+    "priceDrop": "Price Drop",
+    "forSale": "For Sale",
+    "forRent": "For Rent",
+    "bookVisit": "Book Visit",
+    "scheduleTour": "Schedule Tour",
+    "discoverMore": "Discover More",
+    "discoverDesc": "Find more properties that match your lifestyle.",
+    "browseListings": "Browse Listings"
+  },
+  "scheduleVisit": {
+    "title": "Schedule a Viewing",
+    "subtitle": "Choose a date and time to tour the property in person.",
+    "back": "Back to property details",
+    "forSale": "For Sale",
+    "price": "Price",
+    "hostedBy": "Hosted by",
+    "availableTimes": "Available Times",
+    "message": "Message for the agent",
+    "optional": "(Optional)",
+    "placeholder": "Any specific questions or requests?",
+    "cancel": "Cancel",
+    "confirm": "Confirm Visit"
+  },
+  "seller": {
+    "myProperties": "My Properties",
+    "receivedVisits": "Received Visits",
+    "soldProperties": "Sold Properties",
+    "activeListings": "Active Listings",
+    "viewInterested": "View Interested",
+    "editProperty": "Edit Property",
+    "sellerPanel": "Seller Panel"
   }
 }

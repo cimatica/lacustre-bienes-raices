@@ -122,5 +122,63 @@
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
     "help": "Centro de Ayuda"
+  },
+  "userProfile": {
+    "title": "Perfil de Usuario",
+    "memberSince": "Miembro desde",
+    "saved": "Guardados",
+    "visits": "Visitas",
+    "sold": "Vendidos",
+    "savedProperties": "Propiedades Guardadas",
+    "scheduledVisits": "Visitas Programadas",
+    "preferences": "Preferencias",
+    "upcomingVisits": "Próximas Visitas",
+    "reschedule": "Reprogramar",
+    "getDirections": "Obtener Direcciones",
+    "accountPreferences": "Preferencias de la Cuenta",
+    "accountPreferencesDesc": "Gestiona la configuración de tu cuenta y preferencias de email",
+    "viewAllSettings": "Ver toda la configuración",
+    "emailAddress": "Correo Electrónico",
+    "change": "Cambiar",
+    "notifications": "Notificaciones",
+    "propertyAlerts": "Alertas de nuevas propiedades"
+  },
+  "favorites": {
+    "title": "Tus Favoritos",
+    "subtitle": "Tienes {count} propiedades guardadas esperándote.",
+    "sortBy": "Ordenar por: {sort}",
+    "dateAdded": "Fecha de adición",
+    "newListing": "Nuevos",
+    "priceDrop": "Bajó de precio",
+    "forSale": "Venta",
+    "forRent": "Renta",
+    "bookVisit": "Reservar Visita",
+    "scheduleTour": "Programar Recorrido",
+    "discoverMore": "Descubre Más",
+    "discoverDesc": "Encuentra más propiedades que se adapten a tu estilo de vida.",
+    "browseListings": "Explorar Propiedades"
+  },
+  "scheduleVisit": {
+    "title": "Programar una Visita",
+    "subtitle": "Elige una fecha y hora para conocer la propiedad en persona.",
+    "back": "Volver a la propiedad",
+    "forSale": "En Venta",
+    "price": "Precio",
+    "hostedBy": "Anfitrión",
+    "availableTimes": "Horas Disponibles",
+    "message": "Mensaje para el agente",
+    "optional": "(Opcional)",
+    "placeholder": "¿Alguna pregunta o requerimiento específico?",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar Visita"
+  },
+  "seller": {
+    "myProperties": "Mis Propiedades",
+    "receivedVisits": "Visitas Recibidas",
+    "soldProperties": "Propiedades Vendidas",
+    "activeListings": "Propiedades Activas",
+    "viewInterested": "Ver Interesados",
+    "editProperty": "Editar Propiedad",
+    "sellerPanel": "Panel Vendedor"
   }
 }

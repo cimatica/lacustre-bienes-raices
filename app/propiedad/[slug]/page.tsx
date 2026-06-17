@@ -12,6 +12,7 @@ import ContactCard from '@/app/propiedad/components/ContactCard';
 import PropertyMap from '@/app/propiedad/components/PropertyMap';
 import { getDictionary } from '@/lib/i18n';
 import { getUfValue, formatUF, formatCLP } from '@/lib/currency';
+import { createClient } from '@/utils/supabase/server';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -45,6 +46,23 @@ export default async function PropertyPage({ params }: Props) {
   if (!property) {
     notFound();
   }
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let userRole = 'usuario';
+  if (user) {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+    if (roleData) {
+      userRole = roleData.role;
+    }
+  }
+
+  const isOwner = user?.id === property.host_id;
 
   // Always include the main image url, and append gallery images if they exist
   const mainImageObj = {
@@ -88,7 +106,7 @@ export default async function PropertyPage({ params }: Props) {
           {/* Right Column */}
           <div className="lg:col-span-4 relative">
             <div className="sticky top-28 space-y-6">
-              <ContactCard price={property.price} clpPrice={property.price * ufValue} location={property.location} dict={dict} />
+              <ContactCard price={property.price} clpPrice={property.price * ufValue} location={property.location} slug={property.slug} isOwner={isOwner} userRole={userRole} dict={dict} />
               <PropertyMap latitude={property.latitude} longitude={property.longitude} />
             </div>
           </div>

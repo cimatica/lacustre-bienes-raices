@@ -41,7 +41,11 @@ export default async function Navbar() {
             <Link className="text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1" href="#">{dict.navbar.buy}</Link>
             <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.rent}</Link>
             <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.sell}</Link>
-            <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.saved}</Link>
+            {userRole === 'vendedor' ? (
+              <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="/perfil">{(dict as any).seller?.myProperties || "Mis Propiedades"}</Link>
+            ) : (
+              <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="/favoritos">{dict.navbar.saved}</Link>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <LanguageSelector currentLanguage={currentLanguage} />
@@ -72,6 +76,10 @@ export default async function Navbar() {
                         </span>
                       </div>
                     </div>
+                    <Link href="/perfil" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                      <span className="material-icons text-[18px]">person</span>
+                      {(dict as any).userProfile?.title || "Perfil de Usuario"}
+                    </Link>
                     {userRole === 'administrador' && (
                       <Link href="/admin/properties" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
                         <span className="material-icons text-[18px]">admin_panel_settings</span>
@@ -102,7 +110,11 @@ export default async function Navbar() {
           <Link className="block px-3 py-2 rounded-md text-base font-medium text-mosque bg-mosque/10" href="#">{dict.navbar.buy}</Link>
           <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="#">{dict.navbar.rent}</Link>
           <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="#">{dict.navbar.sell}</Link>
-          <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="#">{dict.navbar.saved}</Link>
+          {userRole === 'vendedor' ? (
+            <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="/perfil">{(dict as any).seller?.myProperties || "Mis Propiedades"}</Link>
+          ) : (
+            <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="/favoritos">{dict.navbar.saved}</Link>
+          )}
         </div>
       </div>
     </nav>

@@ -1,16 +1,20 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { formatUF, formatCLP } from "@/lib/currency";
 
 type Props = {
   price: number;
   clpPrice: number;
   location: string;
+  slug: string;
+  isOwner?: boolean;
+  userRole?: string;
   dict?: any;
 };
 
-export default function ContactCard({ price, clpPrice, location, dict }: Props) {
+export default function ContactCard({ price, clpPrice, location, slug, isOwner, userRole, dict }: Props) {
   return (
     <div className="bg-white p-6 rounded-xl shadow-sm border border-mosque/5">
       <div className="mb-4">
@@ -49,10 +53,17 @@ export default function ContactCard({ price, clpPrice, location, dict }: Props) 
         </div>
       </div>
       <div className="space-y-3">
-        <button className="w-full bg-mosque hover:bg-primary-hover text-white py-4 px-6 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center gap-2 group">
-          <span className="material-icons text-xl group-hover:scale-110 transition-transform">calendar_today</span>
-          {dict?.property?.scheduleVisit || "Schedule Visit"}
-        </button>
+        {isOwner && userRole === 'vendedor' ? (
+          <Link href={`/admin/properties`} className="w-full bg-mosque hover:bg-primary-hover text-white py-4 px-6 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center gap-2 group">
+            <span className="material-icons text-xl group-hover:scale-110 transition-transform">edit</span>
+            {(dict as any).seller?.editProperty || "Edit Property"}
+          </Link>
+        ) : (
+          <Link href={`/propiedad/${slug}/visita`} className="w-full bg-mosque hover:bg-primary-hover text-white py-4 px-6 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center gap-2 group">
+            <span className="material-icons text-xl group-hover:scale-110 transition-transform">calendar_today</span>
+            {dict?.property?.scheduleVisit || "Schedule Visit"}
+          </Link>
+        )}
         <button className="w-full bg-transparent border border-nordic/10 hover:border-mosque text-nordic/80 hover:text-mosque py-4 px-6 rounded-lg font-medium transition-all flex items-center justify-center gap-2">
           <span className="material-icons text-xl">mail_outline</span>
           {dict?.property?.contactAgent || "Contact Agent"}
