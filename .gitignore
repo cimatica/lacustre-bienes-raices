@@ -40,3 +40,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Documentación local / notas de desarrollo
+/antigravity/
+mejoras-practicas.md
+lecciones_aprendidas.md

@@ -151,3 +151,18 @@ Este documento establece los estándares de ingeniería y mejores prácticas par
   * **Por qué importa:** Asegura que el portal no levante en producción sin claves críticas (API de mapas, credenciales de DB, tokens de correo) y evita exponer secretos.
   * **Cómo se hace en Next.js:** Usar librerías como `@t3-oss/env-nextjs` para crear un esquema Zod que valide que el archivo `.env` contenga todo lo necesario durante el build. Usar el prefijo `NEXT_PUBLIC_` estrictamente para claves que el cliente debe conocer (ej. token de Mapbox).
   * **Anti-patrón:** Subir por error archivos `.env` o `.env.local` al repositorio de código o usar `process.env.SECRET` en Client Components.
+
+---
+
+## 6. Manejo de Errores y Excepciones
+
+* **Práctica:** Fronteras de Error (Error Boundaries) a Nivel de Ruta
+  * **Impacto y Etapa:** Alto | Producción
+  * **Por qué importa:** Evita que toda la aplicación colapse (pantalla en blanco) cuando ocurre un error en un componente o falla una petición externa. Mantiene intactos el layout y la navegación (navbar/footer).
+  * **Cómo se hace en Next.js:** Crear archivos `error.tsx` en las rutas clave. Utilizar el estado del error para determinar si es un problema de red (offline) o de servidor, y ofrecer un botón para reintentar (`reset()`).
+  * **Anti-patrón:** Dejar que las excepciones no controladas lleguen al root sin manejar, o usar `window.alert` en lugar de una interfaz amigable.
+
+* **Práctica:** Páginas Personalizadas para Rutas Inexistentes
+  * **Impacto y Etapa:** Medio | MVP
+  * **Por qué importa:** Mejora la experiencia del usuario y el SEO cuando visitan URLs rotas o propiedades que ya fueron eliminadas.
+  * **Cómo se hace en Next.js:** Implementar el archivo `not-found.tsx` con llamadas claras a la acción (ej. "Volver al inicio" o "Buscar otras propiedades").
