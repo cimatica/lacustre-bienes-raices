@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Property, PropertyImage } from "@/lib/supabase";
 import dynamic from "next/dynamic";
+import { useAlert } from "@/app/components/ui/AlertProvider";
 
 // Dynamically import LocationPicker to prevent SSR issues with Leaflet
 const LocationPicker = dynamic(() => import("./LocationPicker"), { ssr: false });
@@ -25,6 +26,7 @@ type GalleryImageState = {
 export default function PropertyForm({ initialData, propertyId }: PropertyFormProps) {
   const router = useRouter();
   const supabase = createClient();
+  const { showAlert } = useAlert();
   const isEditing = !!initialData;
 
   const [loading, setLoading] = useState(false);
@@ -117,7 +119,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > 5 * 1024 * 1024) {
-        alert("La imagen principal excede el límite de 5MB");
+        showAlert("Límite excedido", "La imagen principal excede el límite de 5MB", "warning");
         return;
       }
       setMainImage(file);
@@ -131,13 +133,13 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
       const activeImages = gallery.filter(img => !img.isDeleted);
       
       if (activeImages.length + filesArray.length > 9) {
-        alert("Puedes subir un máximo de 9 imágenes extra para la galería (10 en total contando la principal)");
+        showAlert("Límite de imágenes", "Puedes subir un máximo de 9 imágenes extra para la galería (10 en total contando la principal)", "warning");
         return;
       }
 
       const newGallery = filesArray.map(file => {
         if (file.size > 5 * 1024 * 1024) {
-          alert(`La imagen ${file.name} excede el límite de 5MB y no será agregada.`);
+          showAlert("Límite excedido", `La imagen ${file.name} excede el límite de 5MB y no será agregada.`, "warning");
           return null;
         }
         return {

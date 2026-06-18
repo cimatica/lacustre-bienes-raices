@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useAlert } from "@/app/components/ui/AlertProvider";
 
 // Fix default icon issue with Webpack
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -31,6 +32,7 @@ export default function LocationPicker({
 
   const [address, setAddress] = useState(initialAddress);
   const [searching, setSearching] = useState(false);
+  const { showAlert } = useAlert();
 
   // Initialize map
   useEffect(() => {
@@ -130,7 +132,7 @@ export default function LocationPicker({
             }
           }
         } else {
-          alert("Ubicación no encontrada");
+          showAlert("Sin resultados", "No pudimos encontrar esa ubicación. Intenta con otros términos.", "warning");
         }
       }
     } catch (error) {

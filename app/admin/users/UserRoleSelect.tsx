@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { updateUserRole } from './actions';
+import { useAlert } from '@/app/components/ui/AlertProvider';
 
 const ROLES = [
   { id: 'administrador', label: 'Administrador', icon: 'shield' },
@@ -11,6 +12,7 @@ const ROLES = [
 ];
 
 export default function UserRoleSelect({ userId, currentRole }: { userId: string, currentRole: string }) {
+  const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,9 @@ export default function UserRoleSelect({ userId, currentRole }: { userId: string
     setLoading(true);
     const result = await updateUserRole(userId, newRole);
     if (result.error) {
-      alert(`Error al actualizar: ${result.error}`);
+      showAlert('Error', `Error al actualizar: ${result.error}`, 'error');
+    } else {
+      showAlert('¡Actualizado!', 'El rol del usuario ha sido actualizado exitosamente.', 'success');
     }
     setLoading(false);
   };

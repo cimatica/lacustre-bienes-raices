@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { getCurrentLanguage, getDictionary } from "../lib/i18n";
 import { I18nProvider } from "./components/I18nProvider";
+import { AlertProvider } from "./components/ui/AlertProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -33,7 +34,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col font-display selection:bg-mosque selection:text-white bg-surface-darkest text-slate-200">
         <I18nProvider dictionary={dict}>
-          {children}
+          <AlertProvider>
+            {children}
+          </AlertProvider>
         </I18nProvider>
       </body>
     </html>

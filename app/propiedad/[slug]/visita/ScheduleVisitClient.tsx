@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Property, scheduleVisit } from '@/lib/supabase';
 import { formatUF, formatCLP } from '@/lib/currency';
 import { useRouter } from 'next/navigation';
+import { useAlert } from '@/app/components/ui/AlertProvider';
 
 type Props = {
   property: Property;
@@ -15,6 +16,7 @@ type Props = {
 
 export default function ScheduleVisitClient({ property, clpPrice, dict, userId }: Props) {
   const router = useRouter();
+  const { showAlert } = useAlert();
   const [selectedDate, setSelectedDate] = useState<number | null>(8);
   const [selectedTime, setSelectedTime] = useState<string | null>("10:00 AM");
   const [message, setMessage] = useState('');
@@ -22,11 +24,11 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
 
   const handleConfirm = async () => {
     if (!userId) {
-      alert("Por favor, inicia sesión para programar una visita.");
+      showAlert("Atención", "Por favor, inicia sesión para programar una visita.", "warning");
       return;
     }
     if (!selectedDate || !selectedTime) {
-      alert("Por favor, selecciona una fecha y hora.");
+      showAlert("Atención", "Por favor, selecciona una fecha y hora.", "warning");
       return;
     }
 
@@ -46,10 +48,10 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     setIsSubmitting(false);
 
     if (success) {
-      alert("¡Visita agendada con éxito!");
+      showAlert("¡Éxito!", "¡Visita agendada con éxito!", "success");
       router.push('/perfil');
     } else {
-      alert("Hubo un error al agendar tu visita.");
+      showAlert("Error", "Hubo un error al agendar tu visita.", "error");
     }
   };
 

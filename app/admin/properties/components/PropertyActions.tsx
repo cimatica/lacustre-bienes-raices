@@ -3,27 +3,34 @@
 import React, { useTransition } from 'react';
 import { togglePropertyStatus, deleteProperty } from '@/app/admin/actions';
 import Link from 'next/link';
+import { useAlert } from '@/app/components/ui/AlertProvider';
 
 export function PropertyActions({ property }: { property: any }) {
   const [isPending, startTransition] = useTransition();
+  const { showAlert, showConfirm } = useAlert();
 
   const handleToggle = () => {
     startTransition(async () => {
       try {
         await togglePropertyStatus(property.id, property.is_active);
       } catch (err) {
-        alert("Error al actualizar estado");
+        showAlert("Error", "Error al actualizar estado", "error");
       }
     });
   };
 
-  const handleDelete = () => {
-    if (window.confirm("¿Estás seguro de que quieres eliminar esta propiedad? Se eliminarán los registros y se perderá el historial. Esta acción es irreversible.")) {
+  const handleDelete = async () => {
+    const isConfirmed = await showConfirm(
+      "Eliminar Propiedad", 
+      "¿Estás seguro de que quieres eliminar esta propiedad? Se eliminarán los registros y se perderá el historial. Esta acción es irreversible."
+    );
+    
+    if (isConfirmed) {
       startTransition(async () => {
         try {
           await deleteProperty(property.id);
         } catch (err) {
-          alert("Error al eliminar la propiedad");
+          showAlert("Error", "Error al eliminar la propiedad", "error");
         }
       });
     }
