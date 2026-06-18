@@ -53,8 +53,8 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-all text-sm font-medium
           ${
             isFirst
-              ? "border-nordic-dark/10 text-nordic-dark/30 pointer-events-none"
-              : "border-nordic-dark/10 text-nordic-dark hover:border-mosque hover:text-mosque hover:shadow-md"
+              ? "border-slate-700/50 text-slate-600 pointer-events-none"
+              : "border-slate-700/50 text-slate-300 hover:border-mosque hover:text-mosque hover:bg-surface-darker hover:shadow-md"
           }`}
       >
         <span className="material-icons text-lg">chevron_left</span>
@@ -65,7 +65,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         p === "…" ? (
           <span
             key={`ellipsis-${idx}`}
-            className="w-10 h-10 flex items-center justify-center text-nordic-muted text-sm"
+            className="w-10 h-10 flex items-center justify-center text-slate-500 text-sm"
           >
             …
           </span>
@@ -78,7 +78,7 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
               ${
                 p === currentPage
                   ? "border-mosque bg-mosque text-white shadow-md"
-                  : "border-nordic-dark/10 text-nordic-dark hover:border-mosque hover:text-mosque hover:shadow-md"
+                  : "border-slate-700/50 text-slate-300 hover:border-mosque hover:text-mosque hover:bg-surface-darker hover:shadow-md"
               }`}
           >
             {p}
@@ -93,8 +93,8 @@ export default function Pagination({ currentPage, totalPages }: PaginationProps)
         className={`flex items-center justify-center w-10 h-10 rounded-lg border transition-all text-sm font-medium
           ${
             isLast
-              ? "border-nordic-dark/10 text-nordic-dark/30 pointer-events-none"
-              : "border-nordic-dark/10 text-nordic-dark hover:border-mosque hover:text-mosque hover:shadow-md"
+              ? "border-slate-700/50 text-slate-600 pointer-events-none"
+              : "border-slate-700/50 text-slate-300 hover:border-mosque hover:text-mosque hover:bg-surface-darker hover:shadow-md"
           }`}
       >
         <span className="material-icons text-lg">chevron_right</span>

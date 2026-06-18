@@ -80,7 +80,7 @@ export default async function PropertyPage({ params }: Props) {
     : [mainImageObj];
 
   return (
-    <div className="bg-clear-day text-nordic min-h-screen selection:bg-mosque/20">
+    <div className="min-h-screen selection:bg-mosque/20">
       <Navbar />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -98,7 +98,7 @@ export default async function PropertyPage({ params }: Props) {
                   </>
                 )}
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold text-nordic-dark">{property.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-white">{property.title}</h1>
             </div>
             <ImageGallery images={imagesToPass} badge={property.badge} />
           </div>
@@ -118,21 +118,6 @@ export default async function PropertyPage({ params }: Props) {
             <PropertyFeatures area={property.area} beds={property.beds} baths={property.baths} parking={property.parking} dict={dict} />
             <PropertyDescription dict={dict} description={property.description || ""} />
             <PropertyAmenities dict={dict} amenities={property.amenities} />
-            
-            <div className="bg-mosque/5 p-6 rounded-xl border border-mosque/10 flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex items-start gap-4">
-                <div className="p-3 bg-white rounded-full text-mosque shadow-sm">
-                  <span className="material-icons">calculate</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-nordic">{dict.property.estimatedPayment}</h3>
-                  <p className="text-sm text-nordic/60">{dict.property.startingFrom} <strong className="text-mosque">$5,430{dict.propertyCard.month}</strong> {dict.property.with20Down}</p>
-                </div>
-              </div>
-              <button className="whitespace-nowrap px-4 py-2 bg-white border border-nordic/10 rounded-lg text-sm font-semibold hover:border-mosque transition-colors text-nordic">
-                {dict.property.calculateMortgage}
-              </button>
-            </div>
           </div>
         </div>
       </main>

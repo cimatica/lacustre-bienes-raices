@@ -47,7 +47,7 @@
     "foundOne": "Se encontró 1 propiedad.",
     "foundMultiple": "Se encontraron {count} propiedades.",
     "noProperties": "No se encontraron propiedades",
-    "noPropertiesDesc": "Intenta ajustar tus filtros de búsqueda, reducir el número de comodidades requeridas o ampliar el rango de precio.",
+    "noPropertiesDesc": "Intenta ajustar tus filtros de búsqueda",
     "clearSearch": "Limpiar Búsqueda"
   },
   "filters": {

@@ -53,20 +53,20 @@ export default function PropertyMap({ latitude, longitude }: Props) {
 
   if (!latitude || !longitude) {
     return (
-      <div className="bg-white p-2 rounded-xl shadow-sm border border-mosque/5">
-        <div className="w-full aspect-[4/3] bg-slate-100 rounded-lg flex items-center justify-center">
-          <p className="text-nordic/50 font-medium">Ubicación no disponible</p>
+      <div className="bg-surface-dark p-2 rounded-xl shadow-sm border border-slate-700/50">
+        <div className="w-full aspect-[4/3] bg-surface-darker rounded-lg flex items-center justify-center">
+          <p className="text-slate-400 font-medium">Ubicación no disponible</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white p-2 rounded-xl shadow-sm border border-mosque/5">
-      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-slate-100 z-0">
+    <div className="bg-surface-dark p-2 rounded-xl shadow-sm border border-slate-700/50">
+      <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-surface-darker z-0">
          <div ref={mapRef} className="w-full h-full" />
          <a 
-           className="absolute bottom-2 right-2 bg-white/90 text-xs font-medium px-2 py-1 rounded shadow-sm text-nordic hover:text-mosque z-[1000]" 
+           className="absolute bottom-2 right-2 bg-surface-darkest/90 text-xs font-medium px-2 py-1 rounded shadow-sm text-slate-300 hover:text-mosque z-[1000]" 
            href={`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`} 
            target="_blank" 
            rel="noreferrer"

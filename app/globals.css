@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #EEF6F6;
-  --foreground: #19322F;
+  --background: #0f2320;
+  --foreground: #e2e8f0;
 }
 
 @theme inline {
@@ -20,6 +20,9 @@
   --color-hint-of-green: #D9ECC8;
   --color-accent: #D9ECC8;
   --color-surface: #FFFFFF;
+  --color-surface-dark: #162e2a;
+  --color-surface-darker: #112522;
+  --color-surface-darkest: #0f2320;
   --color-clear-day: #EEF6F6;
   
   --font-display: var(--font-inter);
@@ -43,4 +46,43 @@ body {
 .hide-scroll {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Elegant Custom Scrollbar for Luxury Theme */
+.custom-scrollbar-x::-webkit-scrollbar {
+  height: 4px;
+}
+.custom-scrollbar-x::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 4px;
+}
+.custom-scrollbar-x::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+.custom-scrollbar-x::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.custom-scrollbar-x {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.02);
+}
+
+.custom-scrollbar-y::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar-y::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+}
+.custom-scrollbar-y::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+.custom-scrollbar-y::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.custom-scrollbar-y {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) rgba(255, 255, 255, 0.02);
 }

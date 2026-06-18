@@ -23,6 +23,7 @@ export default function ImageGallery({ images, badge }: Props) {
     images && images.length > 0 ? (images.find((i) => i.is_main) || images[0]) : null
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [slideshowIndex, setSlideshowIndex] = useState<number | null>(null);
 
   if (!images || images.length === 0 || !currentMainImage) {
     return <div className="aspect-[16/10] bg-slate-200 rounded-xl animate-pulse"></div>;
@@ -68,7 +69,7 @@ export default function ImageGallery({ images, badge }: Props) {
 
         {/* Thumbnails */}
         {galleryImages.length > 0 && (
-          <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 snap-x">
+          <div className="flex gap-4 overflow-x-auto custom-scrollbar-x pb-4 snap-x">
             {galleryImages.map((img) => (
               <div
                 key={img.id}
@@ -92,63 +93,110 @@ export default function ImageGallery({ images, badge }: Props) {
       {/* Modal View All Photos */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-nordic-dark/80 backdrop-blur-sm transition-all"
-          onClick={() => setIsModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/80 backdrop-blur-sm transition-all"
+          onClick={() => { setIsModalOpen(false); setSlideshowIndex(null); }}
         >
-          <div 
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex-none bg-white dark:bg-gray-900 px-6 py-4 flex justify-between items-center border-b border-gray-100 dark:border-gray-800 z-10">
-              <h2 className="text-xl font-semibold text-nordic-dark dark:text-white">
-                {dict?.property?.viewAllPhotos || "View All Photos"} ({images.length})
-              </h2>
-              <button 
-                onClick={() => setIsModalOpen(false)}
-                className="p-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-600 dark:text-gray-300 flex items-center justify-center"
-              >
-                <span className="material-icons text-xl">close</span>
-              </button>
-            </div>
-            
-            <div className="p-4 sm:p-6 overflow-y-auto flex-grow bg-gray-50/50 dark:bg-gray-900/50 custom-scrollbar">
-              <div 
-                className={`grid gap-4 sm:gap-6 ${
-                  images.length === 1 ? 'grid-cols-1 max-w-4xl mx-auto' : 
-                  images.length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto' : 
-                  'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                }`}
-              >
-                {images.map((img) => (
-                  <div 
-                    key={img.id} 
-                    className={`relative rounded-xl overflow-hidden shadow-md group ${
-                      images.length === 1 ? 'aspect-[16/10]' : 'aspect-[4/3]'
-                    }`}
-                    onClick={() => {
-                      setCurrentMainImage(img);
-                      // Instead of closing, we just visually indicate it was selected or simply let them know it updated the background.
-                      // Since the background is obscured, we don't necessarily need to close it.
-                    }}
-                  >
-                    <Image
-                      src={img.image_url}
-                      alt={img.image_alt || "Property photo"}
-                      fill
-                      unoptimized
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105 cursor-pointer"
-                    />
-                    
-                    {/* Visual indicator if it is the current main image */}
-                    {currentMainImage.id === img.id && (
-                      <div className="absolute inset-0 ring-4 ring-inset ring-mosque/80 bg-mosque/10 pointer-events-none rounded-xl transition-all"></div>
-                    )}
-                  </div>
-                ))}
+          {slideshowIndex === null ? (
+            // GRID VIEW
+            <div 
+              className="bg-surface-dark rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-700/50"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex-none px-6 py-4 flex justify-between items-center border-b border-slate-700/50 z-10">
+                <h2 className="text-xl font-semibold text-white">
+                  {dict?.property?.viewAllPhotos || "Ver Todas las Fotos"} ({images.length})
+                </h2>
+                <button 
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 bg-surface-darker hover:bg-surface-darkest border border-slate-700/50 rounded-full transition-colors text-slate-300 flex items-center justify-center"
+                >
+                  <span className="material-icons text-xl">close</span>
+                </button>
+              </div>
+              
+              <div className="p-4 sm:p-6 overflow-y-auto flex-grow custom-scrollbar-y">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+                  {images.map((img, idx) => {
+                    // First 2 images take 6 columns each, next ones take 4
+                    const isTopRow = idx < 2;
+                    return (
+                      <div 
+                        key={img.id} 
+                        className={`relative rounded-xl overflow-hidden shadow-md group cursor-pointer ${
+                          isTopRow ? 'md:col-span-6 aspect-[4/3]' : 'md:col-span-4 aspect-[4/3]'
+                        }`}
+                        onClick={() => {
+                          setSlideshowIndex(idx);
+                        }}
+                      >
+                        <Image
+                          src={img.image_url}
+                          alt={img.image_alt || "Property photo"}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            // SLIDESHOW VIEW
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-darkest/95 backdrop-blur-md" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Header inside slideshow */}
+              <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-50">
+                <div className="text-slate-300 font-medium tracking-widest text-sm">
+                  {slideshowIndex + 1} / {images.length}
+                </div>
+                <button 
+                  onClick={() => setSlideshowIndex(null)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors text-white flex items-center justify-center"
+                >
+                  <span className="material-icons text-2xl">close</span>
+                </button>
+              </div>
+
+              {/* Prev Button */}
+              <button 
+                className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all z-50 disabled:opacity-30"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSlideshowIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+                }}
+                disabled={slideshowIndex === 0}
+              >
+                <span className="material-icons text-2xl">chevron_left</span>
+              </button>
+
+              {/* Main Slideshow Image */}
+              <div className="relative w-full max-w-5xl h-[70vh] sm:h-[80vh] mx-16">
+                <Image
+                  src={images[slideshowIndex].image_url}
+                  alt={images[slideshowIndex].image_alt || "Property photo"}
+                  fill
+                  unoptimized
+                  className="object-contain drop-shadow-2xl"
+                />
+              </div>
+
+              {/* Next Button */}
+              <button 
+                className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full backdrop-blur-md transition-all z-50 disabled:opacity-30"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSlideshowIndex((prev) => (prev !== null && prev < images.length - 1 ? prev + 1 : prev));
+                }}
+                disabled={slideshowIndex === images.length - 1}
+              >
+                <span className="material-icons text-2xl">chevron_right</span>
+              </button>
+              
+            </div>
+          )}
         </div>
       )}
     </>

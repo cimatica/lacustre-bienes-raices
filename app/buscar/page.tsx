@@ -51,7 +51,7 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
             {dict.search.searchResults}
           </h1>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mt-2 gap-4">
-            <p className="text-nordic-muted">
+            <p className="text-slate-400">
               {results.length === 1 
                 ? dict.search.foundOne 
                 : dict.search.foundMultiple.replace("{count}", results.length.toString())}
@@ -67,13 +67,13 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
             ))}
           </div>
         ) : (
-          <div className="py-20 text-center bg-white rounded-xl shadow-sm border border-nordic-dark/5">
-            <span className="material-icons text-6xl text-nordic-muted/30 mb-4 block">search_off</span>
-            <h3 className="text-lg font-semibold text-mosque mb-2">{dict.search.noProperties}</h3>
-            <p className="text-nordic-muted max-w-md mx-auto">
+          <div className="py-20 text-center bg-surface-dark rounded-xl shadow-sm border border-slate-700/50">
+            <span className="material-icons text-6xl text-slate-500 mb-4 block">manage_search</span>
+            <h3 className="text-lg font-semibold text-white mb-2">{dict.search.noProperties}</h3>
+            <p className="text-slate-400 max-w-md mx-auto">
               {dict.search.noPropertiesDesc}
             </p>
-            <Link href="/" className="mt-6 inline-block bg-mosque hover:bg-mosque/90 text-white font-medium px-6 py-2 rounded-lg transition-colors">
+            <Link href="/" className="mt-6 inline-block bg-surface-darker hover:bg-mosque border border-slate-700/50 text-white font-medium px-6 py-2 rounded-lg transition-colors">
               {dict.search.clearSearch}
             </Link>
           </div>

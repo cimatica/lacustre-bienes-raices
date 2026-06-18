@@ -5,9 +5,9 @@ type Props = {
 
 export default function PropertyDescription({ description, dict }: Props) {
   return (
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-mosque/5">
-      <h2 className="text-lg font-semibold mb-4 text-nordic">{dict?.property?.aboutHome || "About this home"}</h2>
-      <div className="prose prose-slate max-w-none text-nordic/70 leading-relaxed">
+    <div className="bg-surface-dark p-8 rounded-xl shadow-sm border border-slate-700/50">
+      <h2 className="text-lg font-semibold mb-4 text-white">{dict?.property?.aboutHome || "About this home"}</h2>
+      <div className="prose prose-slate max-w-none text-slate-300 leading-relaxed">
         {description ? (
           <p>{description}</p>
         ) : (

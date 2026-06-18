@@ -45,8 +45,8 @@ export default async function Home({ searchParams }: HomeProps) {
         <section className="mb-16">
           <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-mosque">{dict.home.featuredCollections}</h2>
-              <p className="text-nordic-muted mt-1 text-sm">{dict.home.featuredSubtitle}</p>
+              <h2 className="text-2xl font-bold text-white">{dict.home.featuredCollections}</h2>
+              <p className="text-slate-400 mt-1 text-sm">{dict.home.featuredSubtitle}</p>
             </div>
             <Link
               className="hidden sm:flex items-center gap-1 text-sm font-medium text-mosque hover:opacity-70 transition-opacity"
@@ -66,8 +66,8 @@ export default async function Home({ searchParams }: HomeProps) {
         <section>
           <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-mosque">{dict.home.newInMarket}</h2>
-              <p className="text-nordic-muted mt-1 text-sm">
+              <h2 className="text-2xl font-bold text-white">{dict.home.newInMarket}</h2>
+              <p className="text-slate-400 mt-1 text-sm">
                 {dict.home.newSubtitle}
                 {newProperties.total > 0 && (
                   <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-mosque/10 text-mosque">
@@ -77,7 +77,7 @@ export default async function Home({ searchParams }: HomeProps) {
               </p>
             </div>
             {/* Filter tabs — server-driven via URL */}
-            <div className="hidden md:flex bg-white p-1 rounded-lg shadow-sm border border-nordic-dark/5">
+            <div className="hidden md:flex bg-surface-darker p-1 rounded-lg shadow-sm border border-slate-800">
               {(["Todos", "Venta", "Renta"] as const).map((tab) => {
                 const label = tab === "Todos" ? dict.home.all : tab === "Venta" ? dict.home.sale : dict.home.rent;
                 return (
@@ -86,8 +86,8 @@ export default async function Home({ searchParams }: HomeProps) {
                     href={tab === "Todos" ? "/?page=1" : `/?tipo=${tab}&page=1`}
                     id={`filter-tab-${tab.toLowerCase()}`}
                     className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${activeTab === tab
-                      ? "bg-nordic-dark text-white shadow-sm"
-                      : "text-nordic-muted hover:text-nordic-dark"
+                      ? "bg-mosque text-white shadow-sm"
+                      : "text-slate-400 hover:text-white"
                       }`}
                   >
                     {label}
@@ -104,7 +104,7 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
 
           {newProperties.data.length === 0 && (
-            <div className="py-20 text-center text-nordic-muted">
+            <div className="py-20 text-center text-slate-500">
               <span className="material-icons text-5xl mb-4 block opacity-30">home_work</span>
               {dict.home.noProperties}
             </div>
