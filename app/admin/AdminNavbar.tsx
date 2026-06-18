@@ -18,7 +18,11 @@ export default function AdminNavbar({ user, userRole }: { user: any, userRole: s
           <div className="flex">
             <div className="flex-shrink-0 flex items-center gap-2 cursor-pointer">
               <img src="/img/logo_navbar.png" alt="Logo" className="h-8 w-auto object-contain" />
-              <span className="font-bold text-xl tracking-tight text-[#19322F]">Lacustre - Bienes Raíces Admin</span>
+              <span className="font-bold text-xl tracking-tight text-[#19322F] flex items-center gap-2">
+                <span className="text-base text-gray-500 font-medium hidden sm:inline">Lacustre - Bienes Raíces</span>
+                <span className="hidden sm:inline text-gray-300">|</span> 
+                Admin
+              </span>
             </div>
             <div className="hidden md:ml-10 md:flex md:space-x-8">
               {navLinks.map((link) => {
@@ -40,11 +44,7 @@ export default function AdminNavbar({ user, userRole }: { user: any, userRole: s
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button className="p-2 rounded-full text-gray-400 hover:text-[#006655] hover:bg-[#006655]/5 transition-colors relative">
-              <span className="material-icons text-xl">notifications_none</span>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="flex items-center gap-3 pl-4 border-l border-gray-200 group relative py-3">
+            <div className="flex items-center gap-3 group relative py-3">
               {user ? (
                 <>
                   <div className="flex flex-col items-end hidden sm:flex cursor-pointer">

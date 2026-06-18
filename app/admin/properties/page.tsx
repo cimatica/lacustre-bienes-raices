@@ -56,8 +56,8 @@ export default async function AdminPropertiesPage({
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">Mis Propiedades</h1>
-          <p className="text-gray-500 mt-1">Gestiona tu portafolio y monitorea el rendimiento.</p>
+          <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">Directorio de Propiedades</h1>
+          <p className="text-gray-500 mt-1">Administra todas las propiedades registradas en la plataforma.</p>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
@@ -67,7 +67,7 @@ export default async function AdminPropertiesPage({
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 max-w-3xl">
         <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-gray-500">Total Propiedades</p>
@@ -84,15 +84,6 @@ export default async function AdminPropertiesPage({
           </div>
           <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
             <span className="material-icons">check_circle</span>
-          </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Ventas Pendientes</p>
-            <p className="text-2xl font-bold text-[#19322F] mt-1">{pendingSale}</p>
-          </div>
-          <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
-            <span className="material-icons">pending</span>
           </div>
         </div>
       </div>
