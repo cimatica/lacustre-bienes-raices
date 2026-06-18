@@ -7,6 +7,10 @@ export default function LoginForm({ dict }: { dict: any }) {
   const supabase = createClient();
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const [loadingGithub, setLoadingGithub] = useState(false);
+  const [loadingEmail, setLoadingEmail] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleGoogleSignIn = async () => {
     setLoadingGoogle(true);
@@ -28,8 +32,71 @@ export default function LoginForm({ dict }: { dict: any }) {
     });
   };
 
+  const handleEmailSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoadingEmail(true);
+    setErrorMsg('');
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      setErrorMsg(error.message);
+      setLoadingEmail(false);
+    } else {
+      window.location.href = '/';
+    }
+  };
+
   return (
     <div className="bg-surface-dark rounded-2xl shadow-sm p-8 sm:p-10 border border-slate-700/50 backdrop-blur-sm">
+      <form onSubmit={handleEmailSignIn} className="space-y-4 mb-6">
+        {errorMsg && (
+          <div className="p-3 bg-red-500/10 border border-red-500/50 rounded-lg text-red-500 text-sm">
+            {errorMsg}
+          </div>
+        )}
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">{dict.email || "Correo Electrónico"}</label>
+          <input 
+            type="email" 
+            required 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-surface-darker border border-slate-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-mosque focus:ring-1 focus:ring-mosque transition-colors"
+            placeholder="tu@email.com"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">{dict.password || "Contraseña"}</label>
+          <input 
+            type="password" 
+            required 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full bg-surface-darker border border-slate-700/50 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-mosque focus:ring-1 focus:ring-mosque transition-colors"
+            placeholder="••••••••"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={loadingEmail || loadingGoogle || loadingGithub}
+          className="w-full bg-mosque hover:bg-primary-hover text-white py-3.5 px-4 rounded-lg font-medium transition-all shadow-lg shadow-mosque/20 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+        >
+          {loadingEmail ? <span className="material-symbols-outlined animate-spin">progress_activity</span> : (dict.signIn || "Iniciar Sesión")}
+        </button>
+      </form>
+
+      <div className="relative mb-6">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-slate-700/50"></div>
+        </div>
+        <div className="relative flex justify-center text-sm">
+          <span className="px-2 bg-surface-dark text-slate-400">{dict.orContinueWith || "O continuar con"}</span>
+        </div>
+      </div>
+
       <div className="space-y-4">
         <button
           onClick={handleGoogleSignIn}

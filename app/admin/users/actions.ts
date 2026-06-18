@@ -13,18 +13,29 @@ export async function updateUserRole(userId: string, newRole: string) {
 
   const { data: roleData } = await supabase
     .from('user_roles')
-    .select('role')
+    .select('role_types(name)')
     .eq('id', user.id)
     .single();
 
-  if (!roleData || roleData.role !== 'administrador') {
+  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
+  }
+
+  // Get new role id
+  const { data: newRoleData } = await supabase
+    .from('role_types')
+    .select('id')
+    .eq('name', newRole)
+    .single();
+
+  if (!newRoleData) {
+    return { error: 'Rol no válido' };
   }
 
   // Update role
   const { error } = await supabase
     .from('user_roles')
-    .update({ role: newRole })
+    .update({ role_id: newRoleData.id })
     .eq('id', userId);
 
   if (error) {
@@ -51,11 +62,11 @@ export async function createUserByAdmin(formData: FormData) {
 
   const { data: roleData } = await supabaseServer
     .from('user_roles')
-    .select('role')
+    .select('role_types(name)')
     .eq('id', user.id)
     .single();
 
-  if (!roleData || roleData.role !== 'administrador') {
+  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
   }
 
@@ -80,18 +91,35 @@ export async function createUserByAdmin(formData: FormData) {
     return { error: authError.message };
   }
 
-  // Trigger inserta 'usuario' por defecto, actualizamos con rol real y nombre.
+  // Trigger inserts into user_profiles usually, we update it
   if (authData?.user) {
-    const { error: updateError } = await supabaseAdmin
-      .from('user_roles')
-      .update({ 
-        role: role,
+    // 1. Update user_profiles
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .upsert({ 
+        id: authData.user.id,
+        email: email,
         full_name: fullName
-      })
-      .eq('id', authData.user.id);
+      });
 
-    if (updateError) {
-      return { error: 'Usuario creado pero falló al asignar detalles: ' + updateError.message };
+    // 2. Assign role_id
+    const { data: roleType } = await supabaseAdmin
+      .from('role_types')
+      .select('id')
+      .eq('name', role)
+      .single();
+
+    if (roleType) {
+      const { error: updateError } = await supabaseAdmin
+        .from('user_roles')
+        .upsert({ 
+          id: authData.user.id,
+          role_id: roleType.id
+        });
+
+      if (updateError) {
+        return { error: 'Usuario creado pero falló al asignar rol: ' + updateError.message };
+      }
     }
   }
 

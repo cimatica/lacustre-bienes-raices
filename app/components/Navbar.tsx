@@ -13,11 +13,11 @@ export default async function Navbar() {
   if (user) {
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role')
+      .select('role_types(name)')
       .eq('id', user.id)
       .single();
-    if (roleData) {
-      userRole = roleData.role;
+    if (roleData && roleData.role_types) {
+      userRole = roleData.role_types.name;
     }
   }
 
@@ -76,10 +76,30 @@ export default async function Navbar() {
                         </span>
                       </div>
                     </div>
-                    <Link href="/perfil" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
-                      <span className="material-icons text-[18px]">person</span>
-                      {(dict as any).userProfile?.title || "Perfil de Usuario"}
-                    </Link>
+                    {userRole === 'usuario' && (
+                      <>
+                        <Link href="/perfil" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                          <span className="material-icons text-[18px]">person</span>
+                          Mi Perfil
+                        </Link>
+                        <Link href="/favoritos" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1 md:hidden">
+                          <span className="material-icons text-[18px]">favorite_border</span>
+                          Propiedades Guardadas
+                        </Link>
+                      </>
+                    )}
+                    {userRole === 'vendedor' && (
+                      <Link href="/vendedor" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                        <span className="material-icons text-[18px]">dashboard</span>
+                        Panel Vendedor
+                      </Link>
+                    )}
+                    {userRole === 'agente' && (
+                      <Link href="/agente" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                        <span className="material-icons text-[18px]">support_agent</span>
+                        CRM Agentes
+                      </Link>
+                    )}
                     {userRole === 'administrador' && (
                       <Link href="/admin/properties" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
                         <span className="material-icons text-[18px]">admin_panel_settings</span>

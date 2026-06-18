@@ -19,15 +19,15 @@ export default async function AdminUsersPage({
   const itemsPerPage = 10;
   
   let userQuery = supabase
-    .from('user_roles')
-    .select('*', { count: 'exact' });
+    .from('user_profiles')
+    .select('*, user_roles(role_types(name))', { count: 'exact' });
     
   if (query) {
     userQuery = userQuery.or(`email.ilike.%${query}%,full_name.ilike.%${query}%`);
   }
   
   const { data: users, error, count } = await userQuery
-    .order('created_at', { ascending: false })
+    .order('member_since', { ascending: false })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
@@ -54,22 +54,35 @@ export default async function AdminUsersPage({
       </header>
 
       <div className="hidden md:grid grid-cols-12 gap-4 px-6 text-xs font-semibold uppercase tracking-wider text-[#19322F]/50 mb-2">
-        <div className="col-span-4">Detalles del Usuario</div>
-        <div className="col-span-3">Rol & Estado</div>
-        <div className="col-span-3">Rendimiento</div>
-        <div className="col-span-2 text-right">Acciones</div>
+        <div className="col-span-5">Detalles del Usuario</div>
+        <div className="col-span-4">Rol & Estado</div>
+        <div className="col-span-3 text-right">Acciones</div>
       </div>
+
+      {error && (
+        <div className="p-4 bg-red-100 text-red-700 rounded-lg mb-4">
+          Error loading users: {error.message}
+        </div>
+      )}
 
       {users?.map((u: any, index: number) => {
         const shortId = u.id.split('-')[0].toUpperCase();
         const displayName = u.full_name || u.email.split('@')[0];
+        let role = 'usuario';
+        if (u.user_roles) {
+          if (Array.isArray(u.user_roles)) {
+            role = u.user_roles.length > 0 && u.user_roles[0].role_types ? u.user_roles[0].role_types.name : 'usuario';
+          } else {
+            role = u.user_roles.role_types ? u.user_roles.role_types.name : 'usuario';
+          }
+        }
         
         return (
           <div key={u.id} style={{ zIndex: 50 - index }} className="user-card group relative bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:bg-[#D9ECC8]/30 transition-colors flex flex-col md:grid md:grid-cols-12 gap-4 items-center">
-            <div className="col-span-12 md:col-span-4 flex items-center w-full">
+            <div className="col-span-12 md:col-span-5 flex items-center w-full">
               <div className="relative flex-shrink-0">
-                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white">
-                  <span className="material-icons text-gray-500">person</span>
+                <div className="h-12 w-12 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white overflow-hidden">
+                  {u.avatar_url ? <img src={u.avatar_url} className="w-full h-full object-cover" /> : <span className="material-icons text-gray-500">person</span>}
                 </div>
                 <span className={`absolute bottom-0 right-0 block h-3 w-3 rounded-full ring-2 ring-white ${u.status === 'Active' || !u.status ? 'bg-green-400' : 'bg-gray-400'}`}></span>
               </div>
@@ -80,14 +93,14 @@ export default async function AdminUsersPage({
               </div>
             </div>
             
-            <div className="col-span-12 md:col-span-3 w-full flex items-center justify-between md:justify-start gap-4">
+            <div className="col-span-12 md:col-span-4 w-full flex items-center justify-between md:justify-start gap-4">
               <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium capitalize ${
-                u.role === 'administrador' ? 'bg-[#19322F] text-white' :
-                u.role === 'agente' ? 'bg-[#006655]/10 text-[#006655]' :
-                u.role === 'vendedor' ? 'bg-orange-100 text-orange-700' :
+                role === 'administrador' ? 'bg-[#19322F] text-white' :
+                role === 'agente' ? 'bg-[#006655]/10 text-[#006655]' :
+                role === 'vendedor' ? 'bg-orange-100 text-orange-700' :
                 'bg-gray-100 text-gray-600'
               }`}>
-                {u.role}
+                {role}
               </span>
               <div className="flex items-center text-xs text-[#19322F]/60">
                 <span className={`material-icons text-[14px] mr-1 ${u.status === 'Active' || !u.status ? 'text-[#006655]' : 'text-gray-400'}`}>
@@ -97,19 +110,8 @@ export default async function AdminUsersPage({
               </div>
             </div>
             
-            <div className="col-span-12 md:col-span-3 w-full grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-[#19322F]/40">Propiedades</div>
-                <div className="text-sm font-semibold text-[#19322F]">{u.properties_count || 0}</div>
-              </div>
-              <div>
-                <div className="text-[10px] uppercase tracking-wider text-[#19322F]/40">Ventas (YTD)</div>
-                <div className="text-sm font-semibold text-[#19322F]">${(u.sales_ytd || 0).toLocaleString()}</div>
-              </div>
-            </div>
-            
-            <div className="col-span-12 md:col-span-2 w-full flex justify-end relative">
-              <UserRoleSelect userId={u.id} currentRole={u.role} />
+            <div className="col-span-12 md:col-span-3 w-full flex justify-end relative">
+              <UserRoleSelect userId={u.id} currentRole={role} />
             </div>
           </div>
         );

@@ -24,11 +24,11 @@ export default async function UserProfilePage() {
     email = user.email || '';
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role')
+      .select('role_types(name)')
       .eq('id', user.id)
       .single();
-    if (roleData) {
-      userRole = roleData.role;
+    if (roleData && roleData.role_types) {
+      userRole = roleData.role_types.name;
     }
   }
 
@@ -37,16 +37,15 @@ export default async function UserProfilePage() {
   const favorites = userId ? await getUserFavorites(userId) : [];
   const visits = userId ? await getUserVisits(userId) : [];
   
-  const isSeller = userRole === 'vendedor';
-  const propertiesCount = isSeller ? favorites.length : favorites.length; // In a real app we'd fetch host properties if seller
+  const propertiesCount = favorites.length;
   const visitsCount = visits.length;
   
-  const statsSavedLabel = isSeller ? (dict as any).seller?.activeListings || "Active Listings" : (dict as any).userProfile?.saved || "Saved";
-  const statsVisitsLabel = isSeller ? (dict as any).seller?.receivedVisits || "Received Visits" : (dict as any).userProfile?.visits || "Visits";
-  const statsSoldLabel = isSeller ? (dict as any).seller?.soldProperties || "Sold Properties" : (dict as any).userProfile?.sold || "Sold";
-  const tab1Label = isSeller ? (dict as any).seller?.myProperties || "My Properties" : (dict as any).userProfile?.savedProperties || "Saved Properties";
-  const tab2Label = isSeller ? (dict as any).seller?.receivedVisits || "Received Visits" : (dict as any).userProfile?.scheduledVisits || "Scheduled Visits";
-  const sectionVisitsLabel = isSeller ? (dict as any).seller?.receivedVisits || "Received Visits" : (dict as any).userProfile?.upcomingVisits || "Upcoming Visits";
+  const statsSavedLabel = (dict as any).userProfile?.saved || "Propiedades Guardadas";
+  const statsVisitsLabel = (dict as any).userProfile?.visits || "Visitas Agendadas";
+  const statsSoldLabel = "Completadas";
+  const tab1Label = (dict as any).userProfile?.savedProperties || "Propiedades Guardadas";
+  const tab2Label = (dict as any).userProfile?.scheduledVisits || "Visitas Programadas";
+  const sectionVisitsLabel = (dict as any).userProfile?.upcomingVisits || "Próximas Visitas";
 
   return (
     <div className="font-display min-h-screen flex flex-col selection:bg-mosque selection:text-white">
@@ -69,9 +68,9 @@ export default async function UserProfilePage() {
             <div>
               <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-white mb-2">Elena Richardson</h1>
               <p className="text-slate-400 font-light flex items-center gap-2">
-                <span className="material-icons text-sm">location_on</span> San Francisco, CA
+                <span className="material-icons text-sm">location_on</span> Villarrica, Chile
                 <span className="mx-2">•</span>
-                {(dict as any).userProfile?.memberSince || "Member since"} 2021
+                {(dict as any).userProfile?.memberSince || "Miembro desde"} 2024
               </p>
             </div>
           </div>
@@ -109,8 +108,13 @@ export default async function UserProfilePage() {
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {favorites.length === 0 ? (
-             <div className="col-span-full py-8 text-center text-slate-400">
-               No properties found.
+             <div className="col-span-full py-16 text-center bg-surface-darker rounded-xl border border-slate-700/50">
+               <span className="material-icons text-slate-500 text-5xl mb-4">favorite_border</span>
+               <h3 className="text-xl font-medium text-white mb-2">No tienes propiedades guardadas</h3>
+               <p className="text-slate-400 mb-6 max-w-md mx-auto">Explora nuestro catálogo y guarda las propiedades que más te interesen para darles seguimiento.</p>
+               <Link href="/" className="inline-block bg-mosque hover:bg-nordic text-white px-6 py-2.5 rounded-lg font-medium transition-colors">
+                 Explorar Propiedades
+               </Link>
              </div>
           ) : favorites.map(fav => {
             const property = fav.property;

@@ -54,11 +54,11 @@ export default async function PropertyPage({ params }: Props) {
   if (user) {
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role')
+      .select('role_types(name)')
       .eq('id', user.id)
       .single();
-    if (roleData) {
-      userRole = roleData.role;
+    if (roleData && roleData.role_types) {
+      userRole = roleData.role_types.name;
     }
   }
 

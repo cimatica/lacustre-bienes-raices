@@ -113,7 +113,7 @@
     "logout": "Cerrar sesión",
     "loggedInAs": "Conectado como",
     "welcome": "Bienvenido a Lacustre - Bienes Raíces",
-    "unlock": "Desbloquea propiedades exclusivas en todo el mundo.",
+    "unlock": "Desbloquea propiedades exclusivas en Chile.",
     "continueGoogle": "Continuar con Google",
     "continueGithub": "Continuar con GitHub",
     "redirecting": "Redirigiendo...",
@@ -121,7 +121,11 @@
     "signUp": "Regístrate",
     "privacy": "Política de Privacidad",
     "terms": "Términos de Servicio",
-    "help": "Centro de Ayuda"
+    "help": "Centro de Ayuda",
+    "email": "Correo Electrónico",
+    "password": "Contraseña",
+    "signIn": "Iniciar Sesión",
+    "orContinueWith": "O continuar con"
   },
   "userProfile": {
     "title": "Perfil de Usuario",
@@ -178,7 +182,7 @@
     "soldProperties": "Propiedades Vendidas",
     "activeListings": "Propiedades Activas",
     "viewInterested": "Ver Interesados",
-    "editProperty": "Editar Propiedad",
+    "editProperty": "Ver Interesados / Editar",
     "sellerPanel": "Panel Vendedor"
   }
 }

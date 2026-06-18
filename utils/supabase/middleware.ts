@@ -43,7 +43,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (pathname.startsWith('/admin')) {
+  if (pathname.startsWith('/admin') || pathname.startsWith('/vendedor') || pathname.startsWith('/agente')) {
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/login'
@@ -52,11 +52,25 @@ export async function updateSession(request: NextRequest) {
 
     const { data: roleData } = await supabase
       .from('user_roles')
-      .select('role')
+      .select('role_types(name)')
       .eq('id', user.id)
       .single()
 
-    if (!roleData || roleData.role !== 'administrador') {
+    const roleName = roleData?.role_types?.name || 'usuario';
+
+    if (pathname.startsWith('/admin') && roleName !== 'administrador') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+
+    if (pathname.startsWith('/vendedor') && roleName !== 'vendedor' && roleName !== 'administrador') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+
+    if (pathname.startsWith('/agente') && roleName !== 'agente' && roleName !== 'administrador') {
       const url = request.nextUrl.clone()
       url.pathname = '/'
       return NextResponse.redirect(url)
