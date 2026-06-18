@@ -126,3 +126,95 @@ export async function createUserByAdmin(formData: FormData) {
   revalidatePath('/admin/users');
   return { success: true };
 }
+
+export async function deleteUserByAdmin(userId: string) {
+  const supabaseServer = await createServerClient();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: roleData } = await supabaseServer
+    .from('user_roles')
+    .select('role_types(name)')
+    .eq('id', user.id)
+    .single();
+
+  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+    return { error: 'No autorizado' };
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return { error: 'Falta clave maestra' };
+
+  const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
+
+export async function updateUserProfile(userId: string, data: { full_name: string, phone: string }) {
+  const supabaseServer = await createServerClient();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: roleData } = await supabaseServer
+    .from('user_roles')
+    .select('role_types(name)')
+    .eq('id', user.id)
+    .single();
+
+  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+    return { error: 'No autorizado' };
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return { error: 'Falta clave maestra' };
+
+  const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+
+  const { error } = await supabaseAdmin
+    .from('user_profiles')
+    .update({ full_name: data.full_name, phone: data.phone })
+    .eq('id', userId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}
+
+export async function updateUserStatus(userId: string, status: string) {
+  const supabaseServer = await createServerClient();
+  const { data: { user } } = await supabaseServer.auth.getUser();
+  if (!user) return { error: 'No autenticado' };
+
+  const { data: roleData } = await supabaseServer
+    .from('user_roles')
+    .select('role_types(name)')
+    .eq('id', user.id)
+    .single();
+
+  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+    return { error: 'No autorizado' };
+  }
+
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) return { error: 'Falta clave maestra' };
+
+  const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
+
+  const { error } = await supabaseAdmin
+    .from('user_profiles')
+    .update({ status: status })
+    .eq('id', userId);
+
+  if (error) return { error: error.message };
+
+  revalidatePath('/admin/users');
+  return { success: true };
+}

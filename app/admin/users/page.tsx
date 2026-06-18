@@ -1,7 +1,9 @@
 import { createClient } from '@/utils/supabase/server';
-import UserRoleSelect from './UserRoleSelect';
+import Link from 'next/link';
+import UserActionsMenu from './UserActionsMenu';
 import AdminSearch from '../components/AdminSearch';
 import AdminPagination from '../components/AdminPagination';
+import AdminSort from './components/AdminSort';
 import AddUserModal from './AddUserModal';
 
 export const dynamic = 'force-dynamic';
@@ -16,25 +18,34 @@ export default async function AdminUsersPage({
   
   const query = typeof resolvedSearchParams.query === 'string' ? resolvedSearchParams.query : '';
   const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
+  const orderBy = typeof resolvedSearchParams.orderBy === 'string' ? resolvedSearchParams.orderBy : 'member_since';
+  const orderDir = typeof resolvedSearchParams.orderDir === 'string' ? resolvedSearchParams.orderDir : 'desc';
+  const roleFilter = typeof resolvedSearchParams.role === 'string' ? resolvedSearchParams.role : 'todos';
   const itemsPerPage = 10;
+  
+  let selectQuery = roleFilter !== 'todos' ? '*, user_roles!inner(role_types!inner(name))' : '*, user_roles(role_types(name))';
   
   let userQuery = supabase
     .from('user_profiles')
-    .select('*, user_roles(role_types(name))', { count: 'exact' });
+    .select(selectQuery, { count: 'exact' });
+    
+  if (roleFilter !== 'todos') {
+    userQuery = userQuery.eq('user_roles.role_types.name', roleFilter);
+  }
     
   if (query) {
     userQuery = userQuery.or(`email.ilike.%${query}%,full_name.ilike.%${query}%`);
   }
   
   const { data: users, error, count } = await userQuery
-    .order('member_since', { ascending: false })
+    .order(orderBy, { ascending: orderDir === 'asc' })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
   return (
     <main className="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-12 space-y-4">
-      <header className="w-full pt-8 pb-6">
+      <header className="w-full pt-8 pb-6 relative z-[60]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-[#19322F]">Directorio de Usuarios</h1>
@@ -45,11 +56,37 @@ export default async function AdminUsersPage({
             <AddUserModal />
           </div>
         </div>
-        <div className="mt-8 flex gap-6 border-b border-[#19322F]/10 overflow-x-auto">
-          <button className="pb-3 text-sm font-semibold text-[#006655] border-b-2 border-[#006655]">Todos</button>
-          <button className="pb-3 text-sm font-medium text-[#19322F]/60 hover:text-[#19322F] transition-colors">Agentes</button>
-          <button className="pb-3 text-sm font-medium text-[#19322F]/60 hover:text-[#19322F] transition-colors">Vendedores</button>
-          <button className="pb-3 text-sm font-medium text-[#19322F]/60 hover:text-[#19322F] transition-colors">Admins</button>
+        <div className="mt-8 flex flex-col md:flex-row md:items-center justify-between border-b border-[#19322F]/10 gap-4">
+          <div className="flex gap-6 overflow-x-auto">
+            {[
+              { label: 'Todos', value: 'todos' },
+              { label: 'Usuarios', value: 'usuario' },
+              { label: 'Agentes', value: 'agente' },
+              { label: 'Vendedores', value: 'vendedor' },
+              { label: 'Admins', value: 'administrador' },
+            ].map(t => {
+              const isActive = roleFilter === t.value;
+              const params = new URLSearchParams();
+              if (query) params.set('query', query);
+              if (orderBy !== 'member_since') params.set('orderBy', orderBy);
+              if (orderDir !== 'desc') params.set('orderDir', orderDir);
+              if (t.value !== 'todos') params.set('role', t.value);
+              
+              return (
+                <Link 
+                  key={t.value} 
+                  href={`?${params.toString()}`}
+                  className={`pb-3 text-sm transition-colors whitespace-nowrap ${isActive ? 'font-semibold text-[#006655] border-b-2 border-[#006655]' : 'font-medium text-[#19322F]/60 hover:text-[#19322F]'}`}
+                >
+                  {t.label}
+                </Link>
+              );
+            })}
+          </div>
+          
+          <div className="pb-2">
+            <AdminSort />
+          </div>
         </div>
       </header>
 
@@ -111,7 +148,14 @@ export default async function AdminUsersPage({
             </div>
             
             <div className="col-span-12 md:col-span-3 w-full flex justify-end relative">
-              <UserRoleSelect userId={u.id} currentRole={role} />
+              <UserActionsMenu user={{
+                id: u.id,
+                email: u.email,
+                full_name: u.full_name,
+                phone: u.phone,
+                status: u.status || 'Active',
+                role: role
+              }} />
             </div>
           </div>
         );

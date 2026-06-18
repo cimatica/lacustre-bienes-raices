@@ -11,7 +11,7 @@ const ROLES = [
   { id: 'usuario', label: 'Usuario', icon: 'visibility' },
 ];
 
-export default function UserRoleSelect({ userId, currentRole }: { userId: string, currentRole: string }) {
+export default function UserRoleSelect({ userId, currentRole, status }: { userId: string, currentRole: string, status?: string }) {
   const { showAlert } = useAlert();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +38,37 @@ export default function UserRoleSelect({ userId, currentRole }: { userId: string
     } else {
       showAlert('¡Actualizado!', 'El rol del usuario ha sido actualizado exitosamente.', 'success');
     }
+    setLoading(false);
+  };
+
+  const handleToggleStatus = async () => {
+    setIsOpen(false);
+    setLoading(true);
+    
+    if (status === 'Inactive') {
+      try {
+        const res = await fetch('/api/users/activate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUserId: userId })
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          showAlert('¡Usuario Activado!', data.message || 'El usuario ha sido activado y notificado por correo.', 'success');
+          // In a real scenario we'd revalidate path here or wait for Next router refresh
+          window.location.reload();
+        } else {
+          showAlert('Error', data.error || 'Error al activar', 'error');
+        }
+      } catch (err: any) {
+        showAlert('Error', err.message, 'error');
+      }
+    } else {
+      // Just showing how you'd implement suspend if you want
+      showAlert('Aviso', 'La suspensión de usuarios aún no está implementada.', 'info');
+    }
+    
     setLoading(false);
   };
 
@@ -75,10 +106,17 @@ export default function UserRoleSelect({ userId, currentRole }: { userId: string
               </button>
             ))}
             <div className="border-t border-white/10 my-1"></div>
-            <button className="group flex items-center w-full px-4 py-3 text-xs text-red-200 hover:bg-red-500/20 hover:text-red-100 transition-colors text-left" role="menuitem">
-              <span className="material-icons text-sm mr-3 text-red-300 group-hover:text-red-100">block</span>
-              Suspender Usuario
-            </button>
+            {status === 'Inactive' ? (
+              <button onClick={handleToggleStatus} className="group flex items-center w-full px-4 py-3 text-xs text-green-200 hover:bg-green-500/20 hover:text-green-100 transition-colors text-left" role="menuitem">
+                <span className="material-icons text-sm mr-3 text-green-300 group-hover:text-green-100">check_circle</span>
+                Activar Usuario
+              </button>
+            ) : (
+              <button onClick={handleToggleStatus} className="group flex items-center w-full px-4 py-3 text-xs text-red-200 hover:bg-red-500/20 hover:text-red-100 transition-colors text-left" role="menuitem">
+                <span className="material-icons text-sm mr-3 text-red-300 group-hover:text-red-100">block</span>
+                Suspender Usuario
+              </button>
+            )}
           </div>
         </div>
       )}

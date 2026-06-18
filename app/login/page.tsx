@@ -12,8 +12,8 @@ export default async function LoginPage() {
         <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-mosque/10 rounded-full blur-3xl"></div>
       </div>
       <main className="w-full max-w-4xl z-10">
-        <div className="text-center mb-12">
-          <div className="mb-8 flex justify-center drop-shadow-lg hover:scale-105 transition-transform duration-500 ease-out">
+        <div className="text-center mb-8">
+          <div className="mb-4 flex justify-center drop-shadow-lg hover:scale-105 transition-transform duration-500 ease-out">
             <img src="/img/logo.png" alt="Logo Lacustre" className="h-24 md:h-32 w-auto object-contain brightness-0 invert opacity-90" />
           </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-white mb-3 pb-1 whitespace-nowrap">
@@ -25,7 +25,7 @@ export default async function LoginPage() {
         <div className="max-w-md mx-auto">
           <LoginForm dict={dict} />
           
-          <div className="mt-8 text-center">
+          <div className="mt-6 text-center">
             <nav className="flex justify-center gap-6 text-xs text-slate-500">
               <a className="hover:text-white transition-colors" href="#">{dict.privacy}</a>
               <a className="hover:text-white transition-colors" href="#">{dict.terms}</a>

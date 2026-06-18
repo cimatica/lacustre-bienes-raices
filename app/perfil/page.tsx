@@ -5,6 +5,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getUserProfile, getUserFavorites, getUserVisits } from '@/lib/supabase';
 import { formatUF } from '@/lib/currency';
 import Link from 'next/link';
+import ProfileSettings from './components/ProfileSettings';
 
 export const metadata = {
   title: 'Perfil de Usuario | Lacustre - Bienes Raíces',
@@ -59,16 +60,13 @@ export default async function UserProfilePage() {
               <img 
                 alt="Profile portrait" 
                 className="w-24 h-24 lg:w-32 lg:h-32 rounded-full object-cover border-4 border-slate-800 shadow-lg" 
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd_ouiePtERQTSfbcLEHNMJhNFxSXP8beK-4DetlBD_G0XENGPBbXjEfk08cNoUsGBoIWZRMRRoQTdL6tgGLyjrYglYUnUw7ce2O3Y6cHRIWZBN2BXU6YPG0jHhit2hPdam7opmhwpFjsGY68pDpCqMVQ6yj3wPulKs2X3PG2UcHOfoCZgt12BZpZ_XHj9-xT3VJHunaR-f6j8HYVS8FrTtKh_io3Iu2E7JIucJmHGGc4J0AF5MISFaObH51sFDruLCdwyyBAC3Cs"
+                src={profile?.avatar_url || "https://lh3.googleusercontent.com/aida-public/AB6AXuAd_ouiePtERQTSfbcLEHNMJhNFxSXP8beK-4DetlBD_G0XENGPBbXjEfk08cNoUsGBoIWZRMRRoQTdL6tgGLyjrYglYUnUw7ce2O3Y6cHRIWZBN2BXU6YPG0jHhit2hPdam7opmhwpFjsGY68pDpCqMVQ6yj3wPulKs2X3PG2UcHOfoCZgt12BZpZ_XHj9-xT3VJHunaR-f6j8HYVS8FrTtKh_io3Iu2E7JIucJmHGGc4J0AF5MISFaObH51sFDruLCdwyyBAC3Cs"}
               />
-              <button className="absolute bottom-0 right-0 w-8 h-8 lg:w-10 lg:h-10 bg-mosque text-white rounded-full flex items-center justify-center hover:bg-nordic transition-colors shadow-md">
-                <span className="material-icons text-sm lg:text-base">edit</span>
-              </button>
             </div>
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-white mb-2">Elena Richardson</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight text-white mb-2">{profile?.full_name || 'Usuario'}</h1>
               <p className="text-slate-400 font-light flex items-center gap-2">
-                <span className="material-icons text-sm">location_on</span> Villarrica, Chile
+                <span className="material-icons text-sm">location_on</span> {profile?.location || 'Sin ubicación'}
                 <span className="mx-2">•</span>
                 {(dict as any).userProfile?.memberSince || "Miembro desde"} 2024
               </p>
@@ -201,31 +199,12 @@ export default async function UserProfilePage() {
         <section className="mt-16 bg-surface-darker rounded-2xl p-8 border border-slate-700/50 shadow-sm">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h2 className="text-xl font-bold text-white">{(dict as any).userProfile?.accountPreferences || "Account Preferences"}</h2>
-              <p className="text-slate-400 text-sm mt-1">{(dict as any).userProfile?.accountPreferencesDesc || "Manage your account settings"}</p>
-            </div>
-            <button className="text-mosque font-medium text-sm hover:underline">{(dict as any).userProfile?.viewAllSettings || "View all settings"}</button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{(dict as any).userProfile?.emailAddress || "Email Address"}</label>
-              <div className="flex items-center gap-3 p-3 bg-surface-darkest rounded-lg border border-slate-700/50">
-                <span className="material-icons text-slate-500">mail</span>
-                <input className="bg-transparent border-none outline-none flex-1 text-slate-200 text-sm focus:ring-0 w-full" readOnly type="email" value={email} />
-                <button className="text-xs text-mosque font-medium">{(dict as any).userProfile?.change || "Change"}</button>
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{(dict as any).userProfile?.notifications || "Notifications"}</label>
-              <div className="flex items-center justify-between p-3 bg-surface-darkest rounded-lg border border-slate-700/50 h-[50px]">
-                <span className="text-sm text-slate-200">{(dict as any).userProfile?.propertyAlerts || "New Property Alerts"}</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input defaultChecked className="sr-only peer" type="checkbox" value="" />
-                  <div className="w-9 h-5 bg-slate-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-mosque"></div>
-                </label>
-              </div>
+              <h2 className="text-xl font-bold text-white">{(dict as any).userProfile?.accountPreferences || "Configuración de la Cuenta"}</h2>
+              <p className="text-slate-400 text-sm mt-1">{(dict as any).userProfile?.accountPreferencesDesc || "Gestiona tus datos personales y seguridad"}</p>
             </div>
           </div>
+          
+          <ProfileSettings profile={profile} email={email} dict={dict} />
         </section>
       </main>
 

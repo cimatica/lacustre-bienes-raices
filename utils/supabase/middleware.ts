@@ -37,10 +37,34 @@ export async function updateSession(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  if (pathname === '/login' && user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/'
-    return NextResponse.redirect(url)
+  if (user) {
+    if (pathname === '/login') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+
+    // Check if user is Inactive
+    // We skip this check for auth callback routes to avoid infinite redirects
+    if (!pathname.startsWith('/auth/')) {
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('status')
+        .eq('id', user.id)
+        .single()
+
+      if (profile?.status === 'Inactive') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/auth/inactive'
+        return NextResponse.redirect(url)
+      }
+
+      if (profile?.status === 'Suspended') {
+        const url = request.nextUrl.clone()
+        url.pathname = '/auth/suspended'
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   if (pathname.startsWith('/admin') || pathname.startsWith('/vendedor') || pathname.startsWith('/agente')) {
