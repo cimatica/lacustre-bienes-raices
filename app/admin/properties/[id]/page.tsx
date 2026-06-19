@@ -25,7 +25,7 @@ export default async function EditPropertyPage({
   }
 
   return (
-    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <main className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
       <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-200 pb-8">
         <div className="space-y-4">
           <nav aria-label="Breadcrumb" className="flex">

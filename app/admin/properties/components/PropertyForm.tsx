@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Property, PropertyImage } from "@/lib/supabase";
+import { assignPropertyUser, unassignPropertyUser } from "@/app/admin/actions";
 import dynamic from "next/dynamic";
 import { useAlert } from "@/app/components/ui/AlertProvider";
 
@@ -65,6 +66,13 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
   const [propertyTypes, setPropertyTypes] = useState<{ id: string, name: string }[]>([]);
   const [commercialStatuses, setCommercialStatuses] = useState<{ id: string, name: string }[]>([]);
 
+  const [currentUser, setCurrentUser] = useState<{ id: string, role: string } | null>(null);
+  const [availableSellers, setAvailableSellers] = useState<{ id: string, name: string }[]>([]);
+  const [availableAgents, setAvailableAgents] = useState<{ id: string, name: string }[]>([]);
+
+  const [vendedorId, setVendedorId] = useState<string>("");
+  const [agenteId, setAgenteId] = useState<string>("");
+
   useEffect(() => {
     async function fetchTypes() {
       const { data } = await supabase.from('property_types').select('id, name').order('name');
@@ -83,9 +91,55 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
           setFormData(prev => ({ ...prev, commercial_status_id: availableStatus ? availableStatus.id : cStatuses[0].id }));
         }
       }
+
+      // Fetch current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: roleData } = await supabase
+          .from('user_roles')
+          .select('role_types(name)')
+          .eq('id', user.id)
+          .single();
+        const role = roleData?.role_types?.name || 'usuario';
+        setCurrentUser({ id: user.id, role });
+
+        if (!propertyId && role === 'vendedor') {
+           setVendedorId(user.id);
+        }
+      }
+
+      // Fetch assignments if editing
+      if (propertyId) {
+        const { data: assignments } = await supabase
+          .from('property_assignments')
+          .select('user_id, role_types(name)')
+          .eq('property_id', propertyId);
+        if (assignments) {
+          const seller = assignments.find((a: any) => a.role_types.name === 'vendedor');
+          const agent = assignments.find((a: any) => a.role_types.name === 'agente');
+          if (seller) setVendedorId(seller.user_id);
+          if (agent) setAgenteId(agent.user_id);
+        }
+      }
+
+      // Fetch all sellers and agents for the selects
+      const { data: roleUsers } = await supabase
+        .from('user_roles')
+        .select('user_profiles(id, full_name), role_types(name)');
+      
+      if (roleUsers) {
+        const sellers = roleUsers
+          .filter((ru: any) => ru.role_types?.name === 'vendedor')
+          .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+        const agents = roleUsers
+          .filter((ru: any) => ru.role_types?.name === 'agente')
+          .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+        setAvailableSellers(sellers);
+        setAvailableAgents(agents);
+      }
     }
     fetchTypes();
-  }, []);
+  }, [propertyId, supabase]);
 
   // Handlers for inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -235,6 +289,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
     if (formData.price <= 0) return "El precio debe ser mayor a 0.";
     if (!formData.location) return "Debes buscar y seleccionar una ubicación válida en el mapa.";
     if (!mainImagePreview) return "Debes subir al menos la imagen principal de la propiedad.";
+    if (!vendedorId) return "Debes asignar un Vendedor a la propiedad.";
     return null;
   };
 
@@ -352,6 +407,18 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         }
       }
 
+      // 4. Save Assignments
+      if (vendedorId) {
+        await assignPropertyUser(actualPropertyId, vendedorId, 'vendedor');
+      } else {
+        await unassignPropertyUser(actualPropertyId, 'vendedor');
+      }
+      if (agenteId) {
+        await assignPropertyUser(actualPropertyId, agenteId, 'agente');
+      } else {
+        await unassignPropertyUser(actualPropertyId, 'agente');
+      }
+
       setShowSuccessModal(true);
     } catch (err: any) {
       console.error(err);
@@ -456,6 +523,54 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
           </div>
         </div>
         
+        {currentUser?.role !== 'agente' && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-8 py-6 border-b border-[#D9ECC8]/30 flex items-center gap-3 bg-gradient-to-r from-[#D9ECC8]/10 to-transparent">
+              <div className="w-8 h-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#19322F]">
+                <span className="material-icons text-lg">manage_accounts</span>
+              </div>
+              <h2 className="text-xl font-bold text-[#19322F]">Asignación de Personal</h2>
+            </div>
+            <div className="p-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="vendedorId">Vendedor <span className="text-red-500">*</span></label>
+                  <select 
+                    required 
+                    value={vendedorId} 
+                    onChange={(e) => setVendedorId(e.target.value)} 
+                    disabled={currentUser?.role !== 'administrador'}
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed" 
+                    id="vendedorId"
+                  >
+                    <option value="" disabled>Seleccionar Vendedor</option>
+                    {availableSellers.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                  {currentUser?.role !== 'administrador' && (
+                    <p className="text-xs text-gray-500 mt-1">Solo los administradores pueden reasignar el Vendedor.</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="agenteId">Agente</label>
+                  <select 
+                    value={agenteId} 
+                    onChange={(e) => setAgenteId(e.target.value)} 
+                    className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" 
+                    id="agenteId"
+                  >
+                    <option value="">Sin Agente Asignado</option>
+                    {availableAgents.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-8 py-6 border-b border-[#D9ECC8]/30 flex justify-between items-center bg-gradient-to-r from-[#D9ECC8]/10 to-transparent">
             <div className="flex items-center gap-3">

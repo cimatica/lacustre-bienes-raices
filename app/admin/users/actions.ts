@@ -32,6 +32,16 @@ export async function updateUserRole(userId: string, newRole: string) {
     return { error: 'Rol no válido' };
   }
 
+  // Validate if user has assigned properties
+  const { count: assignmentCount } = await supabase
+    .from('property_assignments')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  if (assignmentCount && assignmentCount > 0) {
+    return { error: 'No se puede cambiar el rol porque el usuario tiene propiedades asignadas.' };
+  }
+
   // Update role
   const { error } = await supabase
     .from('user_roles')

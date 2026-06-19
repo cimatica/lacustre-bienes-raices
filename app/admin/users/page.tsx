@@ -44,7 +44,7 @@ export default async function AdminUsersPage({
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
   return (
-    <main className="flex-grow px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full pb-12 space-y-4">
+    <main className="flex-grow px-4 sm:px-6 lg:px-8 max-w-[1600px] mx-auto w-full pb-12 space-y-4">
       <header className="w-full pt-8 pb-6 relative z-[60]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>

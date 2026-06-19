@@ -97,3 +97,53 @@ export async function updateCommercialStatus(id: string, statusId: string) {
   revalidatePath('/admin/properties');
   revalidatePath(`/admin/properties/${id}`);
 }
+
+export async function assignPropertyUser(propertyId: string, userId: string, roleTypeName: 'vendedor' | 'agente') {
+  const supabase = await createClient();
+  
+  // Get role type id
+  const { data: roleType } = await supabase
+    .from('role_types')
+    .select('id')
+    .eq('name', roleTypeName)
+    .single();
+
+  if (!roleType) {
+    throw new Error('Rol no válido');
+  }
+
+  const { error } = await supabase
+    .from('property_assignments')
+    .upsert({
+      property_id: propertyId,
+      user_id: userId,
+      role_type_id: roleType.id
+    }, { onConflict: 'property_id, role_type_id' });
+
+  if (error) {
+    console.error("Error assigning user to property:", error);
+    throw new Error('No se pudo asignar el usuario a la propiedad.');
+  }
+
+  revalidatePath('/admin/properties');
+}
+
+export async function unassignPropertyUser(propertyId: string, roleTypeName: 'vendedor' | 'agente') {
+  const supabase = await createClient();
+  
+  const { data: roleType } = await supabase
+    .from('role_types')
+    .select('id')
+    .eq('name', roleTypeName)
+    .single();
+
+  if (!roleType) return;
+
+  await supabase
+    .from('property_assignments')
+    .delete()
+    .eq('property_id', propertyId)
+    .eq('role_type_id', roleType.id);
+
+  revalidatePath('/admin/properties');
+}

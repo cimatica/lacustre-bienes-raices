@@ -5,6 +5,7 @@ import AdminPagination from '../components/AdminPagination';
 import Link from 'next/link';
 import { PropertyActions } from './components/PropertyActions';
 import CommercialStatusDropdown from './components/CommercialStatusDropdown';
+import PropertyAssignments from './components/PropertyAssignments';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,7 @@ export default async function AdminPropertiesPage({
   // Base query for properties
   let propQuery = supabase
     .from('properties')
-    .select('*, property_types(id, name)', { count: 'exact' });
+    .select('*, property_types(id, name), property_assignments(user_id, role_types(name), user_profiles(id, full_name))', { count: 'exact' });
     
   if (query) {
     propQuery = propQuery.ilike('title', `%${query}%`);
@@ -54,6 +55,18 @@ export default async function AdminPropertiesPage({
     .order('created_at', { ascending: false })
     .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
+
+  // Get current user role
+  const { data: { user } } = await supabase.auth.getUser();
+  let currentUserRole = 'usuario';
+  if (user) {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role_types(name)')
+      .eq('id', user.id)
+      .single();
+    currentUserRole = roleData?.role_types?.name || 'usuario';
+  }
 
   // Overall stats
   const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true });
@@ -81,7 +94,7 @@ export default async function AdminPropertiesPage({
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
   return (
-    <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <main className="flex-grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
@@ -158,18 +171,19 @@ export default async function AdminPropertiesPage({
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Table Header */}
-        <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          <div className="col-span-6">Detalles de la Propiedad</div>
+        <div className="hidden md:grid grid-cols-12 gap-6 px-6 py-4 bg-gray-50/50 border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          <div className="col-span-4">Detalles de la Propiedad</div>
           <div className="col-span-2">Precio</div>
           <div className="col-span-2">Estado</div>
+          <div className="col-span-2">Personal</div>
           <div className="col-span-2 text-right">Acciones</div>
         </div>
 
         {/* List Items */}
         {properties?.map((prop: any) => (
-          <div key={prop.id} className="group grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-5 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center">
+          <div key={prop.id} className="group grid grid-cols-1 md:grid-cols-12 gap-6 px-6 py-6 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center">
             {/* Property Details */}
-            <div className="col-span-12 md:col-span-6 flex gap-4 items-center">
+            <div className="col-span-12 md:col-span-4 flex gap-4 items-center">
               <div className="relative h-20 w-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
                 {prop.image_url ? (
                   <img src={prop.image_url} alt={prop.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -179,17 +193,17 @@ export default async function AdminPropertiesPage({
                   </div>
                 )}
               </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer">{prop.title}</h3>
-                <p className="text-sm text-gray-500">{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-400">
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">king_bed</span> {prop.beds || 0} Camas</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">bathtub</span> {prop.baths || 0} Baños</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">directions_car</span> {prop.parking || 0} Estac.</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                  <span className="flex items-center gap-1"><span className="material-icons text-[14px]">square_foot</span> {prop.area || 0} m²</span>
+              <div className="min-w-0 flex-1">
+                <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer truncate" title={prop.title}>{prop.title}</h3>
+                <p className="text-sm text-gray-500 truncate" title={`${prop.property_types?.name || 'Propiedad'} en ${prop.location}`}>{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
+                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400 truncate">
+                  <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">king_bed</span> {prop.beds || 0} Camas</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0"></span>
+                  <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">bathtub</span> {prop.baths || 0} Baños</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0"></span>
+                  <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">directions_car</span> {prop.parking || 0} Estac.</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0"></span>
+                  <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">square_foot</span> {prop.area || 0} m²</span>
                 </div>
               </div>
             </div>
@@ -217,8 +231,17 @@ export default async function AdminPropertiesPage({
               />
             </div>
 
+            {/* Personal */}
+            <div className="col-span-12 md:col-span-2 bg-gray-50/50 p-2 rounded-lg border border-gray-100/50">
+              <PropertyAssignments 
+                propertyId={prop.id} 
+                initialAssignments={prop.property_assignments || []} 
+                currentUserRole={currentUserRole} 
+              />
+            </div>
+
             {/* Actions */}
-            <div className="col-span-12 md:col-span-2">
+            <div className="col-span-12 md:col-span-2 text-right flex justify-end items-center">
               <PropertyActions property={prop} />
             </div>
           </div>
