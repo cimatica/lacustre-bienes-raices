@@ -52,6 +52,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
     type: initialData?.type || "new",
     is_featured: initialData?.is_featured || false,
     badge: initialData?.badge || "Nuevo",
+    commercial_status_id: (initialData as any)?.commercial_status_id || "",
   });
 
   const [mainImage, setMainImage] = useState<File | null>(null);
@@ -62,6 +63,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
   );
 
   const [propertyTypes, setPropertyTypes] = useState<{ id: string, name: string }[]>([]);
+  const [commercialStatuses, setCommercialStatuses] = useState<{ id: string, name: string }[]>([]);
 
   useEffect(() => {
     async function fetchTypes() {
@@ -70,6 +72,15 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         setPropertyTypes(data);
         if (!initialData?.property_type && data.length > 0) {
           setFormData(prev => ({ ...prev, property_type: data[0].id }));
+        }
+      }
+
+      const { data: cStatuses } = await supabase.from('commercial_statuses').select('id, name').order('created_at');
+      if (cStatuses) {
+        setCommercialStatuses(cStatuses);
+        if (!(initialData as any)?.commercial_status_id && cStatuses.length > 0) {
+          const availableStatus = cStatuses.find(s => s.name === 'Disponible');
+          setFormData(prev => ({ ...prev, commercial_status_id: availableStatus ? availableStatus.id : cStatuses[0].id }));
         }
       }
     }
@@ -286,6 +297,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         type: formData.type,
         is_featured: formData.is_featured,
         badge: formData.badge,
+        commercial_status_id: formData.commercial_status_id,
         image_url: mainImageUrl,
         image_alt: formData.title,
         slug: slug,
@@ -402,7 +414,15 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-4 border-t border-gray-100">
+              <div>
+                <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="commercial_status_id">Situación Comercial</label>
+                <select value={formData.commercial_status_id} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="commercial_status_id">
+                  {commercialStatuses.map(cs => (
+                    <option key={cs.id} value={cs.id}>{cs.name}</option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="badge">Etiqueta (Badge)</label>
                 <input value={formData.badge} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] placeholder-gray-400 focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all" id="badge" placeholder="Ej. Nuevo, Exclusivo" type="text" />

@@ -4,6 +4,7 @@ import AdminFilters from '../components/AdminFilters';
 import AdminPagination from '../components/AdminPagination';
 import Link from 'next/link';
 import { PropertyActions } from './components/PropertyActions';
+import CommercialStatusDropdown from './components/CommercialStatusDropdown';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,8 +20,12 @@ export default async function AdminPropertiesPage({
   const page = typeof resolvedSearchParams.page === 'string' ? parseInt(resolvedSearchParams.page) : 1;
   const status = typeof resolvedSearchParams.status === 'string' ? resolvedSearchParams.status : 'all';
   const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type : 'all';
+  const commercialStatus = typeof resolvedSearchParams.commercial_status === 'string' ? resolvedSearchParams.commercial_status : 'all';
   
   const itemsPerPage = 10;
+  
+  // Commercial Statuses
+  const { data: commercialStatuses } = await supabase.from('commercial_statuses').select('*').order('created_at', { ascending: true });
   
   // Base query for properties
   let propQuery = supabase
@@ -38,16 +43,40 @@ export default async function AdminPropertiesPage({
   if (type !== 'all') {
     propQuery = propQuery.eq('sale_type', type);
   }
+  if (commercialStatus !== 'all' && commercialStatuses) {
+    const st = commercialStatuses.find((s: any) => s.name === commercialStatus);
+    if (st) {
+      propQuery = propQuery.eq('commercial_status_id', st.id);
+    }
+  }
   
   const { data: properties, error, count } = await propQuery
     .order('created_at', { ascending: false })
     .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
-  // Overall stats (we do a separate count for total and active for the top cards without pagination limit)
+  // Overall stats
   const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true });
   const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true);
-  const pendingSale = 0; // Static for now
+  
+  const { data: allPropsStats } = await supabase.from('properties').select('commercial_status_id');
+  
+  const statusCounts: Record<string, number> = {
+    'Disponible': 0,
+    'Vendida': 0,
+    'Arrendada': 0,
+    'Reservada': 0
+  };
+
+  if (allPropsStats && commercialStatuses) {
+    const idToNameMap = Object.fromEntries(commercialStatuses.map((s: any) => [s.id, s.name]));
+    for (const p of allPropsStats) {
+      const name = idToNameMap[p.commercial_status_id];
+      if (name && statusCounts[name] !== undefined) {
+        statusCounts[name]++;
+      }
+    }
+  }
 
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
@@ -67,25 +96,61 @@ export default async function AdminPropertiesPage({
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8 max-w-3xl">
-        <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Total Propiedades</p>
-            <p className="text-2xl font-bold text-[#19322F] mt-1">{totalListings || 0}</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <Link href="/admin/properties" className={`bg-white p-4 rounded-xl border ${(status === 'all' && commercialStatus === 'all') ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Total</p>
+            <div className="h-8 w-8 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-sm">apartment</span>
+            </div>
           </div>
-          <div className="h-10 w-10 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
-            <span className="material-icons">apartment</span>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{totalListings || 0}</p>
+        </Link>
+        <Link href="/admin/properties?status=active" className={`bg-white p-4 rounded-xl border ${status === 'active' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Activas</p>
+            <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-sm">visibility</span>
+            </div>
           </div>
-        </div>
-        <div className="bg-white p-5 rounded-xl border border-[#006655]/10 shadow-sm flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">Propiedades Activas</p>
-            <p className="text-2xl font-bold text-[#19322F] mt-1">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
+        </Link>
+        <Link href="/admin/properties?commercial_status=Disponible" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Disponible' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Disponibles</p>
+            <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-sm">check_circle</span>
+            </div>
           </div>
-          <div className="h-10 w-10 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
-            <span className="material-icons">check_circle</span>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Disponible']}</p>
+        </Link>
+        <Link href="/admin/properties?commercial_status=Vendida" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Vendida' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Vendidas</p>
+            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+              <span className="material-icons text-sm">sell</span>
+            </div>
           </div>
-        </div>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Vendida']}</p>
+        </Link>
+        <Link href="/admin/properties?commercial_status=Arrendada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Arrendada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Arrendadas</p>
+            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+              <span className="material-icons text-sm">key</span>
+            </div>
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Arrendada']}</p>
+        </Link>
+        <Link href="/admin/properties?commercial_status=Reservada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Reservada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs sm:text-sm font-medium text-gray-500">Reservadas</p>
+            <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
+              <span className="material-icons text-sm">schedule</span>
+            </div>
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Reservada']}</p>
+        </Link>
       </div>
 
       <AdminFilters />
@@ -136,15 +201,20 @@ export default async function AdminPropertiesPage({
             </div>
 
             {/* Status */}
-            <div className="col-span-6 md:col-span-2">
-              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${
+            <div className="col-span-6 md:col-span-2 flex flex-col gap-2 items-start">
+              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
                 prop.is_active 
-                  ? "bg-[#D9ECC8] text-[#006655] border-[#006655]/10" 
+                  ? "bg-[#D9ECC8]/50 text-[#006655] border-[#006655]/20" 
                   : "bg-gray-100 text-gray-500 border-gray-200"
               }`}>
-                <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${prop.is_active ? "bg-[#006655]" : "bg-gray-400"}`}></span>
-                {prop.is_active ? 'Activa' : 'Inactiva'}
+                {prop.is_active ? 'Visible en sitio' : 'Oculta'}
               </span>
+              
+              <CommercialStatusDropdown 
+                propertyId={prop.id} 
+                currentStatusId={prop.commercial_status_id} 
+                statuses={commercialStatuses || []} 
+              />
             </div>
 
             {/* Actions */}

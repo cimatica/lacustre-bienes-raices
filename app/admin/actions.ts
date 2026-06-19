@@ -80,3 +80,20 @@ export async function deleteProperty(id: string) {
   revalidatePath('/admin/properties');
   revalidatePath('/'); // Revalidate public pages
 }
+
+export async function updateCommercialStatus(id: string, statusId: string) {
+  const supabase = await createClient();
+  
+  const { error } = await supabase
+    .from('properties')
+    .update({ commercial_status_id: statusId })
+    .eq('id', id);
+
+  if (error) {
+    console.error("Error updating commercial status:", error);
+    throw new Error('No se pudo actualizar la situación comercial de la propiedad.');
+  }
+
+  revalidatePath('/admin/properties');
+  revalidatePath(`/admin/properties/${id}`);
+}
