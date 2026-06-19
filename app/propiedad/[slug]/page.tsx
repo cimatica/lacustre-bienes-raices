@@ -106,7 +106,16 @@ export default async function PropertyPage({ params }: Props) {
           {/* Right Column */}
           <div className="lg:col-span-4 relative">
             <div className="sticky top-28 space-y-6">
-              <ContactCard price={property.price} clpPrice={property.price * ufValue} location={property.location} slug={property.slug} isOwner={isOwner} userRole={userRole} dict={dict} />
+              <ContactCard 
+                price={property.price} 
+                clpPrice={property.price * ufValue} 
+                location={property.location} 
+                slug={property.slug} 
+                isOwner={isOwner} 
+                userRole={userRole} 
+                dict={dict} 
+                commercialStatus={property.commercial_statuses?.name}
+              />
               <PropertyMap latitude={property.latitude} longitude={property.longitude} />
             </div>
           </div>

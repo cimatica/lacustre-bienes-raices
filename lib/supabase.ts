@@ -44,6 +44,7 @@ export type Property = {
   property_type?: string; // This will hold the UUID
   is_active?: boolean;
   property_types?: PropertyType; // When doing foreign key join
+  commercial_statuses?: { id: string; name: string };
   description?: string;
   year_built?: number;
   parking?: number;
@@ -177,7 +178,7 @@ export async function getNewProperties(
 /** Fetch property by Slug including related images */
 export async function getPropertyBySlug(slug: string): Promise<Property | null> {
   const url = buildUrl({
-    select: "*, property_images(*), property_types(id, name)",
+    select: "*, property_images(*), property_types(id, name), commercial_statuses(id, name)",
     slug: `eq.${slug}`,
     is_active: "eq.true",
   });
