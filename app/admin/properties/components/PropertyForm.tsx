@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import type { Property, PropertyImage } from "@/lib/supabase";
-import { assignPropertyUser, unassignPropertyUser } from "@/app/admin/actions";
+import { assignPropertyUser, unassignPropertyUser, getAvailablePersonnel } from "@/app/admin/actions";
 import dynamic from "next/dynamic";
 import { useAlert } from "@/app/components/ui/AlertProvider";
 
@@ -14,6 +14,7 @@ const LocationPicker = dynamic(() => import("./LocationPicker"), { ssr: false })
 type PropertyFormProps = {
   initialData?: Property;
   propertyId?: string;
+  basePath?: string;
 };
 
 type GalleryImageState = {
@@ -24,7 +25,7 @@ type GalleryImageState = {
   isMovedToMain?: boolean; // Mark if it was promoted to main image
 };
 
-export default function PropertyForm({ initialData, propertyId }: PropertyFormProps) {
+export default function PropertyForm({ initialData, propertyId, basePath = "/admin/properties" }: PropertyFormProps) {
   const router = useRouter();
   const supabase = createClient();
   const { showAlert } = useAlert();
@@ -122,20 +123,13 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
         }
       }
 
-      // Fetch all sellers and agents for the selects
-      const { data: roleUsers } = await supabase
-        .from('user_roles')
-        .select('user_profiles(id, full_name), role_types(name)');
-      
-      if (roleUsers) {
-        const sellers = roleUsers
-          .filter((ru: any) => ru.role_types?.name === 'vendedor')
-          .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
-        const agents = roleUsers
-          .filter((ru: any) => ru.role_types?.name === 'agente')
-          .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+      // Fetch all sellers and agents for the selects using Server Action
+      try {
+        const { sellers, agents } = await getAvailablePersonnel();
         setAvailableSellers(sellers);
         setAvailableAgents(agents);
+      } catch (error) {
+        console.error("Error fetching personnel:", error);
       }
     }
     fetchTypes();
@@ -766,7 +760,7 @@ export default function PropertyForm({ initialData, propertyId }: PropertyFormPr
             <button 
               type="button"
               onClick={() => {
-                router.push("/admin/properties");
+                router.push(basePath);
                 router.refresh();
               }}
               className="flex-1 py-2.5 bg-[#006655] text-white rounded-lg font-medium hover:bg-[#004d40] shadow-md transition-colors"

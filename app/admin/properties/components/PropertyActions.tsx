@@ -5,7 +5,7 @@ import { togglePropertyStatus, deleteProperty } from '@/app/admin/actions';
 import Link from 'next/link';
 import { useAlert } from '@/app/components/ui/AlertProvider';
 
-export function PropertyActions({ property }: { property: any }) {
+export function PropertyActions({ property, currentUserRole = 'administrador', basePath = '/admin/properties' }: { property: any, currentUserRole?: string, basePath?: string }) {
   const [isPending, startTransition] = useTransition();
   const { showAlert, showConfirm } = useAlert();
 
@@ -47,18 +47,20 @@ export function PropertyActions({ property }: { property: any }) {
         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${property.is_active ? 'translate-x-6' : 'translate-x-1'}`} />
       </button>
 
-      <Link href={`/admin/properties/${property.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
+      <Link href={`${basePath}/${property.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
         <span className="material-icons text-xl">edit</span>
       </Link>
 
-      <button 
-        onClick={handleDelete}
-        disabled={isPending}
-        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50" 
-        title="Eliminar Propiedad"
-      >
-        <span className="material-icons text-xl">delete_outline</span>
-      </button>
+      {currentUserRole !== 'vendedor' && (
+        <button 
+          onClick={handleDelete}
+          disabled={isPending}
+          className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50" 
+          title="Eliminar Propiedad"
+        >
+          <span className="material-icons text-xl">delete_outline</span>
+        </button>
+      )}
     </div>
   );
 }

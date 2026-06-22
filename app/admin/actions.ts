@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 function extractPathFromUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -29,6 +30,19 @@ export async function togglePropertyStatus(id: string, currentStatus: boolean) {
 export async function deleteProperty(id: string) {
   const supabase = await createClient();
   
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    const { data: roleData } = await supabase
+      .from('user_roles')
+      .select('role_types(name)')
+      .eq('id', user.id)
+      .single();
+    if (roleData?.role_types?.name === 'vendedor') {
+      throw new Error('Los vendedores no tienen permiso para eliminar propiedades.');
+    }
+  }
+
+
   // 1. Obtener la propiedad y sus imágenes asociadas para borrar del Storage
   const { data: property, error: fetchError } = await supabase
     .from('properties')
@@ -146,4 +160,26 @@ export async function unassignPropertyUser(propertyId: string, roleTypeName: 've
     .eq('role_type_id', roleType.id);
 
   revalidatePath('/admin/properties');
+}
+
+export async function getAvailablePersonnel() {
+  // Use service role key to bypass RLS so Vendedores can see all Agents/Sellers
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  const supabaseAdmin = createSupabaseClient(supabaseUrl, supabaseKey);
+
+  const { data: roleUsers } = await supabaseAdmin
+    .from('user_roles')
+    .select('user_profiles(id, full_name), role_types(name)');
+  
+  if (!roleUsers) return { sellers: [], agents: [] };
+
+  const sellers = roleUsers
+    .filter((ru: any) => ru.role_types?.name === 'vendedor')
+    .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+  const agents = roleUsers
+    .filter((ru: any) => ru.role_types?.name === 'agente')
+    .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+
+  return { sellers, agents };
 }

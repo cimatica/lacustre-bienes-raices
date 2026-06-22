@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
-import { assignPropertyUser, unassignPropertyUser } from "@/app/admin/actions";
+import { assignPropertyUser, unassignPropertyUser, getAvailablePersonnel } from "@/app/admin/actions";
 import { useAlert } from "@/app/components/ui/AlertProvider";
 
 type Assignment = {
@@ -37,22 +37,14 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
       setVendedorId(seller?.user_id || "");
       setAgenteId(agent?.user_id || "");
 
-      // Fetch users
+      // Fetch users using Server Action to bypass RLS for Vendedor
       const fetchUsers = async () => {
-        const supabase = createClient();
-        const { data: roleUsers } = await supabase
-          .from('user_roles')
-          .select('user_profiles(id, full_name), role_types(name)');
-        
-        if (roleUsers) {
-          const sellers = roleUsers
-            .filter((ru: any) => ru.role_types?.name === 'vendedor')
-            .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
-          const agents = roleUsers
-            .filter((ru: any) => ru.role_types?.name === 'agente')
-            .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+        try {
+          const { sellers, agents } = await getAvailablePersonnel();
           setAvailableSellers(sellers);
           setAvailableAgents(agents);
+        } catch (error) {
+          console.error("Error fetching personnel:", error);
         }
       };
       fetchUsers();
@@ -103,18 +95,20 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
 
   return (
     <div className="flex flex-col gap-2 items-start">
-      <button 
-        onClick={() => setIsModalOpen(true)}
-        className="text-left w-full hover:bg-white p-1 rounded transition-colors group"
-      >
-        <div className="text-[11px] text-gray-400 font-medium flex justify-between items-center">
-          Vendedor
-          <span className="material-icons text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-[#006655]">edit</span>
-        </div>
-        <div className="text-xs font-semibold text-[#19322F] truncate">
-          {seller ? seller.user_profiles?.full_name : <span className="text-red-400">Sin asignar</span>}
-        </div>
-      </button>
+      {currentUserRole !== 'vendedor' && (
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="text-left w-full hover:bg-white p-1 rounded transition-colors group"
+        >
+          <div className="text-[11px] text-gray-400 font-medium flex justify-between items-center">
+            Vendedor
+            <span className="material-icons text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-[#006655]">edit</span>
+          </div>
+          <div className="text-xs font-semibold text-[#19322F] truncate">
+            {seller ? seller.user_profiles?.full_name : <span className="text-red-400">Sin asignar</span>}
+          </div>
+        </button>
+      )}
 
       <button 
         onClick={() => setIsModalOpen(true)}
@@ -146,20 +140,22 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
                   Solo los administradores pueden cambiar al vendedor.
                 </div>
               )}
-              <div>
-                <label className="block text-sm font-medium text-[#19322F] mb-1.5">Vendedor *</label>
-                <select 
-                  value={vendedorId}
-                  onChange={(e) => setVendedorId(e.target.value)}
-                  disabled={currentUserRole !== 'administrador'}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] disabled:bg-gray-100 disabled:text-gray-500"
-                >
-                  <option value="" disabled>Seleccionar Vendedor</option>
-                  {availableSellers.map(s => (
-                    <option key={s.id} value={s.id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
+              {currentUserRole !== 'vendedor' && (
+                <div>
+                  <label className="block text-sm font-medium text-[#19322F] mb-1.5">Vendedor *</label>
+                  <select 
+                    value={vendedorId}
+                    onChange={(e) => setVendedorId(e.target.value)}
+                    disabled={currentUserRole !== 'administrador'}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] disabled:bg-gray-100 disabled:text-gray-500"
+                  >
+                    <option value="" disabled>Seleccionar Vendedor</option>
+                    {availableSellers.map(s => (
+                      <option key={s.id} value={s.id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5">Agente</label>

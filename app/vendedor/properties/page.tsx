@@ -1,15 +1,15 @@
 import { createClient } from '@/utils/supabase/server';
 import { formatUF } from '@/lib/currency';
-import AdminFilters from '../components/AdminFilters';
-import AdminPagination from '../components/AdminPagination';
+import AdminFilters from '@/app/admin/components/AdminFilters';
+import AdminPagination from '@/app/admin/components/AdminPagination';
 import Link from 'next/link';
-import { PropertyActions } from './components/PropertyActions';
-import CommercialStatusDropdown from './components/CommercialStatusDropdown';
-import PropertyAssignments from './components/PropertyAssignments';
+import { PropertyActions } from '@/app/admin/properties/components/PropertyActions';
+import CommercialStatusDropdown from '@/app/admin/properties/components/CommercialStatusDropdown';
+import PropertyAssignments from '@/app/admin/properties/components/PropertyAssignments';
 
 export const dynamic = 'force-dynamic';
 
-export default async function AdminPropertiesPage({
+export default async function VendedorPropertiesPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -25,14 +25,41 @@ export default async function AdminPropertiesPage({
   
   const itemsPerPage = 10;
   
+  // Get current user
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
   // Commercial Statuses
   const { data: commercialStatuses } = await supabase.from('commercial_statuses').select('*').order('created_at', { ascending: true });
   
+  // Fetch role_type_id for 'vendedor'
+  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').single();
+
+  // Find properties assigned to this seller
+  let myPropertyIds: string[] = [];
+  
+  if (roleType?.id) {
+    const { data: myAssignments } = await supabase
+      .from('property_assignments')
+      .select('property_id')
+      .eq('user_id', user.id)
+      .eq('role_type_id', roleType.id);
+      
+    myPropertyIds = myAssignments?.map(a => a.property_id) || [];
+  }
+
   // Base query for properties
   let propQuery = supabase
     .from('properties')
     .select('*, property_types(id, name), property_assignments(user_id, role_types(name), user_profiles(id, full_name))', { count: 'exact' });
     
+  if (myPropertyIds.length > 0) {
+    propQuery = propQuery.in('id', myPropertyIds);
+  } else {
+    // Force empty result if no properties assigned
+    propQuery = propQuery.in('id', ['00000000-0000-0000-0000-000000000000']);
+  }
+
   if (query) {
     propQuery = propQuery.ilike('title', `%${query}%`);
   }
@@ -56,23 +83,13 @@ export default async function AdminPropertiesPage({
     .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
-  // Get current user role
-  const { data: { user } } = await supabase.auth.getUser();
-  let currentUserRole = 'usuario';
-  if (user) {
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role_types(name)')
-      .eq('id', user.id)
-      .single();
-    currentUserRole = roleData?.role_types?.name || 'usuario';
-  }
+  let currentUserRole = 'vendedor';
 
-  // Overall stats
-  const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true });
-  const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('is_active', true);
+  // Overall stats (filtered by my properties)
+  const { count: totalListings } = await supabase.from('properties').select('*', { count: 'exact', head: true }).in('id', myPropertyIds.length ? myPropertyIds : ['00000000-0000-0000-0000-000000000000']);
+  const { count: activeProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).in('id', myPropertyIds.length ? myPropertyIds : ['00000000-0000-0000-0000-000000000000']).eq('is_active', true);
   
-  const { data: allPropsStats } = await supabase.from('properties').select('commercial_status_id');
+  const { data: allPropsStats } = await supabase.from('properties').select('commercial_status_id').in('id', myPropertyIds.length ? myPropertyIds : ['00000000-0000-0000-0000-000000000000']);
   
   const statusCounts: Record<string, number> = {
     'Disponible': 0,
@@ -93,16 +110,17 @@ export default async function AdminPropertiesPage({
 
   const totalPages = count ? Math.ceil(count / itemsPerPage) : 0;
 
+  // Filter links to point to /vendedor
   return (
     <main className="flex-grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">Directorio de Propiedades</h1>
-          <p className="text-gray-500 mt-1">Administra todas las propiedades registradas en la plataforma.</p>
+          <p className="text-gray-500 mt-1">Administra tu portafolio de propiedades.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+          <Link href="/vendedor/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
             <span className="material-icons text-base">add</span> Nueva Propiedad
           </Link>
         </div>
@@ -110,7 +128,7 @@ export default async function AdminPropertiesPage({
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        <Link href="/admin/properties" className={`bg-white p-4 rounded-xl border ${(status === 'all' && commercialStatus === 'all') ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties" className={`bg-white p-4 rounded-xl border ${(status === 'all' && commercialStatus === 'all') ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Total</p>
             <div className="h-8 w-8 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
@@ -119,7 +137,7 @@ export default async function AdminPropertiesPage({
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{totalListings || 0}</p>
         </Link>
-        <Link href="/admin/properties?status=active" className={`bg-white p-4 rounded-xl border ${status === 'active' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties?status=active" className={`bg-white p-4 rounded-xl border ${status === 'active' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Activas</p>
             <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
@@ -128,7 +146,7 @@ export default async function AdminPropertiesPage({
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Disponible" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Disponible' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties?commercial_status=Disponible" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Disponible' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Disponibles</p>
             <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
@@ -137,7 +155,7 @@ export default async function AdminPropertiesPage({
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Disponible']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Vendida" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Vendida' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties?commercial_status=Vendida" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Vendida' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Vendidas</p>
             <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
@@ -146,7 +164,7 @@ export default async function AdminPropertiesPage({
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Vendida']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Arrendada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Arrendada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties?commercial_status=Arrendada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Arrendada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Arrendadas</p>
             <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
@@ -155,7 +173,7 @@ export default async function AdminPropertiesPage({
           </div>
           <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Arrendada']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Reservada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Reservada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+        <Link href="/vendedor/properties?commercial_status=Reservada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Reservada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
           <div className="flex justify-between items-start mb-2">
             <p className="text-xs sm:text-sm font-medium text-gray-500">Reservadas</p>
             <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
@@ -242,13 +260,13 @@ export default async function AdminPropertiesPage({
 
             {/* Actions */}
             <div className="col-span-12 md:col-span-2 text-right flex justify-end items-center">
-              <PropertyActions property={prop} />
+              <PropertyActions property={prop} currentUserRole={currentUserRole} basePath="/vendedor/properties" />
             </div>
           </div>
         ))}
         {(!properties || properties.length === 0) && (
           <div className="py-12 text-center text-gray-500">
-            {query ? 'No se encontraron propiedades para tu búsqueda.' : 'No hay propiedades registradas aún.'}
+            {query ? 'No se encontraron propiedades para tu búsqueda.' : 'No tienes propiedades asignadas aún.'}
           </div>
         )}
       </div>
