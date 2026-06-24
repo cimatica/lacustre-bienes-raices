@@ -15,6 +15,7 @@ type Lead = {
   };
   property: {
     id: string;
+    slug: string;
     title: string;
     image_url: string | null;
     location: string;
@@ -86,7 +87,7 @@ export default function LeadList({ leads }: { leads: Lead[] }) {
                   )}
                 </div>
                 <div className="min-w-0">
-                  <Link href={`/property/${lead.property.id}`} target="_blank" className="font-bold text-sm text-[#19322F] hover:text-[#006655] transition-colors truncate block">
+                  <Link href={`/propiedad/${lead.property.slug}`} target="_blank" className="font-bold text-sm text-[#19322F] hover:text-[#006655] transition-colors truncate block">
                     {lead.property.title}
                   </Link>
                   <p className="text-xs text-gray-500 truncate">{lead.property.location}</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslation } from "./I18nProvider";
 import { createClient } from "@/utils/supabase/client";
 
@@ -12,6 +12,7 @@ interface SearchFiltersModalProps {
 
 export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersModalProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dict = useTranslation();
 
   // Form state
@@ -54,14 +55,31 @@ export default function SearchFiltersModal({ isOpen, onClose }: SearchFiltersMod
   };
 
   const handleSearch = () => {
-    const params = new URLSearchParams();
+    const params = new URLSearchParams(searchParams?.toString() || "");
+    
     if (ubicacion) params.set("ubicacion", ubicacion);
+    else params.delete("ubicacion");
+    
     if (minPrice) params.set("minPrice", minPrice);
+    else params.delete("minPrice");
+    
     if (maxPrice) params.set("maxPrice", maxPrice);
-    if (tipoPropiedad && tipoPropiedad !== "Cualquier Tipo" && tipoPropiedad !== dict.filters.anyType) params.set("tipoPropiedad", tipoPropiedad);
+    else params.delete("maxPrice");
+    
+    if (tipoPropiedad && tipoPropiedad !== "Cualquier Tipo" && tipoPropiedad !== dict.filters.anyType) {
+      params.set("tipoPropiedad", tipoPropiedad);
+    } else {
+      params.delete("tipoPropiedad");
+    }
+    
     if (beds !== "0") params.set("beds", beds);
+    else params.delete("beds");
+    
     if (baths !== "0") params.set("baths", baths);
+    else params.delete("baths");
+    
     if (amenities.length > 0) params.set("amenities", amenities.join(','));
+    else params.delete("amenities");
 
     router.push(`/buscar?${params.toString()}`);
     onClose();

@@ -47,11 +47,17 @@ export function PropertyActions({ property, currentUserRole = 'administrador', b
         <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${property.is_active ? 'translate-x-6' : 'translate-x-1'}`} />
       </button>
 
-      <Link href={`${basePath}/${property.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
-        <span className="material-icons text-xl">edit</span>
+      {currentUserRole !== 'agente' && (
+        <Link href={`${basePath}/${property.id}`} className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Editar Propiedad">
+          <span className="material-icons text-xl">edit</span>
+        </Link>
+      )}
+
+      <Link href={`/propiedad/${property.slug}`} target="_blank" className="p-2 rounded-lg text-gray-400 hover:text-[#006655] hover:bg-[#D9ECC8]/30 transition-all" title="Ver Propiedad">
+        <span className="material-icons text-xl">visibility</span>
       </Link>
 
-      {currentUserRole !== 'vendedor' && (
+      {currentUserRole !== 'vendedor' && currentUserRole !== 'agente' && (
         <button 
           onClick={handleDelete}
           disabled={isPending}

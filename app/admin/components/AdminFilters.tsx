@@ -83,7 +83,7 @@ export default function AdminFilters({ placeholder = 'Buscar por título de prop
           >
             <option value="all">Todas las Operaciones</option>
             <option value="Venta">Venta</option>
-            <option value="Renta">Renta</option>
+            <option value="Renta">Arriendo</option>
           </select>
           <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-lg">expand_more</span>
         </div>

@@ -38,22 +38,11 @@ export default async function Navbar() {
             </div>
           </Link>
           <div className="hidden md:flex items-center space-x-8">
-            <Link className="text-mosque font-medium text-sm border-b-2 border-mosque px-1 py-1" href="#">{dict.navbar.buy}</Link>
-            <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.rent}</Link>
-            <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="#">{dict.navbar.sell}</Link>
-            {userRole === 'vendedor' ? (
-              <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="/perfil">{(dict as any).seller?.myProperties || "Mis Propiedades"}</Link>
-            ) : (
-              <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="/favoritos">{dict.navbar.saved}</Link>
-            )}
+            <Link className="text-mosque font-medium text-sm hover:border-b-2 hover:border-mosque px-1 py-1 transition-all" href="/buscar?type=Venta">{dict.navbar.buy}</Link>
+            <Link className="text-nordic-dark/70 hover:text-nordic-dark font-medium text-sm hover:border-b-2 hover:border-nordic-dark/20 px-1 py-1 transition-all" href="/buscar?type=Arriendo">{dict.navbar.rent}</Link>
           </div>
           <div className="flex items-center space-x-4">
             <LanguageSelector currentLanguage={currentLanguage} />
-
-            <button className="text-nordic-dark hover:text-mosque transition-colors relative">
-              <span className="material-icons">notifications_none</span>
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-background-light"></span>
-            </button>
             {user ? (
               <div className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 relative group py-2">
                 <button className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center cursor-pointer">
@@ -81,10 +70,6 @@ export default async function Navbar() {
                         <Link href="/perfil" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
                           <span className="material-icons text-[18px]">person</span>
                           Mi Perfil
-                        </Link>
-                        <Link href="/favoritos" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1 md:hidden">
-                          <span className="material-icons text-[18px]">favorite_border</span>
-                          Propiedades Guardadas
                         </Link>
                       </>
                     )}
@@ -127,14 +112,8 @@ export default async function Navbar() {
       </div>
       <div className="md:hidden border-t border-nordic-dark/5 bg-background-light overflow-hidden h-0 transition-all duration-300">
         <div className="px-4 py-2 space-y-1">
-          <Link className="block px-3 py-2 rounded-md text-base font-medium text-mosque bg-mosque/10" href="#">{dict.navbar.buy}</Link>
-          <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="#">{dict.navbar.rent}</Link>
-          <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="#">{dict.navbar.sell}</Link>
-          {userRole === 'vendedor' ? (
-            <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="/perfil">{(dict as any).seller?.myProperties || "Mis Propiedades"}</Link>
-          ) : (
-            <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="/favoritos">{dict.navbar.saved}</Link>
-          )}
+          <Link className="block px-3 py-2 rounded-md text-base font-medium text-mosque bg-mosque/10" href="/buscar?type=Venta">{dict.navbar.buy}</Link>
+          <Link className="block px-3 py-2 rounded-md text-base font-medium text-nordic-dark hover:bg-black/5" href="/buscar?type=Arriendo">{dict.navbar.rent}</Link>
         </div>
       </div>
     </nav>

@@ -205,6 +205,7 @@ export async function searchProperties(params: {
   baths?: string;
   amenities?: string[];
   sort?: string;
+  sale_type?: string;
 }): Promise<Property[]> {
   const url = new URL(`${SUPABASE_URL}/rest/v1/properties`);
   
@@ -219,6 +220,10 @@ export async function searchProperties(params: {
 
   // Only active properties
   url.searchParams.set("is_active", "eq.true");
+
+  if (params.sale_type) {
+    url.searchParams.set("sale_type", `eq.${params.sale_type}`);
+  }
 
   // Location search using ilike (case-insensitive)
   if (params.q) {

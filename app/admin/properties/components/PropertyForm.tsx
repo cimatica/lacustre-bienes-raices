@@ -463,7 +463,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="sale_type">Tipo de Operación</label>
                 <select value={formData.sale_type} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="sale_type">
                   <option value="Venta">Venta</option>
-                  <option value="Renta">Renta</option>
+                  <option value="Renta">Arriendo</option>
                 </select>
               </div>
               <div>

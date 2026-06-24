@@ -1,7 +1,7 @@
 {
   "navbar": {
     "buy": "Comprar",
-    "rent": "Rentar",
+    "rent": "Arrendar",
     "sell": "Vender",
     "saved": "Guardados"
   },
@@ -14,7 +14,7 @@
     "propertiesCount": "propiedades",
     "all": "Todos",
     "sale": "Venta",
-    "rent": "Renta",
+    "rent": "Arriendo",
     "noProperties": "No hay propiedades disponibles con ese filtro."
   },
   "hero": {
@@ -155,7 +155,7 @@
     "newListing": "Nuevos",
     "priceDrop": "Bajó de precio",
     "forSale": "Venta",
-    "forRent": "Renta",
+    "forRent": "Arriendo",
     "bookVisit": "Reservar Visita",
     "scheduleTour": "Programar Recorrido",
     "discoverMore": "Descubre Más",

@@ -25,7 +25,11 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
   const baths = typeof resolvedParams.baths === "string" ? resolvedParams.baths : undefined;
   const amenitiesParam = typeof resolvedParams.amenities === "string" ? resolvedParams.amenities : undefined;
   const amenities = amenitiesParam ? amenitiesParam.split(',') : undefined;
+  const typeParam = typeof resolvedParams.type === "string" ? resolvedParams.type : undefined;
   const sort = typeof resolvedParams.sort === "string" ? resolvedParams.sort : undefined;
+
+  // Map "Arriendo" URL parameter to "Renta" database value
+  const sale_type = typeParam === "Arriendo" ? "Renta" : (typeParam === "Venta" ? "Venta" : undefined);
 
   const results = await searchProperties({
     q,
@@ -37,6 +41,7 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
     baths,
     amenities,
     sort,
+    sale_type,
   });
 
   return (

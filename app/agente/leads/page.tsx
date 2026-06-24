@@ -1,17 +1,17 @@
 import { createClient } from '@/utils/supabase/server';
-import LeadList from './LeadList';
+import LeadList from '@/app/vendedor/leads/LeadList';
 
 export const dynamic = 'force-dynamic';
 
-export default async function VendedorLeadsPage() {
+export default async function AgenteLeadsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
-  // Fetch role_type_id for 'vendedor'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').single();
+  // Fetch role_type_id for 'agente'
+  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'agente').single();
 
-  // Find properties assigned to this seller
+  // Find properties assigned to this agent
   const { data: myAssignments } = await supabase
     .from('property_assignments')
     .select('property_id')
@@ -52,9 +52,7 @@ export default async function VendedorLeadsPage() {
   // Combine data
   const processedLeads = leads.map(lead => {
     const userVisits = visits.filter(v => v.user_id === lead.user_id && v.property_id === lead.property_id);
-    // Fetch role_type_id for 'agente' dynamically inside or outside, but we don't have it here, so we look at the joined role_types(name)
-    // Wait, let's fix the query on line 33 first. It was:
-    // properties!inner(id, title, image_url, location, property_assignments(role_type_id, user_profiles(id, full_name)))
+    // Find agent for this property
     const agentAssignment = lead.properties.property_assignments.find((a: any) => a.role_types?.name === 'agente');
     
     return {
@@ -77,16 +75,16 @@ export default async function VendedorLeadsPage() {
     <main className="flex-grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">Interesados (Leads)</h1>
-        <p className="text-gray-500 mt-1">Usuarios que han marcado tus propiedades como favoritas.</p>
+        <p className="text-gray-500 mt-1">Prospectos interesados en las propiedades asignadas a tu portafolio.</p>
       </div>
 
       {processedLeads.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
           <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-            <span className="material-icons text-3xl">favorite_border</span>
+            <span className="material-icons text-3xl">inbox</span>
           </div>
           <h3 className="text-lg font-bold text-[#19322F] mb-1">Aún no hay interesados</h3>
-          <p className="text-gray-500">Cuando un usuario marque alguna de tus propiedades como favorita, aparecerá aquí.</p>
+          <p className="text-gray-500">Cuando los usuarios soliciten información sobre tus propiedades, aparecerán aquí.</p>
         </div>
       ) : (
         <LeadList leads={processedLeads} />
