@@ -1,14 +1,17 @@
 import { Property } from "../../lib/supabase";
 import Link from "next/link";
 import { getUfValue, formatUF, formatCLP } from "../../lib/currency";
+import FavoriteButton from "./FavoriteButton";
 
 interface PropertyCardProps {
   property: Property;
   variant?: "featured" | "standard";
   dict?: any; // Accepting dict prop for translations
+  userId?: string;
+  isFavorite?: boolean;
 }
 
-export default async function PropertyCard({ property, variant = "standard", dict }: PropertyCardProps) {
+export default async function PropertyCard({ property, variant = "standard", dict, userId, isFavorite = false }: PropertyCardProps) {
   const ufValue = await getUfValue();
   const clpValue = property.price * ufValue;
 
@@ -24,9 +27,9 @@ export default async function PropertyCard({ property, variant = "standard", dic
           <div className="absolute top-4 left-4 bg-surface-darkest/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider text-white">
             {property.badge}
           </div>
-          <button className="absolute top-4 right-4 w-10 h-10 rounded-full bg-surface-darkest/90 backdrop-blur-sm flex items-center justify-center text-white hover:bg-mosque transition-all">
-            <span className="material-icons text-xl">favorite_border</span>
-          </button>
+          <div className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-surface-darkest/90 backdrop-blur-sm flex items-center justify-center text-white hover:bg-mosque transition-all">
+            <FavoriteButton propertyId={property.id} userId={userId} initialIsFavorite={isFavorite} />
+          </div>
           {/* Gradient overlay */}
           <div className="absolute bottom-0 inset-x-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
         </div>
@@ -71,9 +74,9 @@ export default async function PropertyCard({ property, variant = "standard", dic
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           src={property.image_url}
         />
-        <button className="absolute top-3 right-3 p-2 bg-surface-darkest/90 backdrop-blur-sm rounded-full hover:bg-mosque text-white transition-colors">
-          <span className="material-icons text-lg">favorite_border</span>
-        </button>
+        <div className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center bg-surface-darkest/90 backdrop-blur-sm rounded-full hover:bg-mosque text-white transition-colors">
+          <FavoriteButton propertyId={property.id} userId={userId} initialIsFavorite={isFavorite} />
+        </div>
         <div
           className={`absolute bottom-3 left-3 text-white text-xs font-bold px-2 py-1 rounded ${
             property.sale_type === "Venta" ? "bg-surface-darkest/90 backdrop-blur-sm" : "bg-mosque/90 backdrop-blur-sm"

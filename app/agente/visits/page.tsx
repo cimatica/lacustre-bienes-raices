@@ -1,18 +1,20 @@
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import VisitsList from './VisitsList';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AgenteVisitsPage() {
   const supabase = await createClient();
+  const adminSupabase = createAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
 
   // Fetch role_type_id for 'agente'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'agente').single();
+  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'agente').single();
 
   // Find properties assigned to this agent
-  const { data: myAssignments } = await supabase
+  const { data: myAssignments } = await adminSupabase
     .from('property_assignments')
     .select('property_id')
     .eq('user_id', user.id)
@@ -23,14 +25,14 @@ export default async function AgenteVisitsPage() {
   let visits: any[] = [];
 
   if (myPropertyIds.length > 0) {
-    const { data: vs } = await supabase
+    const { data: vs } = await adminSupabase
       .from('visits')
       .select(`
         id,
         visit_date,
         status,
         message,
-        user_profiles!inner(full_name, email, phone),
+        user_profiles(full_name, email, phone),
         properties!inner(id, title, image_url, location)
       `)
       .in('property_id', myPropertyIds)

@@ -17,11 +17,13 @@ type Props = {
 export default function ScheduleVisitClient({ property, clpPrice, dict, userId }: Props) {
   const router = useRouter();
   const { showAlert } = useAlert();
-  const [selectedDate, setSelectedDate] = useState<number | null>(8);
-  const [selectedTime, setSelectedTime] = useState<string | null>("10:00 AM");
+  const [currentMonthDate, setCurrentMonthDate] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [selectedDate, setSelectedDate] = useState<number | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const agentAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'agente');
+  
   const handleConfirm = async () => {
     if (!userId) {
       showAlert("Atención", "Por favor, inicia sesión para programar una visita.", "warning");
@@ -33,9 +35,17 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     }
 
     setIsSubmitting(true);
-    // Dummy date calculation logic for the UI prototype
-    const visitDate = new Date();
-    visitDate.setDate(selectedDate);
+    
+    // selectedDate holds the timestamp, we create a new Date object from it
+    const visitDate = new Date(selectedDate);
+    // Parse time like "10:00 AM" or "02:30 PM"
+    const [timeStr, modifier] = selectedTime.split(' ');
+    let [hours, minutes] = timeStr.split(':');
+    let hoursNum = parseInt(hours, 10);
+    if (modifier === 'PM' && hoursNum < 12) hoursNum += 12;
+    if (modifier === 'AM' && hoursNum === 12) hoursNum = 0;
+    
+    visitDate.setHours(hoursNum, parseInt(minutes, 10), 0, 0);
     
     const success = await scheduleVisit({
       user_id: userId,
@@ -55,19 +65,63 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     }
   };
 
-  const dates = [
-    { day: 1, available: true }, { day: 2, available: true }, { day: 3, available: true },
-    { day: 4, available: true }, { day: 5, available: true }, { day: 6, available: true },
-    { day: 7, available: true }, { day: 8, available: true }, { day: 9, available: true },
-    { day: 10, available: true }, { day: 11, available: true }
-  ];
+  // Generate calendar grid
+  const generateCalendar = () => {
+    const year = currentMonthDate.getFullYear();
+    const month = currentMonthDate.getMonth();
+    
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    
+    const daysInMonth = lastDayOfMonth.getDate();
+    // Monday is 0, Sunday is 6
+    let startingDay = firstDayOfMonth.getDay() === 0 ? 6 : firstDayOfMonth.getDay() - 1;
+    
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    const calendarDays = [];
+    
+    for (let i = 0; i < startingDay; i++) {
+      calendarDays.push(null);
+    }
+    
+    for (let i = 1; i <= daysInMonth; i++) {
+      const d = new Date(year, month, i);
+      const isSunday = d.getDay() === 0;
+      calendarDays.push({
+        timestamp: d.getTime(),
+        day: i,
+        available: d >= today && !isSunday
+      });
+    }
+    
+    return calendarDays;
+  };
 
-  const times = [
-    { time: "09:00 AM", available: true }, { time: "09:30 AM", available: true },
-    { time: "10:00 AM", available: true }, { time: "10:30 AM", available: true },
-    { time: "11:30 AM", available: true }, { time: "01:00 PM", available: false },
-    { time: "02:00 PM", available: true }, { time: "03:30 PM", available: true }
-  ];
+  const handlePrevMonth = () => {
+    setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonthDate(new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 1));
+  };
+
+  const generateTimes = () => {
+    const timeSlots = [];
+    for (let h = 9; h <= 19; h++) {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hr = h > 12 ? h - 12 : h;
+      timeSlots.push({ time: `${hr.toString().padStart(2, '0')}:00 ${ampm}`, available: true });
+      timeSlots.push({ time: `${hr.toString().padStart(2, '0')}:30 ${ampm}`, available: true });
+    }
+    timeSlots.push({ time: `08:00 PM`, available: true });
+    return timeSlots;
+  };
+
+  const times = generateTimes();
+  const monthNames = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+  const currentMonthYear = `${monthNames[currentMonthDate.getMonth()]} de ${currentMonthDate.getFullYear()}`;
 
   return (
     <div className="w-full max-w-6xl bg-white dark:bg-[#162e2a] rounded-xl shadow-2xl shadow-mosque/5 overflow-hidden flex flex-col md:flex-row border border-slate-100 dark:border-slate-800">
@@ -110,16 +164,29 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-3 pt-2">
-            <img alt="Agent" className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjW8nnOPHp1gOZTOS7qhMHvipD0b7viW3jmd_eAxFO7faa8rI-l2bjqTkw5xsGNAAnbxLfoLrJwf86iz_rvrcWZ1PFCBbsJs6F9fVADumsgd1pH2AorRGRV9YWFsvenDLX89W1nX6Lmk8xN6BS-BGAypyNgxlEtcnDxTSovjH9JsrUcwKHPTLVfJpIjQE_c2pIKScAf2WlFi5sf861r5TKZaownHpiub2sbluHlfsR2sZFQCxs5Lgy6J78tn3e1OQ_hBGy1V0_ueE" />
-            <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{dict.scheduleVisit?.hostedBy || "Hosted by"}</p>
-              <p className="text-nordic dark:text-white font-semibold">Sarah Jenkins</p>
+          {agentAssignment?.user_profiles ? (
+            <div className="flex items-center gap-3 pt-2">
+              <img 
+                alt="Agent" 
+                className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm" 
+                src={agentAssignment.user_profiles.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(agentAssignment.user_profiles.full_name)} 
+              />
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Agente Asignado</p>
+                <p className="text-nordic dark:text-white font-semibold">{agentAssignment.user_profiles.full_name}</p>
+              </div>
             </div>
-            <button className="ml-auto p-2 text-mosque hover:bg-mosque/10 rounded-full transition-colors" title={dict.property?.contactAgent || "Contact Agent"}>
-              <span className="material-icons">chat_bubble_outline</span>
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center gap-3 pt-2">
+              <div className="w-12 h-12 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                <span className="material-icons text-slate-400">person</span>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Sin Agente Asignado</p>
+                <p className="text-nordic dark:text-white font-semibold">Bienes Raíces Lacustre</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -131,47 +198,48 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
           
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider">October 2023</h3>
+              <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider">{currentMonthYear}</h3>
               <div className="flex gap-1">
-                <button className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-mosque transition-colors">
+                <button onClick={handlePrevMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-mosque transition-colors">
                   <span className="material-icons text-lg">chevron_left</span>
                 </button>
-                <button className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-nordic dark:text-white hover:text-mosque transition-colors">
+                <button onClick={handleNextMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-nordic dark:text-white hover:text-mosque transition-colors">
                   <span className="material-icons text-lg">chevron_right</span>
                 </button>
               </div>
             </div>
-            <div className="grid grid-cols-7 gap-y-2 gap-x-1 text-center mb-6">
-              <div className="text-xs font-medium text-slate-400 py-2">Mon</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Tue</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Wed</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Thu</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Fri</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Sat</div>
-              <div className="text-xs font-medium text-slate-400 py-2">Sun</div>
-              <button className="text-sm text-slate-300 dark:text-slate-600 py-2 rounded-lg cursor-not-allowed">28</button>
-              <button className="text-sm text-slate-300 dark:text-slate-600 py-2 rounded-lg cursor-not-allowed">29</button>
-              <button className="text-sm text-slate-300 dark:text-slate-600 py-2 rounded-lg cursor-not-allowed">30</button>
-              {dates.map((d) => (
-                <button 
-                  key={d.day}
-                  onClick={() => setSelectedDate(d.day)}
-                  className={`text-sm py-2 rounded-lg transition-colors ${
-                    selectedDate === d.day 
-                      ? 'relative bg-mosque text-white font-semibold shadow-lg shadow-mosque/30 transform scale-105' 
-                      : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }`}
-                >
-                  {d.day}
-                  {selectedDate === d.day && <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span>}
-                </button>
+            <div className="grid grid-cols-7 gap-1 mb-2 text-center">
+              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
+                <div key={day} className="text-xs font-medium text-slate-400 py-1">{day}</div>
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-1">
+              {generateCalendar().map((d, i) => (
+                <div key={i} className="aspect-square flex items-center justify-center p-1">
+                  {d ? (
+                    <button 
+                      disabled={!d.available}
+                      onClick={() => d.available && setSelectedDate(d.timestamp)}
+                      className={`w-full h-full flex items-center justify-center rounded-lg transition-all text-sm ${
+                        !d.available ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-800 text-slate-400' :
+                        selectedDate === d.timestamp 
+                          ? 'bg-mosque text-white font-bold shadow-md transform scale-105 border-transparent' 
+                          : 'text-nordic dark:text-white hover:bg-mosque/10 border border-transparent hover:border-mosque/30'
+                      }`}
+                    >
+                      {d.day}
+                    </button>
+                  ) : (
+                    <div className="w-full h-full rounded-lg"></div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
           <div className="mb-8">
             <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider mb-4">{dict.scheduleVisit?.availableTimes || "Available Times"}</h3>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar-y pr-2">
               {times.map((t) => (
                 <button 
                   key={t.time}
@@ -191,15 +259,21 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider mb-2" htmlFor="message">
-              {dict.scheduleVisit?.message || "Message for the agent"} <span className="text-slate-400 font-normal normal-case ml-1">{dict.scheduleVisit?.optional || "(Optional)"}</span>
-            </label>
+            <div className="flex justify-between items-end mb-2">
+              <label className="block text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider" htmlFor="message">
+                {dict.scheduleVisit?.message || "Message for the agent"} <span className="text-slate-400 font-normal normal-case ml-1">{dict.scheduleVisit?.optional || "(Optional)"}</span>
+              </label>
+              <span className={`text-xs font-medium ${message.length >= 250 ? 'text-red-500' : 'text-slate-400'}`}>
+                {message.length} / 250
+              </span>
+            </div>
             <textarea 
               id="message" 
               rows={3}
+              maxLength={250}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder={dict.scheduleVisit?.placeholder || "Any specific questions or requests?"}
+              placeholder={dict.scheduleVisit?.placeholder || "¿Alguna pregunta o requerimiento específico?"}
               className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#112522] text-nordic dark:text-slate-200 placeholder:text-slate-400 focus:ring-1 focus:ring-mosque focus:border-mosque transition-shadow resize-none text-sm"
             ></textarea>
           </div>

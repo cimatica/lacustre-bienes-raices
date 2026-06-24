@@ -7,6 +7,8 @@ import { getFeaturedProperties, getNewProperties } from "../lib/supabase";
 import { Suspense } from "react";
 import Link from "next/link";
 import { getDictionary } from "../lib/i18n";
+import { createClient } from "@/utils/supabase/server";
+import { getUserFavorites } from "../lib/supabase";
 
 const PAGE_SIZE = 8;
 
@@ -33,6 +35,11 @@ export default async function Home({ searchParams }: HomeProps) {
     getNewProperties(page, PAGE_SIZE, saleType),
   ]);
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const favorites = user ? await getUserFavorites(user.id) : [];
+  const favoritesMap = new Set(favorites.map((f: any) => f.property_id));
+
   const activeTab = saleType ?? "Todos";
 
   return (
@@ -57,7 +64,14 @@ export default async function Home({ searchParams }: HomeProps) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featured.map((property) => (
-              <PropertyCard key={property.id} property={property} variant="featured" dict={dict} />
+              <PropertyCard 
+                key={property.id} 
+                property={property} 
+                variant="featured" 
+                dict={dict} 
+                userId={user?.id}
+                isFavorite={favoritesMap.has(property.id)}
+              />
             ))}
           </div>
         </section>
@@ -99,7 +113,14 @@ export default async function Home({ searchParams }: HomeProps) {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {newProperties.data.map((property) => (
-              <PropertyCard key={property.id} property={property} variant="standard" dict={dict} />
+              <PropertyCard 
+                key={property.id} 
+                property={property} 
+                variant="standard" 
+                dict={dict}
+                userId={user?.id}
+                isFavorite={favoritesMap.has(property.id)}
+              />
             ))}
           </div>
 

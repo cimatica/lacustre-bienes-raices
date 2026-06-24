@@ -49,6 +49,7 @@ export type Property = {
   year_built?: number;
   parking?: number;
   host_id?: string;
+  property_assignments?: any[];
 };
 
 export type PaginatedProperties = {
@@ -175,10 +176,10 @@ export async function getNewProperties(
   };
 }
 
-/** Fetch property by Slug including related images */
+/** Fetch property by Slug including related images and assignments */
 export async function getPropertyBySlug(slug: string): Promise<Property | null> {
   const url = buildUrl({
-    select: "*, property_images(*), property_types(id, name), commercial_statuses(id, name)",
+    select: "*, property_images(*), property_types(id, name), commercial_statuses(id, name), property_assignments(user_id, role_types(name), user_profiles(id, full_name, phone, avatar_url))",
     slug: `eq.${slug}`,
     is_active: "eq.true",
   });

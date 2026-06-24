@@ -8,11 +8,11 @@ import PropertyDescription from '@/app/propiedad/components/PropertyDescription'
 import PropertyAmenities from '@/app/propiedad/components/PropertyAmenities';
 import ImageGallery from '@/app/propiedad/components/ImageGallery';
 import ContactCard from '@/app/propiedad/components/ContactCard';
-
 import PropertyMap from '@/app/propiedad/components/PropertyMap';
 import { getDictionary } from '@/lib/i18n';
 import { getUfValue, formatUF, formatCLP } from '@/lib/currency';
 import { createClient } from '@/utils/supabase/server';
+import { getUserFavorites } from '@/lib/supabase';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -51,6 +51,7 @@ export default async function PropertyPage({ params }: Props) {
   const { data: { user } } = await supabase.auth.getUser();
 
   let userRole = 'usuario';
+  let isFavorite = false;
   if (user) {
     const { data: roleData } = await supabase
       .from('user_roles')
@@ -60,6 +61,8 @@ export default async function PropertyPage({ params }: Props) {
     if (roleData && roleData.role_types) {
       userRole = roleData.role_types.name;
     }
+    const favorites = await getUserFavorites(user.id);
+    isFavorite = favorites.some((f: any) => f.property_id === property.id);
   }
 
   const isOwner = user?.id === property.host_id;
@@ -100,7 +103,13 @@ export default async function PropertyPage({ params }: Props) {
               </div>
               <h1 className="text-3xl md:text-4xl font-bold text-white">{property.title}</h1>
             </div>
-            <ImageGallery images={imagesToPass} badge={property.badge} />
+            <ImageGallery 
+              images={imagesToPass} 
+              badge={property.badge} 
+              propertyId={property.id}
+              userId={user?.id}
+              initialIsFavorite={isFavorite}
+            />
           </div>
 
           {/* Right Column */}
@@ -115,6 +124,8 @@ export default async function PropertyPage({ params }: Props) {
                 userRole={userRole} 
                 dict={dict} 
                 commercialStatus={property.commercial_statuses?.name}
+                assignments={property.property_assignments}
+                userId={user?.id}
               />
               <PropertyMap latitude={property.latitude} longitude={property.longitude} />
             </div>

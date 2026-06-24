@@ -1,10 +1,12 @@
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AgenteDashboard() {
   const supabase = await createClient();
+  const adminSupabase = createAdminClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -12,10 +14,10 @@ export default async function AgenteDashboard() {
   }
 
   // Fetch role_type_id for 'agente'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'agente').single();
+  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'agente').single();
 
   // Find properties assigned to this agent
-  const { data: myAssignments } = await supabase
+  const { data: myAssignments } = await adminSupabase
     .from('property_assignments')
     .select('property_id')
     .eq('user_id', user.id)
@@ -32,9 +34,9 @@ export default async function AgenteDashboard() {
 
   if (myPropertyIds.length > 0) {
     // Count and get latest leads (favorites)
-    const { data: favs } = await supabase
+    const { data: favs } = await adminSupabase
       .from('favorites')
-      .select('created_at, user_profiles!inner(full_name, email), properties!inner(title)', { count: 'exact' })
+      .select('created_at, user_profiles(full_name, email), properties!inner(title)', { count: 'exact' })
       .in('property_id', myPropertyIds)
       .order('created_at', { ascending: false });
     
@@ -44,9 +46,9 @@ export default async function AgenteDashboard() {
     }
 
     // Count and get latest scheduled visits
-    const { data: vs } = await supabase
+    const { data: vs } = await adminSupabase
       .from('visits')
-      .select('visit_date, status, user_profiles!inner(full_name), properties!inner(title)', { count: 'exact' })
+      .select('visit_date, status, user_profiles(full_name), properties!inner(title)', { count: 'exact' })
       .in('property_id', myPropertyIds)
       .eq('status', 'scheduled')
       .order('visit_date', { ascending: true });

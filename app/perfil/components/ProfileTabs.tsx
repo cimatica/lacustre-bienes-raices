@@ -52,11 +52,12 @@ export default function ProfileTabs({ favorites, visits, profile, email, dict }:
             ) : favorites.map((fav: any) => {
               const property = fav.property;
               if (!property) return null;
+              const imageUrl = property.property_images?.find((img: any) => img.is_main)?.image_url || property.property_images?.[0]?.image_url || 'https://via.placeholder.com/400';
               return (
                 <div key={fav.id} className="group bg-surface-dark rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-slate-700/50 flex flex-col h-full">
                   <Link href={`/propiedad/${property.slug}`}>
                     <div className="relative h-64 overflow-hidden">
-                      <img alt={property.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src={property.images?.[0] || 'https://via.placeholder.com/400'} />
+                      <img alt={property.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src={imageUrl} />
                       <div className="absolute top-4 right-4 z-10">
                         <button className="w-10 h-10 bg-mosque backdrop-blur-md rounded-full flex items-center justify-center text-white shadow-sm transition-colors">
                           <span className="material-icons text-lg">favorite</span>
@@ -97,11 +98,12 @@ export default function ProfileTabs({ favorites, visits, profile, email, dict }:
               if (!prop) return null;
               const dateObj = new Date(v.visit_date);
               const isPast = dateObj < new Date() && v.status === 'scheduled';
+              const imageUrl = prop.property_images?.find((img: any) => img.is_main)?.image_url || prop.property_images?.[0]?.image_url || 'https://via.placeholder.com/200';
               
               return (
                 <div key={v.id} className="flex flex-col md:flex-row bg-surface-darker p-2 rounded-xl border border-slate-700/50 items-center hover:bg-surface-dark transition-colors shadow-sm">
                   <div className="w-full md:w-48 h-32 md:h-24 rounded-lg overflow-hidden shrink-0 relative">
-                    <img alt="Thumbnail" className="w-full h-full object-cover" src={prop.images?.[0] || 'https://via.placeholder.com/200'} />
+                    <img alt="Thumbnail" className="w-full h-full object-cover" src={imageUrl} />
                     <div className="absolute inset-0 bg-black/20"></div>
                   </div>
                   <div className="flex-1 p-4 flex flex-col md:flex-row justify-between items-start md:items-center w-full gap-4">

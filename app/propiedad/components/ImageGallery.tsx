@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/app/components/I18nProvider";
+import FavoriteButton from "@/app/components/FavoriteButton";
 
 type PropertyImage = {
   id: string;
@@ -14,9 +15,12 @@ type PropertyImage = {
 type Props = {
   images: PropertyImage[];
   badge?: string;
+  propertyId?: string;
+  userId?: string;
+  initialIsFavorite?: boolean;
 };
 
-export default function ImageGallery({ images, badge }: Props) {
+export default function ImageGallery({ images, badge, propertyId, userId, initialIsFavorite }: Props) {
   const dict = useTranslation();
   
   const [currentMainImage, setCurrentMainImage] = useState<PropertyImage | null>(
@@ -55,7 +59,12 @@ export default function ImageGallery({ images, badge }: Props) {
               </span>
             )}
           </div>
-          <button 
+          {propertyId && (
+            <div className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white hover:bg-mosque transition-all shadow-lg border border-white/20">
+              <FavoriteButton propertyId={propertyId} userId={userId} initialIsFavorite={initialIsFavorite} />
+            </div>
+          )}
+          <button  
             className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-nordic px-4 py-2 rounded-lg text-sm font-medium shadow-lg backdrop-blur transition-all flex items-center gap-2"
             onClick={(e) => {
               e.stopPropagation();

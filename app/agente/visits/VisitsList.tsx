@@ -106,10 +106,10 @@ export default function VisitsList({ visits }: { visits: Visit[] }) {
               </div>
             </div>
 
-            {/* Propiedad */}
+            {/* Propiedad y Mensaje */}
             <div className="col-span-12 md:col-span-4">
               <p className="text-xs text-gray-500 mb-1 uppercase font-semibold tracking-wider">Propiedad</p>
-              <div className="flex items-center gap-3 bg-white border border-gray-100 p-2 rounded-lg">
+              <div className="flex items-center gap-3 bg-white border border-gray-100 p-2 rounded-lg mb-2">
                 <div className="w-10 h-10 rounded overflow-hidden shrink-0 bg-gray-200">
                   {visit.properties.image_url ? (
                     <img src={visit.properties.image_url} alt="" className="w-full h-full object-cover" />
@@ -122,6 +122,12 @@ export default function VisitsList({ visits }: { visits: Visit[] }) {
                   <p className="text-[11px] text-gray-500 truncate">{visit.properties.location}</p>
                 </div>
               </div>
+              {visit.message && (
+                <div className="bg-orange-50 border border-orange-100 rounded-lg p-2 flex gap-2">
+                  <span className="material-icons text-orange-500 text-[16px] shrink-0">chat</span>
+                  <p className="text-xs text-orange-800 italic break-words line-clamp-2" title={visit.message}>"{visit.message}"</p>
+                </div>
+              )}
             </div>
 
             {/* Acciones */}
