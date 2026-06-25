@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Property, scheduleVisit } from '@/lib/supabase';
+import { Property } from '@/lib/supabase';
+import { scheduleVisitAction } from '@/app/actions';
 import { formatUF, formatCLP } from '@/lib/currency';
 import { useRouter } from 'next/navigation';
 import { useAlert } from '@/app/components/ui/AlertProvider';
@@ -49,13 +50,7 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     
     visitDate.setHours(hoursNum, parseInt(minutes, 10), 0, 0);
     
-    const success = await scheduleVisit({
-      user_id: userId,
-      property_id: property.id,
-      visit_date: visitDate.toISOString(),
-      status: 'scheduled',
-      message
-    });
+    const success = await scheduleVisitAction(property.id, visitDate.toISOString(), message);
 
     setIsSubmitting(false);
 

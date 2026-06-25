@@ -49,6 +49,8 @@ export default async function PropertyPage({ params }: Props) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
 
   let userRole = 'usuario';
   let isFavorite = false;
@@ -61,11 +63,13 @@ export default async function PropertyPage({ params }: Props) {
     if (roleData && roleData.role_types) {
       userRole = roleData.role_types.name;
     }
-    const favorites = await getUserFavorites(user.id);
+    const favorites = await getUserFavorites(user.id, token);
     isFavorite = favorites.some((f: any) => f.property_id === property.id);
   }
 
-  const isOwner = user?.id === property.host_id;
+  const isOwner = user ? property.property_assignments?.some(
+    (a: any) => a.user_id === user.id && a.role_types?.name === 'vendedor'
+  ) : false;
 
   // Always include the main image url, and append gallery images if they exist
   const mainImageObj = {

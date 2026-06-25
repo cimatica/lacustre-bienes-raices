@@ -241,6 +241,7 @@ export default async function AgentePropertiesPage({
                 propertyId={prop.id} 
                 currentStatusId={prop.commercial_status_id} 
                 statuses={commercialStatuses || []} 
+                disabled={true}
               />
             </div>
 

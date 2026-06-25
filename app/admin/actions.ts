@@ -12,19 +12,48 @@ function extractPathFromUrl(url: string | null | undefined): string | null {
 
 export async function togglePropertyStatus(id: string, currentStatus: boolean) {
   const supabase = await createClient();
-  
-  const { error } = await supabase
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: "No autenticado" };
+
+  // Verificamos permisos manualmente antes de usar adminSupabase
+  const { data: roleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).single();
+  const isAdmin = roleData?.role_types?.name === 'administrador';
+
+  let hasPermission = isAdmin;
+  if (!hasPermission) {
+    // Si no es admin, revisamos si está asignado a esta propiedad
+    const { data: assignments } = await supabase
+      .from('property_assignments')
+      .select('id')
+      .eq('property_id', id)
+      .eq('user_id', user.id);
+    if (assignments && assignments.length > 0) {
+      hasPermission = true;
+    }
+  }
+
+  if (!hasPermission) {
+    return { error: "No tienes permisos para modificar esta propiedad." };
+  }
+
+  const { createAdminClient } = await import('@/utils/supabase/admin');
+  const adminSupabase = createAdminClient();
+
+  const { error } = await adminSupabase
     .from('properties')
     .update({ is_active: !currentStatus })
     .eq('id', id);
 
   if (error) {
     console.error("Error toggling property status:", error);
-    throw new Error('No se pudo actualizar el estado de la propiedad.');
+    return { error: error.message };
   }
 
   revalidatePath('/admin/properties');
-  revalidatePath('/'); // Revalidate public pages
+  revalidatePath('/vendedor/properties');
+  revalidatePath('/agente/properties');
+  revalidatePath('/');
+  return { success: true };
 }
 
 export async function deleteProperty(id: string) {

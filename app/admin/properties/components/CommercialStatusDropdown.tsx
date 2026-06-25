@@ -12,11 +12,13 @@ type CommercialStatus = {
 export default function CommercialStatusDropdown({
   propertyId,
   currentStatusId,
-  statuses
+  statuses,
+  disabled = false
 }: {
   propertyId: string;
   currentStatusId: string;
   statuses: CommercialStatus[];
+  disabled?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -73,17 +75,18 @@ export default function CommercialStatusDropdown({
     <div className="relative inline-block text-left" ref={menuRef}>
       <button
         type="button"
-        disabled={isPending}
+        disabled={isPending || disabled}
         onClick={(e) => {
+          if (disabled) return;
           e.preventDefault();
           e.stopPropagation();
           setIsOpen(!isOpen);
         }}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${getStatusColor(currentStatus?.name)} hover:opacity-80 disabled:opacity-50`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors ${getStatusColor(currentStatus?.name)} ${disabled ? '' : 'hover:opacity-80 cursor-pointer'} ${isPending ? 'opacity-50' : ''}`}
       >
         <span className="material-icons text-[14px]">{getStatusIcon(currentStatus?.name)}</span>
         {currentStatus?.name}
-        <span className="material-icons text-[14px] ml-0.5">{isOpen ? 'expand_less' : 'expand_more'}</span>
+        {!disabled && <span className="material-icons text-[14px] ml-0.5">{isOpen ? 'expand_less' : 'expand_more'}</span>}
       </button>
 
       {isOpen && (

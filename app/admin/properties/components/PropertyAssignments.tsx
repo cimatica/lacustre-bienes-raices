@@ -162,7 +162,8 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
                 <select 
                   value={agenteId}
                   onChange={(e) => setAgenteId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655]"
+                  disabled={currentUserRole === 'agente'}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] disabled:bg-gray-100 disabled:text-gray-500"
                 >
                   <option value="">Sin Agente Asignado</option>
                   {availableAgents.map(a => (

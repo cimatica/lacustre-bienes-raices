@@ -91,10 +91,10 @@ export type Visit = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function apiHeaders() {
+function apiHeaders(token?: string) {
   return {
     apikey: SUPABASE_ANON_KEY,
-    Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    Authorization: `Bearer ${token || SUPABASE_ANON_KEY}`,
     "Content-Type": "application/json",
     // Request the total count in the response
     Prefer: "count=exact",
@@ -307,12 +307,12 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 }
 
 /** Fetch user favorites */
-export async function getUserFavorites(userId: string): Promise<Favorite[]> {
+export async function getUserFavorites(userId: string, token?: string): Promise<Favorite[]> {
   const url = buildUrl({ select: "*, property:properties(*, property_images(*), property_types(id, name))" });
   const finalUrl = url.replace('/properties?', '/favorites?user_id=eq.' + userId + '&');
   
   const res = await fetch(finalUrl, {
-    headers: apiHeaders(),
+    headers: apiHeaders(token),
     cache: "no-store",
   });
 
@@ -321,57 +321,15 @@ export async function getUserFavorites(userId: string): Promise<Favorite[]> {
 }
 
 /** Fetch user visits */
-export async function getUserVisits(userId: string): Promise<Visit[]> {
+export async function getUserVisits(userId: string, token?: string): Promise<Visit[]> {
   const url = buildUrl({ select: "*, property:properties(*, property_images(*), property_types(id, name))" });
   const finalUrl = url.replace('/properties?', '/visits?user_id=eq.' + userId + '&order=visit_date.desc&');
   
   const res = await fetch(finalUrl, {
-    headers: apiHeaders(),
+    headers: apiHeaders(token),
     cache: "no-store",
   });
 
   if (!res.ok) return [];
   return res.json() as Promise<Visit[]>;
-}
-
-/** Schedule a visit */
-export async function scheduleVisit(visit: Omit<Visit, 'id' | 'created_at'>): Promise<boolean> {
-  const url = new URL(`${SUPABASE_URL}/rest/v1/visits`);
-  
-  const res = await fetch(url.toString(), {
-    method: 'POST',
-    headers: {
-      ...apiHeaders(),
-      "Prefer": "return=minimal"
-    },
-    body: JSON.stringify(visit)
-  });
-
-  return res.ok;
-}
-
-/** Toggle favorite */
-export async function toggleFavorite(userId: string, propertyId: string, isCurrentlyFavorite: boolean): Promise<boolean> {
-  const url = new URL(`${SUPABASE_URL}/rest/v1/favorites`);
-  
-  if (isCurrentlyFavorite) {
-    url.searchParams.set("user_id", `eq.${userId}`);
-    url.searchParams.set("property_id", `eq.${propertyId}`);
-    
-    const res = await fetch(url.toString(), {
-      method: 'DELETE',
-      headers: apiHeaders()
-    });
-    return res.ok;
-  } else {
-    const res = await fetch(url.toString(), {
-      method: 'POST',
-      headers: {
-        ...apiHeaders(),
-        "Prefer": "return=minimal"
-      },
-      body: JSON.stringify({ user_id: userId, property_id: propertyId })
-    });
-    return res.ok;
-  }
 }

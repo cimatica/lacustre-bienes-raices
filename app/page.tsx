@@ -37,7 +37,10 @@ export default async function Home({ searchParams }: HomeProps) {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const favorites = user ? await getUserFavorites(user.id) : [];
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
+  const favorites = user ? await getUserFavorites(user.id, token) : [];
   const favoritesMap = new Set(favorites.map((f: any) => f.property_id));
 
   const activeTab = saleType ?? "Todos";

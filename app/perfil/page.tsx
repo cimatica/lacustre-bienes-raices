@@ -46,10 +46,13 @@ export default async function UserProfilePage() {
     redirect('/agente');
   }
 
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+
   // Fetch real data
   const profile = userId ? await getUserProfile(userId) : null;
-  const favorites = userId ? await getUserFavorites(userId) : [];
-  const visits = userId ? await getUserVisits(userId) : [];
+  const favorites = userId ? await getUserFavorites(userId, token) : [];
+  const visits = userId ? await getUserVisits(userId, token) : [];
   
   const propertiesCount = favorites.length;
   const scheduledVisitsCount = visits.filter((v: any) => v.status === 'scheduled').length;

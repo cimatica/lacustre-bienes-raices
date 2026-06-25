@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toggleFavorite } from "@/lib/supabase";
+import { toggleFavoriteAction } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { useAlert } from "@/app/components/ui/AlertProvider";
 
@@ -34,7 +34,7 @@ export default function FavoriteButton({ propertyId, userId, initialIsFavorite =
     // Optimistic UI update
     setIsFavorite(!isFavorite);
 
-    const success = await toggleFavorite(userId, propertyId, isFavorite);
+    const success = await toggleFavoriteAction(propertyId, isFavorite);
     
     if (!success) {
       // Revert if failed

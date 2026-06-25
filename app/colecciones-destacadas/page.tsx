@@ -12,7 +12,9 @@ export default async function ColeccionesDestacadas() {
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const favorites = user ? await getUserFavorites(user.id) : [];
+  const { data: { session } } = await supabase.auth.getSession();
+  const token = session?.access_token;
+  const favorites = user ? await getUserFavorites(user.id, token) : [];
   const favoritesMap = new Set(favorites.map((f: any) => f.property_id));
 
   return (

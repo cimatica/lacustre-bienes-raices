@@ -12,7 +12,10 @@ export function PropertyActions({ property, currentUserRole = 'administrador', b
   const handleToggle = () => {
     startTransition(async () => {
       try {
-        await togglePropertyStatus(property.id, property.is_active);
+        const result = await togglePropertyStatus(property.id, property.is_active);
+        if (result?.error) {
+          showAlert("Error", "No tienes permisos o hubo un error al actualizar el estado.", "error");
+        }
       } catch (err) {
         showAlert("Error", "Error al actualizar estado", "error");
       }
@@ -28,7 +31,10 @@ export function PropertyActions({ property, currentUserRole = 'administrador', b
     if (isConfirmed) {
       startTransition(async () => {
         try {
-          await deleteProperty(property.id);
+          const result = await deleteProperty(property.id);
+          if (result?.error) {
+            showAlert("Error", "No tienes permisos o hubo un error al eliminar la propiedad.", "error");
+          }
         } catch (err) {
           showAlert("Error", "Error al eliminar la propiedad", "error");
         }
