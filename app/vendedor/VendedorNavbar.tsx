@@ -25,6 +25,7 @@ export default function VendedorNavbar({ user, userRole, initialProfile }: { use
   const navLinks = [
     { name: 'Propiedades', href: '/vendedor/properties' },
     { name: 'Interesados', href: '/vendedor/leads' },
+    { name: 'Visitas', href: '/vendedor/visits' },
   ];
 
   const handleEditProfile = async (e: React.FormEvent) => {

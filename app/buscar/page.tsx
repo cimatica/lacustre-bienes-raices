@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/PropertyCard";
-import { searchProperties } from "../../lib/supabase";
+import { searchProperties, getUserFavorites } from "../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { getDictionary } from "../../lib/i18n";
 import SortDropdown from "../components/SortDropdown";
@@ -44,6 +45,11 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
     sale_type,
   });
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const favorites = user ? await getUserFavorites(user.id) : [];
+  const favoritesMap = new Set(favorites.map((f: any) => f.property_id));
+
   return (
     <>
       <Navbar />
@@ -68,7 +74,14 @@ export default async function BuscarPage({ searchParams }: BuscarProps) {
         {results.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {results.map((property) => (
-              <PropertyCard key={property.id} property={property} variant="standard" dict={dict} />
+              <PropertyCard 
+                key={property.id} 
+                property={property} 
+                variant="standard" 
+                dict={dict} 
+                userId={user?.id}
+                isFavorite={favoritesMap.has(property.id)}
+              />
             ))}
           </div>
         ) : (

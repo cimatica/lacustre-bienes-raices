@@ -10,14 +10,27 @@ export default async function Navbar() {
   const { data: { user } } = await supabase.auth.getUser();
 
   let userRole = 'usuario';
+  let avatarUrl = user?.user_metadata?.avatar_url;
+  let userName = '';
+
   if (user) {
-    const { data: roleData } = await supabase
-      .from('user_roles')
-      .select('role_types(name)')
-      .eq('id', user.id)
-      .single();
-    if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+    const [roleRes, profileRes] = await Promise.all([
+      supabase.from('user_roles').select('role_types(name)').eq('id', user.id).single(),
+      supabase.from('user_profiles').select('avatar_url, full_name').eq('id', user.id).single()
+    ]);
+
+    if (roleRes.data?.role_types) {
+      userRole = roleRes.data.role_types.name;
+    }
+    
+    if (profileRes.data?.full_name) {
+      userName = profileRes.data.full_name;
+    }
+
+    if (profileRes.data?.avatar_url) {
+      avatarUrl = profileRes.data.avatar_url;
+    } else if (userName) {
+      avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=025955&color=fff`;
     }
   }
 
@@ -46,8 +59,8 @@ export default async function Navbar() {
             {user ? (
               <div className="flex items-center gap-2 pl-2 border-l border-nordic-dark/10 ml-2 relative group py-2">
                 <button className="w-9 h-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-mosque transition-all flex items-center justify-center cursor-pointer">
-                  {user.user_metadata?.avatar_url ? (
-                    <img alt="Perfil" className="w-full h-full object-cover" src={user.user_metadata.avatar_url} />
+                  {avatarUrl ? (
+                    <img alt="Perfil" className="w-full h-full object-cover" src={avatarUrl} />
                   ) : (
                     <span className="material-icons text-gray-500">person</span>
                   )}
@@ -57,7 +70,7 @@ export default async function Navbar() {
                     <div className="px-3 py-2 border-b border-gray-100 mb-1.5">
                       <p className="text-xs text-nordic-dark/50 font-medium uppercase tracking-wider mb-0.5">{dict.auth?.loggedInAs || "Conectado como"}</p>
                       <p className="text-sm text-nordic-dark font-medium truncate">
-                        {user.email}
+                        {userName || user.email}
                       </p>
                       <div className="mt-1.5">
                         <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-gray-100 text-gray-600 capitalize">

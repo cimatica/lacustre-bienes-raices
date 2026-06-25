@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { updateVisitStatus } from '@/app/agente/actions';
+import { updateVisitStatus, rescheduleVisit, deleteVisit } from '@/app/agente/actions';
 import { useAlert } from '@/app/components/ui/AlertProvider';
+import RescheduleModal from '@/app/components/visits/RescheduleModal';
 
 type Visit = {
   id: string;
@@ -25,6 +26,7 @@ type Visit = {
 export default function VisitsList({ visits }: { visits: Visit[] }) {
   const { showAlert } = useAlert();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [reschedulingVisitId, setReschedulingVisitId] = useState<string | null>(null);
 
   const handleStatusChange = async (visitId: string, newStatus: 'scheduled' | 'completed' | 'cancelled') => {
     setLoadingId(visitId);
@@ -36,6 +38,25 @@ export default function VisitsList({ visits }: { visits: Visit[] }) {
     } else {
       showAlert('Actualizado', 'El estado de la visita ha sido actualizado.', 'success');
     }
+  };
+
+  const handleReschedule = async (newDate: Date) => {
+    if (!reschedulingVisitId) return;
+    setLoadingId(reschedulingVisitId);
+    const result = await rescheduleVisit(reschedulingVisitId, newDate.toISOString());
+    setLoadingId(null);
+    setReschedulingVisitId(null);
+    if (result.error) showAlert('Error', result.error, 'error');
+    else showAlert('Reprogramada', 'La visita ha sido reprogramada y se ha enviado la notificación por email.', 'success');
+  };
+
+  const handleDelete = async (visitId: string) => {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta visita permanentemente?')) return;
+    setLoadingId(visitId);
+    const result = await deleteVisit(visitId);
+    setLoadingId(null);
+    if (result.error) showAlert('Error', result.error, 'error');
+    else showAlert('Eliminada', 'La visita ha sido eliminada permanentemente.', 'success');
   };
 
   const getStatusBadge = (status: string) => {
@@ -131,32 +152,56 @@ export default function VisitsList({ visits }: { visits: Visit[] }) {
             </div>
 
             {/* Acciones */}
-            <div className="col-span-12 md:col-span-3 flex md:justify-end gap-2">
+            <div className="col-span-12 md:col-span-3 flex md:justify-end gap-2 flex-wrap mt-2 md:mt-0">
               {visit.status === 'scheduled' && (
                 <>
                   <button
                     onClick={() => handleStatusChange(visit.id, 'completed')}
                     disabled={loadingId === visit.id}
                     className="flex-1 md:flex-none px-3 py-2 text-xs font-medium bg-[#006655] hover:bg-[#004d40] text-white rounded-lg transition-colors flex items-center justify-center gap-1"
+                    title="Marcar como Completada"
                   >
                     {loadingId === visit.id ? <span className="material-icons animate-spin text-[14px]">refresh</span> : <span className="material-icons text-[14px]">check</span>}
-                    Completar
+                    <span className="md:hidden lg:inline">Completar</span>
+                  </button>
+                  <button
+                    onClick={() => setReschedulingVisitId(visit.id)}
+                    disabled={loadingId === visit.id}
+                    className="flex-1 md:flex-none px-3 py-2 text-xs font-medium bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    title="Reprogramar Visita"
+                  >
+                    <span className="material-icons text-[14px]">edit_calendar</span>
                   </button>
                   <button
                     onClick={() => handleStatusChange(visit.id, 'cancelled')}
                     disabled={loadingId === visit.id}
                     className="flex-1 md:flex-none px-3 py-2 text-xs font-medium bg-white hover:bg-red-50 border border-gray-200 hover:border-red-200 text-gray-600 hover:text-red-600 rounded-lg transition-colors flex items-center justify-center gap-1"
+                    title="Rechazar Visita"
                   >
                     <span className="material-icons text-[14px]">close</span>
-                    Cancelar
                   </button>
                 </>
               )}
+              <button
+                onClick={() => handleDelete(visit.id)}
+                disabled={loadingId === visit.id}
+                className="flex-1 md:flex-none px-3 py-2 text-xs font-medium bg-white hover:bg-red-50 border border-gray-200 hover:border-red-200 text-red-600 rounded-lg transition-colors flex items-center justify-center gap-1"
+                title="Eliminar permanentemente"
+              >
+                <span className="material-icons text-[14px]">delete</span>
+              </button>
             </div>
 
           </div>
         );
       })}
+
+      <RescheduleModal 
+        isOpen={!!reschedulingVisitId} 
+        onClose={() => setReschedulingVisitId(null)} 
+        onConfirm={handleReschedule} 
+        isSubmitting={!!loadingId} 
+      />
     </div>
   );
 }

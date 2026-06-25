@@ -323,7 +323,7 @@ export async function getUserFavorites(userId: string): Promise<Favorite[]> {
 /** Fetch user visits */
 export async function getUserVisits(userId: string): Promise<Visit[]> {
   const url = buildUrl({ select: "*, property:properties(*, property_images(*), property_types(id, name))" });
-  const finalUrl = url.replace('/properties?', '/visits?user_id=eq.' + userId + '&order=visit_date.asc&status=eq.scheduled&');
+  const finalUrl = url.replace('/properties?', '/visits?user_id=eq.' + userId + '&order=visit_date.desc&');
   
   const res = await fetch(finalUrl, {
     headers: apiHeaders(),

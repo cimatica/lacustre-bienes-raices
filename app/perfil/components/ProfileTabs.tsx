@@ -4,9 +4,34 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { formatUF } from '@/lib/currency';
 import ProfileSettings from './ProfileSettings';
+import { rescheduleVisit, deleteVisit } from '@/app/agente/actions';
+import RescheduleModal from '@/app/components/visits/RescheduleModal';
+import { useAlert } from '@/app/components/ui/AlertProvider';
 
 export default function ProfileTabs({ favorites, visits, profile, email, dict }: any) {
   const [activeTab, setActiveTab] = useState<'favorites' | 'visits' | 'preferences'>('favorites');
+  const { showAlert } = useAlert();
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [reschedulingVisitId, setReschedulingVisitId] = useState<string | null>(null);
+
+  const handleReschedule = async (newDate: Date) => {
+    if (!reschedulingVisitId) return;
+    setLoadingId(reschedulingVisitId);
+    const result = await rescheduleVisit(reschedulingVisitId, newDate.toISOString());
+    setLoadingId(null);
+    setReschedulingVisitId(null);
+    if (result.error) showAlert('Error', result.error, 'error');
+    else showAlert('Reprogramada', 'La visita ha sido reprogramada y se ha notificado al agente.', 'success');
+  };
+
+  const handleDelete = async (visitId: string) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar esta visita? Esta acción no se puede deshacer.')) return;
+    setLoadingId(visitId);
+    const result = await deleteVisit(visitId);
+    setLoadingId(null);
+    if (result.error) showAlert('Error', result.error, 'error');
+    else showAlert('Cancelada', 'La visita ha sido cancelada exitosamente.', 'success');
+  };
 
   const tab1Label = dict?.userProfile?.savedProperties || "Propiedades Guardadas";
   const tab2Label = dict?.userProfile?.scheduledVisits || "Visitas Programadas";
@@ -125,11 +150,37 @@ export default function ProfileTabs({ favorites, visits, profile, email, dict }:
                       }`}>
                         {v.status === 'scheduled' ? 'Agendada' : v.status === 'completed' ? 'Completada' : 'Cancelada'}
                       </div>
+                      {v.status === 'scheduled' && (
+                        <div className="flex gap-2 mt-2">
+                          <button 
+                            onClick={() => setReschedulingVisitId(v.id)}
+                            disabled={loadingId === v.id}
+                            className="text-xs px-3 py-1.5 bg-mosque/10 text-mosque hover:bg-mosque hover:text-white transition-colors rounded flex items-center gap-1"
+                          >
+                            <span className="material-icons text-[14px]">edit_calendar</span>
+                            Reprogramar
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(v.id)}
+                            disabled={loadingId === v.id}
+                            className="text-xs px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors rounded flex items-center gap-1"
+                          >
+                            <span className="material-icons text-[14px]">close</span>
+                            Cancelar
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               );
             })}
+            <RescheduleModal 
+              isOpen={!!reschedulingVisitId} 
+              onClose={() => setReschedulingVisitId(null)} 
+              onConfirm={handleReschedule} 
+              isSubmitting={!!loadingId} 
+            />
           </div>
         )}
 

@@ -23,6 +23,8 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const agentAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'agente');
+  const sellerAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'vendedor');
+  const hasResponsible = !!agentAssignment || !!sellerAssignment;
   
   const handleConfirm = async () => {
     if (!userId) {
@@ -192,106 +194,119 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
 
       {/* Right side: Form */}
       <div className="w-full md:w-7/12 p-6 md:p-8 lg:p-10 flex flex-col justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-nordic dark:text-white mb-2">{dict.scheduleVisit?.title || "Schedule a Viewing"}</h1>
-          <p className="text-slate-500 dark:text-slate-400 mb-8">{dict.scheduleVisit?.subtitle || "Choose a date and time to tour the property in person."}</p>
-          
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider">{currentMonthYear}</h3>
-              <div className="flex gap-1">
-                <button onClick={handlePrevMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-mosque transition-colors">
-                  <span className="material-icons text-lg">chevron_left</span>
-                </button>
-                <button onClick={handleNextMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-nordic dark:text-white hover:text-mosque transition-colors">
-                  <span className="material-icons text-lg">chevron_right</span>
-                </button>
+        {!hasResponsible ? (
+          <div className="flex flex-col items-center justify-center h-full text-center p-8 bg-orange-50 border border-orange-100 rounded-xl">
+            <span className="material-icons text-4xl text-orange-400 mb-4">warning_amber</span>
+            <h2 className="text-xl font-bold text-orange-900 mb-2">Temporalmente no disponible</h2>
+            <p className="text-orange-700 max-w-md">Esta propiedad se encuentra temporalmente sin un agente asignado para recibir visitas. Por favor, intenta nuevamente más adelante o contáctanos por otros medios.</p>
+            <Link href={`/propiedad/${property.slug}`} className="mt-6 px-6 py-2 bg-white border border-orange-200 text-orange-700 font-medium rounded-lg shadow-sm hover:bg-orange-100 transition-colors">
+              Volver a la propiedad
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div>
+              <h1 className="text-3xl font-bold text-nordic dark:text-white mb-2">{dict.scheduleVisit?.title || "Schedule a Viewing"}</h1>
+              <p className="text-slate-500 dark:text-slate-400 mb-8">{dict.scheduleVisit?.subtitle || "Choose a date and time to tour the property in person."}</p>
+              
+              <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider">{currentMonthYear}</h3>
+                  <div className="flex gap-1">
+                    <button onClick={handlePrevMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-mosque transition-colors">
+                      <span className="material-icons text-lg">chevron_left</span>
+                    </button>
+                    <button onClick={handleNextMonth} className="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 text-nordic dark:text-white hover:text-mosque transition-colors">
+                      <span className="material-icons text-lg">chevron_right</span>
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-7 gap-1 mb-2 text-center">
+                  {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
+                    <div key={day} className="text-xs font-medium text-slate-400 py-1">{day}</div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-7 gap-1">
+                  {generateCalendar().map((d, i) => (
+                    <div key={i} className="aspect-square flex items-center justify-center p-1">
+                      {d ? (
+                        <button 
+                          disabled={!d.available}
+                          onClick={() => d.available && setSelectedDate(d.timestamp)}
+                          className={`w-full h-full flex items-center justify-center rounded-lg transition-all text-sm ${
+                            !d.available ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-800 text-slate-400' :
+                            selectedDate === d.timestamp 
+                              ? 'bg-mosque text-white font-bold shadow-md transform scale-105 border-transparent' 
+                              : 'text-nordic dark:text-white hover:bg-mosque/10 border border-transparent hover:border-mosque/30'
+                          }`}
+                        >
+                          {d.day}
+                        </button>
+                      ) : (
+                        <div className="w-full h-full rounded-lg"></div>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-7 gap-1 mb-2 text-center">
-              {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(day => (
-                <div key={day} className="text-xs font-medium text-slate-400 py-1">{day}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7 gap-1">
-              {generateCalendar().map((d, i) => (
-                <div key={i} className="aspect-square flex items-center justify-center p-1">
-                  {d ? (
+
+              <div className="mb-8">
+                <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider mb-4">{dict.scheduleVisit?.availableTimes || "Available Times"}</h3>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar-y pr-2">
+                  {times.map((t) => (
                     <button 
-                      disabled={!d.available}
-                      onClick={() => d.available && setSelectedDate(d.timestamp)}
-                      className={`w-full h-full flex items-center justify-center rounded-lg transition-all text-sm ${
-                        !d.available ? 'opacity-40 cursor-not-allowed bg-slate-50 dark:bg-slate-800 text-slate-400' :
-                        selectedDate === d.timestamp 
-                          ? 'bg-mosque text-white font-bold shadow-md transform scale-105 border-transparent' 
-                          : 'text-nordic dark:text-white hover:bg-mosque/10 border border-transparent hover:border-mosque/30'
+                      key={t.time}
+                      onClick={() => t.available && setSelectedTime(t.time)}
+                      className={`py-2 px-3 rounded-lg text-sm transition-all ${
+                        !t.available 
+                          ? 'border border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50 decoration-slate-400 line-through'
+                          : selectedTime === t.time 
+                            ? 'bg-mosque/10 border border-mosque text-mosque font-medium shadow-sm'
+                            : 'border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-mosque hover:text-mosque'
                       }`}
                     >
-                      {d.day}
+                      {t.time}
                     </button>
-                  ) : (
-                    <div className="w-full h-full rounded-lg"></div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="mb-8">
-            <h3 className="text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider mb-4">{dict.scheduleVisit?.availableTimes || "Available Times"}</h3>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[300px] overflow-y-auto custom-scrollbar-y pr-2">
-              {times.map((t) => (
-                <button 
-                  key={t.time}
-                  onClick={() => t.available && setSelectedTime(t.time)}
-                  className={`py-2 px-3 rounded-lg text-sm transition-all ${
-                    !t.available 
-                      ? 'border border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50 decoration-slate-400 line-through'
-                      : selectedTime === t.time 
-                        ? 'bg-mosque/10 border border-mosque text-mosque font-medium shadow-sm'
-                        : 'border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-mosque hover:text-mosque'
-                  }`}
-                >
-                  {t.time}
-                </button>
-              ))}
+              <div className="mb-8">
+                <div className="flex justify-between items-end mb-2">
+                  <label className="block text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider" htmlFor="message">
+                    {dict.scheduleVisit?.message || "Message for the agent"} <span className="text-slate-400 font-normal normal-case ml-1">{dict.scheduleVisit?.optional || "(Optional)"}</span>
+                  </label>
+                  <span className={`text-xs font-medium ${message.length >= 250 ? 'text-red-500' : 'text-slate-400'}`}>
+                    {message.length} / 250
+                  </span>
+                </div>
+                <textarea 
+                  id="message" 
+                  rows={3}
+                  maxLength={250}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={dict.scheduleVisit?.placeholder || "¿Alguna pregunta o requerimiento específico?"}
+                  className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#112522] text-nordic dark:text-slate-200 placeholder:text-slate-400 focus:ring-1 focus:ring-mosque focus:border-mosque transition-shadow resize-none text-sm"
+                ></textarea>
+              </div>
             </div>
-          </div>
 
-          <div className="mb-8">
-            <div className="flex justify-between items-end mb-2">
-              <label className="block text-sm font-semibold text-nordic dark:text-white uppercase tracking-wider" htmlFor="message">
-                {dict.scheduleVisit?.message || "Message for the agent"} <span className="text-slate-400 font-normal normal-case ml-1">{dict.scheduleVisit?.optional || "(Optional)"}</span>
-              </label>
-              <span className={`text-xs font-medium ${message.length >= 250 ? 'text-red-500' : 'text-slate-400'}`}>
-                {message.length} / 250
-              </span>
+            <div className="pt-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-4">
+              <Link href={`/propiedad/${property.slug}`} className="text-slate-500 dark:text-slate-400 hover:text-nordic dark:hover:text-white font-medium px-4 py-2 text-sm transition-colors">
+                {dict.scheduleVisit?.cancel || "Cancel"}
+              </Link>
+              <button 
+                onClick={handleConfirm}
+                disabled={isSubmitting}
+                className="bg-mosque hover:bg-mosque-dark disabled:opacity-50 text-white font-semibold py-3 px-8 rounded-lg shadow-lg shadow-mosque/20 transition-all hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-sm flex items-center gap-2"
+              >
+                <span>{isSubmitting ? "Enviando..." : (dict.scheduleVisit?.confirm || "Confirm Visit")}</span>
+                <span className="material-icons text-sm">arrow_forward</span>
+              </button>
             </div>
-            <textarea 
-              id="message" 
-              rows={3}
-              maxLength={250}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={dict.scheduleVisit?.placeholder || "¿Alguna pregunta o requerimiento específico?"}
-              className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#112522] text-nordic dark:text-slate-200 placeholder:text-slate-400 focus:ring-1 focus:ring-mosque focus:border-mosque transition-shadow resize-none text-sm"
-            ></textarea>
-          </div>
-        </div>
-
-        <div className="pt-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-4">
-          <Link href={`/propiedad/${property.slug}`} className="text-slate-500 dark:text-slate-400 hover:text-nordic dark:hover:text-white font-medium px-4 py-2 text-sm transition-colors">
-            {dict.scheduleVisit?.cancel || "Cancel"}
-          </Link>
-          <button 
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            className="bg-mosque hover:bg-mosque-dark disabled:opacity-50 text-white font-semibold py-3 px-8 rounded-lg shadow-lg shadow-mosque/20 transition-all hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 text-sm flex items-center gap-2"
-          >
-            <span>{isSubmitting ? "Enviando..." : (dict.scheduleVisit?.confirm || "Confirm Visit")}</span>
-            <span className="material-icons text-sm">arrow_forward</span>
-          </button>
-        </div>
+          </>
+        )}
       </div>
     </div>
   );

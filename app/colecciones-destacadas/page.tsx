@@ -1,13 +1,19 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import PropertyCard from "../components/PropertyCard";
-import { getFeaturedProperties } from "../../lib/supabase";
+import { getFeaturedProperties, getUserFavorites } from "../../lib/supabase";
+import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { getDictionary } from "../../lib/i18n";
 
 export default async function ColeccionesDestacadas() {
   const featured = await getFeaturedProperties();
   const dict = await getDictionary();
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const favorites = user ? await getUserFavorites(user.id) : [];
+  const favoritesMap = new Set(favorites.map((f: any) => f.property_id));
 
   return (
     <>
@@ -29,7 +35,14 @@ export default async function ColeccionesDestacadas() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featured.map((property) => (
-              <PropertyCard key={property.id} property={property} variant="featured" dict={dict} />
+              <PropertyCard 
+                key={property.id} 
+                property={property} 
+                variant="featured" 
+                dict={dict} 
+                userId={user?.id}
+                isFavorite={favoritesMap.has(property.id)}
+              />
             ))}
           </div>
         )}

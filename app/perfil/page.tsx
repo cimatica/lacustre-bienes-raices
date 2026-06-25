@@ -52,7 +52,8 @@ export default async function UserProfilePage() {
   const visits = userId ? await getUserVisits(userId) : [];
   
   const propertiesCount = favorites.length;
-  const visitsCount = visits.length;
+  const scheduledVisitsCount = visits.filter((v: any) => v.status === 'scheduled').length;
+  const completedVisitsCount = visits.filter((v: any) => v.status === 'completed').length;
   
   const statsSavedLabel = (dict as any).userProfile?.saved || "Propiedades Guardadas";
   const statsVisitsLabel = (dict as any).userProfile?.visits || "Visitas Agendadas";
@@ -92,12 +93,12 @@ export default async function UserProfilePage() {
             </div>
             <div className="w-px bg-slate-700/50"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-mosque">{visitsCount}</div>
+              <div className="text-2xl font-bold text-mosque">{scheduledVisitsCount}</div>
               <div className="text-xs uppercase tracking-wider text-slate-400 font-medium">{statsVisitsLabel}</div>
             </div>
             <div className="w-px bg-slate-700/50"></div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white">0</div>
+              <div className="text-2xl font-bold text-white">{completedVisitsCount}</div>
               <div className="text-xs uppercase tracking-wider text-slate-400 font-medium">{statsSoldLabel}</div>
             </div>
           </div>
