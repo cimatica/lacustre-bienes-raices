@@ -44,6 +44,29 @@ export default function AdminNavbar({ user, userRole }: { user: any, userRole: s
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {user && (
+              <div className="group relative py-3 hidden sm:block">
+                <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#006655]/10 text-[#006655] hover:bg-[#006655]/20 transition-colors text-sm font-bold tracking-wide">
+                  <span className="material-icons text-[18px]">visibility</span>
+                  Modo Dios
+                </button>
+                <div className="absolute top-full right-0 pt-2 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-all duration-200 min-w-[200px] z-50 translate-y-[-10px] group-hover:translate-y-0">
+                  <div className="bg-white shadow-xl rounded-xl overflow-hidden border border-gray-100 p-1.5 flex flex-col">
+                    <p className="px-3 py-2 text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Vistas de Perfil</p>
+                    <Link href="/vendedor/properties" className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-[#EEF6F6] hover:text-[#006655] rounded-lg w-full text-left transition-colors mb-0.5">
+                      <span className="material-icons text-[18px]">real_estate_agent</span> Vista Vendedor
+                    </Link>
+                    <Link href="/agente/properties" className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-[#EEF6F6] hover:text-[#006655] rounded-lg w-full text-left transition-colors mb-0.5">
+                      <span className="material-icons text-[18px]">support_agent</span> Vista Agente
+                    </Link>
+                    <Link href="/perfil" className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-[#EEF6F6] hover:text-[#006655] rounded-lg w-full text-left transition-colors">
+                      <span className="material-icons text-[18px]">person</span> Vista Usuario
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3 group relative py-3">
               {user ? (
                 <>
