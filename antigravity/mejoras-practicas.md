@@ -88,6 +88,12 @@ Este documento establece los estándares de ingeniería y mejores prácticas par
   * **Cómo se hace en Next.js:** Crear un archivo `app/sitemap.ts` que consulte la base de datos. Para grandes volúmenes, usar la función `generateSitemaps` para segmentar (ej. un sitemap por región o comuna).
   * **Anti-patrón:** Generar un único sitemap estático o no incluir la fecha de última modificación (`lastModified`) de la propiedad.
 
+* **Práctica:** Accesibilidad (a11y) y Atributos Alt Dinámicos
+  * **Impacto y Etapa:** Medio | Producción
+  * **Por qué importa:** Mejorar el SEO en buscadores de imágenes (Google Images) y cumplir con normativas de accesibilidad web (para usuarios con lectores de pantalla).
+  * **Cómo se hace en Next.js:** Asegurar que cada imagen almacenada en la base de datos tenga su columna `image_alt`. En los formularios de subida (como `PropertyForm`), autogenerar este campo utilizando el título de la propiedad si el usuario no provee uno manual, y consumirlo estrictamente en el componente `<Image alt={prop.image_alt} />`.
+  * **Anti-patrón:** Dejar `alt=""`, usar nombres de archivo genéricos (`alt="IMG_1234.jpg"`) o peor aún, omitir el atributo, lo que penaliza la calificación Lighthouse de la web.
+
 * **Práctica:** Jerarquía de Rutas Semánticas (Friendly URLs)
   * **Impacto y Etapa:** Medio | Producción
   * **Por qué importa:** Posiciona mejor para búsquedas locales y es más legible para el usuario final.
