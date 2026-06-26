@@ -22,6 +22,7 @@ export default async function AgentePropertiesPage({
   const status = typeof resolvedSearchParams.status === 'string' ? resolvedSearchParams.status : 'all';
   const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type : 'all';
   const commercialStatus = typeof resolvedSearchParams.commercial_status === 'string' ? resolvedSearchParams.commercial_status : 'all';
+  const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : 'date_desc';
   
   const itemsPerPage = 10;
   
@@ -78,8 +79,14 @@ export default async function AgentePropertiesPage({
     }
   }
   
+  // Apply Sorting
+  if (sort === 'price_asc') propQuery = propQuery.order('price', { ascending: true });
+  else if (sort === 'price_desc') propQuery = propQuery.order('price', { ascending: false });
+  else if (sort === 'status_asc') propQuery = propQuery.order('commercial_status_id', { ascending: true });
+  else if (sort === 'status_desc') propQuery = propQuery.order('commercial_status_id', { ascending: false });
+  else propQuery = propQuery.order('created_at', { ascending: false }); // date_desc default
+  
   const { data: properties, error, count } = await propQuery
-    .order('created_at', { ascending: false })
     .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
@@ -179,7 +186,7 @@ export default async function AgentePropertiesPage({
         </Link>
       </div>
 
-      <AdminFilters basePath="/agente/properties" />
+      <AdminFilters basePath="/agente/properties" showPersonnelFilters={false} />
 
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">

@@ -6,11 +6,13 @@ import { useTransition, useState, useEffect } from 'react';
 export default function AdminFilters({ 
   placeholder = 'Buscar por título de propiedad...',
   sellers = [],
-  agents = []
+  agents = [],
+  showPersonnelFilters = true
 }: { 
   placeholder?: string;
   sellers?: { id: string; name: string }[];
   agents?: { id: string; name: string }[];
+  showPersonnelFilters?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -153,36 +155,40 @@ export default function AdminFilters({
       </div>
 
       {/* Bottom Filters */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
-        <div className="relative">
-          <select 
-            value={vendedor} 
-            onChange={handleVendedorChange}
-            className="w-full border border-gray-200 rounded-lg pl-3 pr-8 py-2 bg-gray-50 text-xs sm:text-sm text-[#19322F] font-medium focus:ring-2 focus:ring-[#006655] focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
-          >
-            <option value="all">Todos los Vendedores</option>
-            <option value="unassigned">Sin Vendedor Asignado</option>
-            {sellers.map(s => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
-          </select>
-          <span className="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">expand_more</span>
-        </div>
+      <div className={`grid grid-cols-1 ${showPersonnelFilters ? 'sm:grid-cols-3' : 'sm:grid-cols-1'} gap-4 pt-4 border-t border-gray-100`}>
+        {showPersonnelFilters && (
+          <>
+            <div className="relative">
+              <select 
+                value={vendedor} 
+                onChange={handleVendedorChange}
+                className="w-full border border-gray-200 rounded-lg pl-3 pr-8 py-2 bg-gray-50 text-xs sm:text-sm text-[#19322F] font-medium focus:ring-2 focus:ring-[#006655] focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
+              >
+                <option value="all">Todos los Vendedores</option>
+                <option value="unassigned">Sin Vendedor Asignado</option>
+                {sellers.map(s => (
+                  <option key={s.id} value={s.id}>{s.name}</option>
+                ))}
+              </select>
+              <span className="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">expand_more</span>
+            </div>
 
-        <div className="relative">
-          <select 
-            value={agente} 
-            onChange={handleAgenteChange}
-            className="w-full border border-gray-200 rounded-lg pl-3 pr-8 py-2 bg-gray-50 text-xs sm:text-sm text-[#19322F] font-medium focus:ring-2 focus:ring-[#006655] focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
-          >
-            <option value="all">Todos los Agentes</option>
-            <option value="unassigned">Sin Agente Asignado</option>
-            {agents.map(a => (
-              <option key={a.id} value={a.id}>{a.name}</option>
-            ))}
-          </select>
-          <span className="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">expand_more</span>
-        </div>
+            <div className="relative">
+              <select 
+                value={agente} 
+                onChange={handleAgenteChange}
+                className="w-full border border-gray-200 rounded-lg pl-3 pr-8 py-2 bg-gray-50 text-xs sm:text-sm text-[#19322F] font-medium focus:ring-2 focus:ring-[#006655] focus:border-transparent focus:bg-white transition-all appearance-none cursor-pointer"
+              >
+                <option value="all">Todos los Agentes</option>
+                <option value="unassigned">Sin Agente Asignado</option>
+                {agents.map(a => (
+                  <option key={a.id} value={a.id}>{a.name}</option>
+                ))}
+              </select>
+              <span className="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-base">expand_more</span>
+            </div>
+          </>
+        )}
 
         <div className="relative">
           <select 
