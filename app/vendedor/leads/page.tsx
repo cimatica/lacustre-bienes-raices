@@ -9,7 +9,7 @@ export default async function VendedorLeadsPage() {
   if (!user) return null;
 
   // Fetch role_type_id for 'vendedor'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').single();
+  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').maybeSingle();
 
   // Find properties assigned to this seller
   const { data: myAssignments } = await supabase

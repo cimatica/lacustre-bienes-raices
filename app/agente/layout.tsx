@@ -18,7 +18,7 @@ export default async function AgenteLayout({ children }: { children: React.React
       .from('user_roles')
       .select('role_types(name)')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
       
     if (roleData && roleData.role_types) {
       userRole = roleData.role_types.name;
@@ -32,7 +32,7 @@ export default async function AgenteLayout({ children }: { children: React.React
       .from('user_profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     userProfile = profile;
   }
 

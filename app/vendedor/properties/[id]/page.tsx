@@ -15,7 +15,7 @@ export default async function VendedorEditPropertyPage({ params }: { params: Pro
       property_assignments (user_id, role_types(name))
     `)
     .eq('id', resolvedParams.id)
-    .single();
+    .maybeSingle();
 
   if (error || !property) {
     notFound();

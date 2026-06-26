@@ -15,7 +15,7 @@ export async function POST(request: Request) {
       .from('user_roles')
       .select('role_types(name)')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
       return NextResponse.json({ error: 'Acceso denegado: Se requiere rol de administrador' }, { status: 403 });
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       .update({ status: 'Active' })
       .eq('id', targetUserId)
       .select('email, full_name')
-      .single();
+      .maybeSingle();
 
     if (updateError || !updatedProfile) {
       return NextResponse.json({ error: 'Error al actualizar el estado del usuario' }, { status: 500 });

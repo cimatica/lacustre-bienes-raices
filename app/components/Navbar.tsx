@@ -15,8 +15,8 @@ export default async function Navbar() {
 
   if (user) {
     const [roleRes, profileRes] = await Promise.all([
-      supabase.from('user_roles').select('role_types(name)').eq('id', user.id).single(),
-      supabase.from('user_profiles').select('avatar_url, full_name').eq('id', user.id).single()
+      supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle(),
+      supabase.from('user_profiles').select('avatar_url, full_name').eq('id', user.id).maybeSingle()
     ]);
 
     if (roleRes.data?.role_types) {

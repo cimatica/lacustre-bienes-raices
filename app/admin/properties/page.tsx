@@ -22,11 +22,18 @@ export default async function AdminPropertiesPage({
   const status = typeof resolvedSearchParams.status === 'string' ? resolvedSearchParams.status : 'all';
   const type = typeof resolvedSearchParams.type === 'string' ? resolvedSearchParams.type : 'all';
   const commercialStatus = typeof resolvedSearchParams.commercial_status === 'string' ? resolvedSearchParams.commercial_status : 'all';
+  const vendedor = typeof resolvedSearchParams.vendedor === 'string' ? resolvedSearchParams.vendedor : 'all';
+  const agente = typeof resolvedSearchParams.agente === 'string' ? resolvedSearchParams.agente : 'all';
+  const sort = typeof resolvedSearchParams.sort === 'string' ? resolvedSearchParams.sort : 'date_desc';
   
   const itemsPerPage = 10;
   
   // Commercial Statuses
   const { data: commercialStatuses } = await supabase.from('commercial_statuses').select('*').order('created_at', { ascending: true });
+  
+  // Available Personnel
+  const { getAvailablePersonnel } = await import('../actions');
+  const { sellers, agents } = await getAvailablePersonnel();
   
   // Base query for properties
   let propQuery = supabase
@@ -50,9 +57,39 @@ export default async function AdminPropertiesPage({
       propQuery = propQuery.eq('commercial_status_id', st.id);
     }
   }
+
+  // Filter by Vendedor
+  if (vendedor === 'unassigned') {
+    const { data: propsWithSeller } = await supabase.from('property_assignments').select('property_id, role_types!inner(name)').eq('role_types.name', 'vendedor');
+    const ids = propsWithSeller?.map((p: any) => p.property_id) || [];
+    if (ids.length > 0) propQuery = propQuery.not('id', 'in', `(${ids.join(',')})`);
+  } else if (vendedor !== 'all') {
+    const { data: propsOfSeller } = await supabase.from('property_assignments').select('property_id').eq('user_id', vendedor);
+    const ids = propsOfSeller?.map((p: any) => p.property_id) || [];
+    if (ids.length > 0) propQuery = propQuery.in('id', ids);
+    else propQuery = propQuery.in('id', ['00000000-0000-0000-0000-000000000000']);
+  }
+
+  // Filter by Agente
+  if (agente === 'unassigned') {
+    const { data: propsWithAgent } = await supabase.from('property_assignments').select('property_id, role_types!inner(name)').eq('role_types.name', 'agente');
+    const ids = propsWithAgent?.map((p: any) => p.property_id) || [];
+    if (ids.length > 0) propQuery = propQuery.not('id', 'in', `(${ids.join(',')})`);
+  } else if (agente !== 'all') {
+    const { data: propsOfAgent } = await supabase.from('property_assignments').select('property_id').eq('user_id', agente);
+    const ids = propsOfAgent?.map((p: any) => p.property_id) || [];
+    if (ids.length > 0) propQuery = propQuery.in('id', ids);
+    else propQuery = propQuery.in('id', ['00000000-0000-0000-0000-000000000000']);
+  }
+
+  // Apply Sorting
+  if (sort === 'price_asc') propQuery = propQuery.order('price', { ascending: true });
+  else if (sort === 'price_desc') propQuery = propQuery.order('price', { ascending: false });
+  else if (sort === 'status_asc') propQuery = propQuery.order('commercial_status_id', { ascending: true });
+  else if (sort === 'status_desc') propQuery = propQuery.order('commercial_status_id', { ascending: false });
+  else propQuery = propQuery.order('created_at', { ascending: false }); // date_desc default
   
   const { data: properties, error, count } = await propQuery
-    .order('created_at', { ascending: false })
     .order('id', { ascending: true })
     .range((page - 1) * itemsPerPage, page * itemsPerPage - 1);
 
@@ -64,7 +101,7 @@ export default async function AdminPropertiesPage({
       .from('user_roles')
       .select('role_types(name)')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     currentUserRole = roleData?.role_types?.name || 'usuario';
   }
 
@@ -166,7 +203,7 @@ export default async function AdminPropertiesPage({
         </Link>
       </div>
 
-      <AdminFilters />
+      <AdminFilters sellers={sellers} agents={agents} />
 
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">

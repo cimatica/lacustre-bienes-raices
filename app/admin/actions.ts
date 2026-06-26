@@ -16,7 +16,7 @@ export async function togglePropertyStatus(id: string, currentStatus: boolean) {
   if (!user) return { error: "No autenticado" };
 
   // Verificamos permisos manualmente antes de usar adminSupabase
-  const { data: roleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).single();
+  const { data: roleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
   const isAdmin = roleData?.role_types?.name === 'administrador';
 
   let hasPermission = isAdmin;
@@ -65,7 +65,7 @@ export async function deleteProperty(id: string) {
       .from('user_roles')
       .select('role_types(name)')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     if (roleData?.role_types?.name === 'vendedor') {
       throw new Error('Los vendedores no tienen permiso para eliminar propiedades.');
     }
@@ -77,7 +77,7 @@ export async function deleteProperty(id: string) {
     .from('properties')
     .select('image_url, property_images(image_url)')
     .eq('id', id)
-    .single();
+    .maybeSingle();
     
   if (fetchError) {
     console.error("Error fetching property for deletion:", fetchError);
@@ -143,19 +143,35 @@ export async function updateCommercialStatus(id: string, statusId: string) {
 
 export async function assignPropertyUser(propertyId: string, userId: string, roleTypeName: 'vendedor' | 'agente') {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("No autenticado");
+
+  const { data: callerRoleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
+  const callerRole = callerRoleData?.role_types?.name;
+
+  if (callerRole !== 'administrador' && callerRole !== 'vendedor') {
+    throw new Error('No autorizado para asignar usuarios');
+  }
+
+  if (callerRole === 'vendedor' && roleTypeName === 'vendedor' && userId !== user.id) {
+    throw new Error('Los vendedores solo pueden asignarse a sí mismos');
+  }
+
+  const { createAdminClient } = await import('@/utils/supabase/admin');
+  const adminSupabase = createAdminClient();
   
   // Get role type id
-  const { data: roleType } = await supabase
+  const { data: roleType } = await adminSupabase
     .from('role_types')
     .select('id')
     .eq('name', roleTypeName)
-    .single();
+    .maybeSingle();
 
   if (!roleType) {
     throw new Error('Rol no válido');
   }
 
-  const { error } = await supabase
+  const { error } = await adminSupabase
     .from('property_assignments')
     .upsert({
       property_id: propertyId,
@@ -173,16 +189,28 @@ export async function assignPropertyUser(propertyId: string, userId: string, rol
 
 export async function unassignPropertyUser(propertyId: string, roleTypeName: 'vendedor' | 'agente') {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("No autenticado");
+
+  const { data: callerRoleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
+  const callerRole = callerRoleData?.role_types?.name;
+
+  if (callerRole !== 'administrador' && callerRole !== 'vendedor') {
+    throw new Error('No autorizado para desasignar usuarios');
+  }
+
+  const { createAdminClient } = await import('@/utils/supabase/admin');
+  const adminSupabase = createAdminClient();
   
-  const { data: roleType } = await supabase
+  const { data: roleType } = await adminSupabase
     .from('role_types')
     .select('id')
     .eq('name', roleTypeName)
-    .single();
+    .maybeSingle();
 
   if (!roleType) return;
 
-  await supabase
+  await adminSupabase
     .from('property_assignments')
     .delete()
     .eq('property_id', propertyId)

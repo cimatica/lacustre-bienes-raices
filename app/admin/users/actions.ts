@@ -15,7 +15,7 @@ export async function updateUserRole(userId: string, newRole: string) {
     .from('user_roles')
     .select('role_types(name)')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
@@ -26,7 +26,7 @@ export async function updateUserRole(userId: string, newRole: string) {
     .from('role_types')
     .select('id')
     .eq('name', newRole)
-    .single();
+    .maybeSingle();
 
   if (!newRoleData) {
     return { error: 'Rol no válido' };
@@ -74,7 +74,7 @@ export async function createUserByAdmin(formData: FormData) {
     .from('user_roles')
     .select('role_types(name)')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
@@ -117,7 +117,7 @@ export async function createUserByAdmin(formData: FormData) {
       .from('role_types')
       .select('id')
       .eq('name', role)
-      .single();
+      .maybeSingle();
 
     if (roleType) {
       const { error: updateError } = await supabaseAdmin
@@ -146,7 +146,7 @@ export async function deleteUserByAdmin(userId: string) {
     .from('user_roles')
     .select('role_types(name)')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
@@ -176,7 +176,7 @@ export async function updateUserProfile(userId: string, data: { full_name: strin
     .from('user_roles')
     .select('role_types(name)')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };
@@ -207,7 +207,7 @@ export async function updateUserStatus(userId: string, status: string) {
     .from('user_roles')
     .select('role_types(name)')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
     return { error: 'No autorizado' };

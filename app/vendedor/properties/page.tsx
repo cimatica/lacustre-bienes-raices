@@ -33,7 +33,7 @@ export default async function VendedorPropertiesPage({
   const { data: commercialStatuses } = await supabase.from('commercial_statuses').select('*').order('created_at', { ascending: true });
   
   // Fetch role_type_id for 'vendedor'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').single();
+  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'vendedor').maybeSingle();
 
   // Find properties assigned to this seller
   let myPropertyIds: string[] = [];

@@ -30,7 +30,7 @@ export default function ImageGallery({ images, badge, propertyId, userId, initia
   const [slideshowIndex, setSlideshowIndex] = useState<number | null>(null);
 
   if (!images || images.length === 0 || !currentMainImage) {
-    return <div className="aspect-[16/10] bg-slate-200 rounded-xl animate-pulse"></div>;
+    return <div className="aspect-[16/10] bg-surface-darker rounded-xl animate-pulse"></div>;
   }
 
   // Thumbnails are all images except the one currently shown as main
@@ -41,7 +41,7 @@ export default function ImageGallery({ images, badge, propertyId, userId, initia
       <div className="space-y-4">
         {/* Main Image */}
         <div 
-          className="relative aspect-[16/10] overflow-hidden rounded-xl shadow-sm group cursor-pointer"
+          className="relative aspect-[16/10] overflow-hidden rounded-xl shadow-sm group cursor-pointer bg-surface-darker flex items-center justify-center"
           onClick={() => setIsModalOpen(true)}
         >
           <Image
@@ -83,7 +83,7 @@ export default function ImageGallery({ images, badge, propertyId, userId, initia
               <div
                 key={img.id}
                 onClick={() => setCurrentMainImage(img)}
-                className="flex-none w-48 aspect-[4/3] rounded-lg overflow-hidden cursor-pointer snap-start relative opacity-70 hover:opacity-100 transition-opacity"
+                className="flex-none w-48 aspect-[4/3] rounded-lg overflow-hidden cursor-pointer snap-start relative opacity-70 hover:opacity-100 transition-opacity bg-surface-darker flex items-center justify-center"
               >
                 <Image
                   src={img.image_url}
@@ -131,7 +131,7 @@ export default function ImageGallery({ images, badge, propertyId, userId, initia
                     return (
                       <div 
                         key={img.id} 
-                        className={`relative rounded-xl overflow-hidden shadow-md group cursor-pointer ${
+                        className={`relative rounded-xl overflow-hidden shadow-md group cursor-pointer bg-surface-darker flex items-center justify-center ${
                           isTopRow ? 'md:col-span-6 aspect-[4/3]' : 'md:col-span-4 aspect-[4/3]'
                         }`}
                         onClick={() => {

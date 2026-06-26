@@ -100,7 +100,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
           .from('user_roles')
           .select('role_types(name)')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
         const role = roleData?.role_types?.name || 'usuario';
         setCurrentUser({ id: user.id, role });
 
@@ -283,7 +283,9 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
     if (formData.price <= 0) return "El precio debe ser mayor a 0.";
     if (!formData.location) return "Debes buscar y seleccionar una ubicación válida en el mapa.";
     if (!mainImagePreview) return "Debes subir al menos la imagen principal de la propiedad.";
-    if (!vendedorId) return "Debes asignar un Vendedor a la propiedad.";
+    if (!vendedorId && currentUser?.role !== 'administrador') return "Debes asignar un Vendedor a la propiedad.";
+    if (!formData.property_type) return "Configuración incompleta: No hay Tipos de Propiedad creados en el sistema.";
+    if (!formData.commercial_status_id) return "Configuración incompleta: No hay Estados Comerciales creados en el sistema.";
     return null;
   };
 
@@ -469,6 +471,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
               <div>
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="property_type">Tipo de Propiedad</label>
                 <select value={formData.property_type} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="property_type">
+                  {propertyTypes.length === 0 && <option value="">Sin tipos disponibles</option>}
                   {propertyTypes.map(pt => (
                     <option key={pt.id} value={pt.id}>{pt.name}</option>
                   ))}
@@ -479,6 +482,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
               <div>
                 <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="commercial_status_id">Situación Comercial</label>
                 <select value={formData.commercial_status_id} onChange={handleChange} className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer" id="commercial_status_id">
+                  {commercialStatuses.length === 0 && <option value="">Sin estados disponibles</option>}
                   {commercialStatuses.map(cs => (
                     <option key={cs.id} value={cs.id}>{cs.name}</option>
                   ))}
@@ -528,16 +532,16 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
             <div className="p-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="vendedorId">Vendedor <span className="text-red-500">*</span></label>
+                  <label className="block text-sm font-medium text-[#19322F] mb-1.5" htmlFor="vendedorId">Vendedor {currentUser?.role !== 'administrador' && <span className="text-red-500">*</span>}</label>
                   <select 
-                    required 
+                    required={currentUser?.role !== 'administrador'} 
                     value={vendedorId} 
                     onChange={(e) => setVendedorId(e.target.value)} 
                     disabled={currentUser?.role !== 'administrador'}
                     className="w-full px-4 py-2.5 rounded-md border border-gray-200 bg-white text-[#19322F] focus:ring-1 focus:ring-[#006655] focus:border-[#006655] transition-all text-base cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed" 
                     id="vendedorId"
                   >
-                    <option value="" disabled>Seleccionar Vendedor</option>
+                    <option value="" disabled={currentUser?.role !== 'administrador'}>{currentUser?.role === 'administrador' ? "Sin Vendedor Asignado" : "Seleccionar Vendedor"}</option>
                     {availableSellers.map(s => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}

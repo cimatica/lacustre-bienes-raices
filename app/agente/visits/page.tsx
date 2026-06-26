@@ -11,7 +11,7 @@ export default async function AgenteVisitsPage() {
   if (!user) return null;
 
   // Fetch role_type_id for 'agente'
-  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'agente').single();
+  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'agente').maybeSingle();
 
   // Find properties assigned to this agent
   const { data: myAssignments } = await adminSupabase

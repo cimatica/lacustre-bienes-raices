@@ -71,7 +71,7 @@ export async function rescheduleVisit(visitId: string, newDate: string) {
     .from('visits')
     .select('user_profiles(full_name, email), properties(title)')
     .eq('id', visitId)
-    .single();
+    .maybeSingle();
 
   const { error } = await adminSupabase
     .from('visits')

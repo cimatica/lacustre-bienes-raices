@@ -18,7 +18,7 @@ export default async function EditPropertyPage({
     .from('properties')
     .select('*, property_images(*)')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
   if (error || !property) {
     redirect('/admin/properties');

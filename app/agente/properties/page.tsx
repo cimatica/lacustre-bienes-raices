@@ -33,7 +33,7 @@ export default async function AgentePropertiesPage({
   const { data: commercialStatuses } = await supabase.from('commercial_statuses').select('*').order('created_at', { ascending: true });
   
   // Fetch role_type_id for 'agente'
-  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'agente').single();
+  const { data: roleType } = await supabase.from('role_types').select('id').eq('name', 'agente').maybeSingle();
 
   // Find properties assigned to this agent
   let myPropertyIds: string[] = [];

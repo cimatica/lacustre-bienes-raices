@@ -28,7 +28,7 @@ export default async function UserProfilePage() {
       .from('user_roles')
       .select('role_types(name)')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     if (roleData && roleData.role_types) {
       userRole = roleData.role_types.name;
     }

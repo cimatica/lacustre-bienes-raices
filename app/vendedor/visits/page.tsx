@@ -11,7 +11,7 @@ export default async function VendedorVisitsPage() {
   if (!user) return null;
 
   // Fetch role_type_id for 'vendedor'
-  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'vendedor').single();
+  const { data: roleType } = await adminSupabase.from('role_types').select('id').eq('name', 'vendedor').maybeSingle();
 
   // Find properties assigned to this seller
   const { data: myAssignments } = await adminSupabase
