@@ -166,3 +166,22 @@ Este documento establece los estándares de ingeniería y mejores prácticas par
   * **Impacto y Etapa:** Medio | MVP
   * **Por qué importa:** Mejora la experiencia del usuario y el SEO cuando visitan URLs rotas o propiedades que ya fueron eliminadas.
   * **Cómo se hace en Next.js:** Implementar el archivo `not-found.tsx` con llamadas claras a la acción (ej. "Volver al inicio" o "Buscar otras propiedades").
+
+---
+
+## 7. Resiliencia y Control de Acceso (RBAC / RLS)
+
+* **Práctica:** Diseño para Despliegues "Zero-Data"
+  * **Impacto y Etapa:** Alto | Configuración Inicial / QA
+  * **Por qué importa:** Cuando la aplicación se despliega en un nuevo ambiente (Staging o Producción) las tablas maestras suelen estar vacías. Si la UI asume que siempre existirá al menos un registro, la aplicación arrojará errores 500 al intentar leer `[0].id`.
+  * **Cómo se hace en Next.js:** Validar siempre la longitud de los arreglos provenientes de la BD (`data.length > 0`) antes de asignar valores por defecto en los estados. Los componentes de interfaz (como `<select>`) deben manejar estados vacíos mostrando mensajes como "Sin opciones disponibles" y deshabilitándose si es necesario.
+
+* **Práctica:** Propagación de Row Level Security (RLS) a Tablas Hijas
+  * **Impacto y Etapa:** Crítico | Seguridad / Producción
+  * **Por qué importa:** En arquitecturas de BD relacional como Supabase, si otorgas permiso a un rol para editar una tabla (ej. `properties`), ese permiso **no** se hereda automáticamente a sus tablas hijas (ej. `property_images`). Esto genera fallos de permisos silenciosos.
+  * **Cómo se hace en PostgreSQL:** Las políticas (Policies) de las tablas secundarias deben realizar un `JOIN` o un `EXISTS` consultando las tablas de asignación (ej. `property_assignments`) para verificar si el usuario tiene derechos sobre el registro padre antes de permitir un `INSERT` o `DELETE`.
+
+* **Práctica:** Funciones de "Impersonation" (Modo Dios) para QA de UI
+  * **Impacto y Etapa:** Medio | Mantenimiento
+  * **Por qué importa:** Permite a los administradores validar visualmente la experiencia y navegación de perfiles inferiores (Vendedor, Agente, Cliente) sin tener que cerrar sesión y usar credenciales de prueba. Útil para validar *Empty States*.
+  * **Cómo se hace en Next.js:** Crear enlaces directos a las rutas de los otros paneles (`/vendedor`, `/agente`) desde el menú de Administrador, aprovechando que el Middleware o el `layout.tsx` les concede acceso. El sistema buscará asignaciones con el ID del Administrador (las cuales no existirán) forzando los estados vacíos.
