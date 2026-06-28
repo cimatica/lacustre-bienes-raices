@@ -25,10 +25,20 @@ export async function toggleFavoriteAction(propertyId: string, isCurrentlyFavori
 }
 
 import { headers } from 'next/headers';
-
 export async function scheduleVisitAction(propertyId: string, visitDate: string, message?: string, turnstileToken?: string) {
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for') || '127.0.0.1';
+  const ip = headersList.get('x-vercel-forwarded-for') || headersList.get('x-forwarded-for') || '127.0.0.1';
+
+  // Manual Validation
+  const dateObj = new Date(visitDate);
+  if (isNaN(dateObj.getTime()) || dateObj <= new Date()) {
+    return { success: false, error: 'La fecha de la visita debe ser válida y estar en el futuro' };
+  }
+  
+  const msgText = message || '';
+  if (msgText.length > 250) {
+    return { success: false, error: 'El mensaje no puede exceder los 250 caracteres' };
+  }
 
   // 1. Verify Turnstile
   if (!turnstileToken) return { success: false, error: 'Validación de seguridad requerida (Anti-Spam)' };

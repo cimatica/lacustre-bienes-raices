@@ -13,7 +13,8 @@ export async function GET(request: Request) {
       .from('properties')
       .select('*, property_types(name), commercial_statuses(name)')
       .eq('is_active', true)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) {
       console.error('Error fetching properties for feed:', error);

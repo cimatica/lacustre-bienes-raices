@@ -3,6 +3,26 @@
 import { createClient as createServerClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 
+async function isAuthorizedForVisit(visitId: string, userId: string, adminSupabase: any) {
+  // Check if user is admin
+  const { data: profile } = await adminSupabase.from('user_profiles').select('role').eq('id', userId).single();
+  if (profile?.role === 'administrador') return true;
+
+  // Get the property ID for the visit
+  const { data: visit } = await adminSupabase.from('visits').select('property_id').eq('id', visitId).single();
+  if (!visit) return false;
+
+  // Check if user is assigned to this property
+  const { data: assignment } = await adminSupabase
+    .from('property_assignments')
+    .select('id')
+    .eq('property_id', visit.property_id)
+    .eq('user_id', userId)
+    .single();
+
+  return !!assignment;
+}
+
 export async function updateOwnProfile(data: { full_name: string, phone: string }) {
   const supabase = await createServerClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -42,6 +62,9 @@ export async function updateVisitStatus(visitId: string, status: 'scheduled' | '
 
   const { createAdminClient } = await import('@/utils/supabase/admin');
   const adminSupabase = createAdminClient();
+
+  const isAuth = await isAuthorizedForVisit(visitId, user.id, adminSupabase);
+  if (!isAuth) return { error: 'No autorizado para modificar esta visita' };
 
   const { error } = await adminSupabase
     .from('visits')
@@ -110,6 +133,9 @@ export async function rescheduleVisit(visitId: string, newDate: string) {
   const { createAdminClient } = await import('@/utils/supabase/admin');
   const adminSupabase = createAdminClient();
 
+  const isAuth = await isAuthorizedForVisit(visitId, user.id, adminSupabase);
+  if (!isAuth) return { error: 'No autorizado para modificar esta visita' };
+
   // Get visit details for the email notification mock
   const { data: visitData } = await adminSupabase
     .from('visits')
@@ -153,6 +179,9 @@ export async function deleteVisit(visitId: string) {
 
   const { createAdminClient } = await import('@/utils/supabase/admin');
   const adminSupabase = createAdminClient();
+
+  const isAuth = await isAuthorizedForVisit(visitId, user.id, adminSupabase);
+  if (!isAuth) return { error: 'No autorizado para modificar esta visita' };
 
   const { error } = await adminSupabase
     .from('visits')

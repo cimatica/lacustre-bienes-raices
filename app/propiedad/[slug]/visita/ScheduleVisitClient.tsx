@@ -107,10 +107,17 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     renderTurnstile();
 
     // Fallback polling for script load
+    let attempts = 0;
     const interval = setInterval(() => {
+      attempts++;
       if (typeof (window as any).turnstile !== 'undefined') {
         renderTurnstile();
         clearInterval(interval);
+      } else if (attempts >= 20) {
+        clearInterval(interval);
+        console.warn("Turnstile no pudo cargar. Posible bloqueo por AdBlocker.");
+        const errorMsg = document.getElementById('turnstile-error');
+        if (errorMsg) errorMsg.classList.remove('hidden');
       }
     }, 500);
 
@@ -354,6 +361,9 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
               {!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
                  <p className="text-red-500 text-sm">Falta configurar NEXT_PUBLIC_TURNSTILE_SITE_KEY en el servidor (Reinicia npm run dev).</p>
               )}
+              <p id="turnstile-error" className="text-amber-500 text-sm hidden mt-2">
+                 La casilla de seguridad no cargó. Si usas un bloqueador de anuncios, por favor pausa su protección para agendar.
+              </p>
               <Script 
                 src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" 
                 strategy="afterInteractive"
