@@ -99,10 +99,22 @@ export default async function Navbar() {
                       </Link>
                     )}
                     {userRole === 'administrador' && (
-                      <Link href="/admin/properties" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
-                        <span className="material-icons text-[18px]">admin_panel_settings</span>
-                        Panel Admin
-                      </Link>
+                      <>
+                        <Link href="/admin/properties" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                          <span className="material-icons text-[18px]">admin_panel_settings</span>
+                          Panel Admin
+                        </Link>
+                        <div className="border-t border-gray-100 my-1"></div>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider px-3 pt-2 pb-1">Modo Dios (QA)</p>
+                        <Link href="/vendedor" className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-500 hover:text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                          <span className="material-icons text-[16px]">visibility</span>
+                          Ver como Vendedor
+                        </Link>
+                        <Link href="/agente" className="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-500 hover:text-nordic-dark hover:bg-gray-50 rounded-lg w-full text-left transition-colors mb-1">
+                          <span className="material-icons text-[16px]">visibility</span>
+                          Ver como Agente
+                        </Link>
+                      </>
                     )}
                     <form action="/auth/signout" method="post" className="w-full">
                       <button type="submit" className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg w-full text-left transition-colors">

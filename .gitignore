@@ -45,3 +45,12 @@ next-env.d.ts
 /antigravity/
 mejoras-practicas.md
 lecciones_aprendidas.md
+
+# Archivos y scripts temporales de desarrollo (AI / Debug)
+/scratch/
+AGENTS.md
+CLAUDE.md
+check_error.ts
+fetch_error.js
+setup_db.js
+update_type.ts
