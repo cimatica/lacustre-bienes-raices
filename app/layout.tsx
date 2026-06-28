@@ -13,7 +13,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Lacustre - Bienes Raíces",
-  description: "Encuentra tu santuario.",
+  description: "Encuentra propiedades de buen nivel en las bellas zonas del sur de Chile.",
 };
 
 export default async function RootLayout({

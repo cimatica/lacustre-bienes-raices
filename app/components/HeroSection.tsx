@@ -56,11 +56,11 @@ export default function HeroSection() {
   };
 
   return (
-    <section className="py-12 md:py-16">
+    <section className="pt-12 pb-8 md:pt-16 md:pb-10">
       <div className="max-w-5xl mx-auto text-center space-y-8 px-4">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
           {dict.hero.findYour} <span className="relative inline-block">
-            <span className="relative z-10 font-extrabold text-mosque">{dict.hero.sanctuary}</span>
+            <span className="relative z-10 font-bold text-mosque">{dict.hero.sanctuary}</span>
             <span className="absolute bottom-2 left-0 w-full h-3 bg-mosque/20 -rotate-1 z-0"></span>
           </span>.
         </h1>
