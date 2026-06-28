@@ -50,6 +50,50 @@ export async function updateVisitStatus(visitId: string, status: 'scheduled' | '
 
   if (error) return { error: error.message };
 
+  // Fetch visit details to send email
+  const { data: visitData } = await adminSupabase
+    .from('visits')
+    .select('user_profiles(email, full_name), properties(title), visit_date')
+    .eq('id', visitId)
+    .maybeSingle();
+
+  if (visitData && process.env.RESEND_API_KEY) {
+    const userEmail = visitData.user_profiles?.email;
+    const userName = visitData.user_profiles?.full_name || 'Cliente';
+    const propTitle = visitData.properties?.title || 'Propiedad';
+    const visitDate = new Date(visitData.visit_date).toLocaleString('es-CL');
+    
+    let subject = '';
+    let html = '';
+    if (status === 'completed') {
+      subject = `Visita Completada: ${propTitle}`;
+      html = `<p>Hola ${userName},</p><p>Tu visita a <strong>${propTitle}</strong> del ${visitDate} ha sido marcada como completada.</p><p>¡Gracias por usar nuestro portal!</p>`;
+    } else if (status === 'cancelled') {
+      subject = `Visita Cancelada: ${propTitle}`;
+      html = `<p>Hola ${userName},</p><p>Lamentamos informarte que tu visita a <strong>${propTitle}</strong> del ${visitDate} ha sido cancelada.</p><p>Por favor contáctanos para más detalles.</p>`;
+    }
+
+    if (subject && userEmail) {
+      try {
+        const res = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            from: 'Lacustre Inmobiliaria <onboarding@resend.dev>',
+            to: [userEmail],
+            subject: subject,
+            html: html
+          })
+        });
+        if (!res.ok) {
+          console.error("Error from Resend API:", await res.text());
+        }
+      } catch(e) {
+        console.error("Failed to fetch Resend:", e);
+      }
+    }
+  }
+
   revalidatePath('/agente/visits');
   revalidatePath('/agente');
   revalidatePath('/vendedor/visits');

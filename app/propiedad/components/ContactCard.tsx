@@ -98,6 +98,12 @@ export default function ContactCard({ price, clpPrice, location, slug, isOwner, 
                   if (!userId) {
                     e.preventDefault();
                     showAlert("Inicia sesión", "Debes iniciar sesión para contactar vía WhatsApp", "warning");
+                  } else if (typeof window !== 'undefined' && (window as any).dataLayer) {
+                    (window as any).dataLayer.push({
+                      event: 'whatsapp_click',
+                      agent_type: 'agente',
+                      slug: slug
+                    });
                   }
                 }}
                 className={`p-2 rounded-full flex items-center justify-center transition-colors ${userId ? 'bg-mosque/10 text-mosque hover:bg-mosque hover:text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
@@ -135,6 +141,12 @@ export default function ContactCard({ price, clpPrice, location, slug, isOwner, 
                   if (!userId) {
                     e.preventDefault();
                     showAlert("Inicia sesión", "Debes iniciar sesión para contactar vía WhatsApp", "warning");
+                  } else if (typeof window !== 'undefined' && (window as any).dataLayer) {
+                    (window as any).dataLayer.push({
+                      event: 'whatsapp_click',
+                      agent_type: 'vendedor',
+                      slug: slug
+                    });
                   }
                 }}
                 className={`p-2 rounded-full flex items-center justify-center transition-colors ${userId ? 'bg-mosque/10 text-mosque hover:bg-mosque hover:text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}

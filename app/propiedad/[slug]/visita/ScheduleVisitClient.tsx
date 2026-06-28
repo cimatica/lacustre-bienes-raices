@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { Property } from '@/lib/supabase';
 import { scheduleVisitAction } from '@/app/actions';
 import { formatUF, formatCLP } from '@/lib/currency';
 import { useRouter } from 'next/navigation';
 import { useAlert } from '@/app/components/ui/AlertProvider';
+import Script from 'next/script';
 
 type Props = {
   property: Property;
@@ -23,6 +24,8 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<HTMLDivElement>(null);
   const agentAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'agente');
   const sellerAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'vendedor');
   const hasResponsible = !!agentAssignment || !!sellerAssignment;
@@ -34,6 +37,10 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     }
     if (!selectedDate || !selectedTime) {
       showAlert("Atención", "Por favor, selecciona una fecha y hora.", "warning");
+      return;
+    }
+    if (!turnstileToken) {
+      showAlert("Atención", "Por favor, completa la verificación de seguridad (reCAPTCHA/Turnstile).", "warning");
       return;
     }
 
@@ -50,17 +57,72 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
     
     visitDate.setHours(hoursNum, parseInt(minutes, 10), 0, 0);
     
-    const success = await scheduleVisitAction(property.id, visitDate.toISOString(), message);
+    const result = await scheduleVisitAction(property.id, visitDate.toISOString(), message, turnstileToken);
 
     setIsSubmitting(false);
 
-    if (success) {
-      showAlert("¡Éxito!", "¡Visita agendada con éxito!", "success");
+    if (result && result.success) {
+      // Fire GTM Event for Conversion
+      if (typeof window !== 'undefined' && (window as any).dataLayer) {
+        (window as any).dataLayer.push({
+          event: 'visit_scheduled',
+          property_id: property.id,
+          property_price: property.price
+        });
+      }
+      showAlert("¡Éxito!", "¡Visita agendada con éxito! Te hemos enviado un correo de confirmación.", "success");
       router.push('/perfil');
     } else {
-      showAlert("Error", "Hubo un error al agendar tu visita.", "error");
+      showAlert("Error", result?.error || "Hubo un error al agendar tu visita.", "error");
+      // Reset Turnstile token so user can retry
+      setTurnstileToken(null);
+      if (typeof (window as any).turnstile !== 'undefined') {
+        (window as any).turnstile.reset();
+      }
     }
   };
+
+  useEffect(() => {
+    let widgetId: string | undefined;
+
+    const renderTurnstile = () => {
+      if (turnstileRef.current && typeof (window as any).turnstile !== 'undefined') {
+        try {
+          if (turnstileRef.current.children.length === 0 && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+            widgetId = (window as any).turnstile.render(turnstileRef.current, {
+              sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+              callback: function(token: string) {
+                setTurnstileToken(token);
+              },
+              theme: 'light'
+            });
+          }
+        } catch (e) {
+          console.error("Turnstile render error", e);
+        }
+      }
+    };
+
+    // Render if already loaded
+    renderTurnstile();
+
+    // Fallback polling for script load
+    const interval = setInterval(() => {
+      if (typeof (window as any).turnstile !== 'undefined') {
+        renderTurnstile();
+        clearInterval(interval);
+      }
+    }, 500);
+
+    return () => {
+      clearInterval(interval);
+      if (widgetId && typeof (window as any).turnstile !== 'undefined') {
+        try {
+          (window as any).turnstile.remove(widgetId);
+        } catch(e) {}
+      }
+    };
+  }, []);
 
   // Generate calendar grid
   const generateCalendar = () => {
@@ -285,6 +347,17 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
                   className="w-full rounded-lg border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-[#112522] text-nordic dark:text-slate-200 placeholder:text-slate-400 focus:ring-1 focus:ring-mosque focus:border-mosque transition-shadow resize-none text-sm"
                 ></textarea>
               </div>
+            </div>
+
+            <div className="mb-8">
+              <div ref={turnstileRef}></div>
+              {!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY && (
+                 <p className="text-red-500 text-sm">Falta configurar NEXT_PUBLIC_TURNSTILE_SITE_KEY en el servidor (Reinicia npm run dev).</p>
+              )}
+              <Script 
+                src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" 
+                strategy="afterInteractive"
+              />
             </div>
 
             <div className="pt-6 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-4">
