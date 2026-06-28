@@ -17,6 +17,8 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
 
   const [editName, setEditName] = useState(initialProfile?.full_name || user.user_metadata?.full_name || '');
   const [editPhone, setEditPhone] = useState(initialProfile?.phone || '');
+  const [editLocation, setEditLocation] = useState(initialProfile?.location || '');
+  const [avatarUrl, setAvatarUrl] = useState(initialProfile?.avatar_url || user.user_metadata?.avatar_url || 'https://via.placeholder.com/150');
 
   useEffect(() => {
     setMounted(true);
@@ -29,6 +31,35 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
     { name: 'Propiedades', href: '/agente/properties', exact: false },
   ];
 
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (file.size > 2 * 1024 * 1024) {
+      showAlert("Archivo muy grande", "La imagen no debe superar los 2MB", "warning");
+      return;
+    }
+    setLoading(true);
+    const { createClient } = await import('@/utils/supabase/client');
+    const supabaseClient = createClient();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+    const filePath = `${user.id}/${fileName}`;
+    try {
+      const { error: uploadError } = await supabaseClient.storage.from('avatars').upload(filePath, file);
+      if (uploadError) throw uploadError;
+      const { data } = supabaseClient.storage.from('avatars').getPublicUrl(filePath);
+      const { error: updateError } = await supabaseClient.from('user_profiles').update({ avatar_url: data.publicUrl }).eq('id', user.id);
+      if (updateError) throw updateError;
+      await supabaseClient.auth.updateUser({ data: { avatar_url: data.publicUrl } });
+      setAvatarUrl(data.publicUrl);
+      showAlert("Foto Actualizada", "Tu foto de perfil ha sido actualizada.", "success");
+    } catch (err: any) {
+      showAlert("Error", err.message || "Error al subir imagen", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEditProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (editPhone) {
@@ -40,7 +71,7 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
     }
     
     setLoading(true);
-    const result = await updateOwnProfile({ full_name: editName, phone: editPhone });
+    const result = await updateOwnProfile({ full_name: editName, phone: editPhone, location: editLocation });
     setLoading(false);
 
     if (result.error) {
@@ -95,8 +126,8 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
                       <span className="text-xs text-gray-500 capitalize">{userRole}</span>
                     </div>
                     <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden ring-2 ring-white cursor-pointer flex items-center justify-center">
-                      {user.user_metadata?.avatar_url ? (
-                        <img alt="User profile" className="h-full w-full object-cover" src={user.user_metadata.avatar_url} />
+                      {avatarUrl ? (
+                        <img alt="User profile" className="h-full w-full object-cover" src={avatarUrl} />
                       ) : (
                         <span className="material-icons text-gray-500">person</span>
                       )}
@@ -150,6 +181,16 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
             <h2 className="text-xl font-bold text-[#19322F] mb-4">Editar Perfil</h2>
             
             <form onSubmit={handleEditProfile} className="space-y-4">
+              <div className="flex flex-col items-center space-y-4 mb-4">
+                <div className="relative w-24 h-24">
+                  <img src={avatarUrl} alt="Profile" className="w-full h-full rounded-full object-cover border-2 border-gray-200" />
+                </div>
+                <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-xs font-medium transition-colors flex items-center gap-1 shadow-sm">
+                  <span className="material-icons text-[14px]">add_a_photo</span>
+                  Cambiar Foto
+                  <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={loading} />
+                </label>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
                 <input 
@@ -177,6 +218,16 @@ export default function AgenteNavbar({ user, userRole, initialProfile }: { user:
                     placeholder="912345678"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación (Ciudad, País)</label>
+                <input 
+                  type="text" 
+                  value={editLocation}
+                  onChange={e => setEditLocation(e.target.value)}
+                  placeholder="Ej: Villarrica, Chile"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#006655] focus:border-transparent"
+                />
               </div>
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">Cancelar</button>

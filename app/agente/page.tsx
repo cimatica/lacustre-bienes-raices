@@ -60,9 +60,9 @@ export default async function AgenteDashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <main className="flex-grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-[#19322F]">CRM Inmobiliario</h1>
+        <h1 className="text-3xl font-bold text-[#19322F]">Tablero Inmobiliario</h1>
         <p className="text-gray-500 mt-1">Tu centro de gestión de prospectos y propiedades asignadas.</p>
       </div>
 
@@ -182,6 +182,6 @@ export default async function AgenteDashboard() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

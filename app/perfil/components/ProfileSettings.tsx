@@ -13,6 +13,7 @@ export default function ProfileSettings({ profile, email, dict }: { profile: any
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
+  const [location, setLocation] = useState(profile?.location || '');
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || 'https://via.placeholder.com/150');
   
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -38,6 +39,7 @@ export default function ProfileSettings({ profile, email, dict }: { profile: any
         .update({
           full_name: fullName,
           phone: phone,
+          location: location,
         })
         .eq('id', profile.id);
 
@@ -138,18 +140,18 @@ export default function ProfileSettings({ profile, email, dict }: { profile: any
       <div className="flex flex-col md:flex-row gap-8">
         {/* Avatar Upload */}
         <div className="flex flex-col items-center space-y-4">
-          <div className="relative group w-32 h-32">
+          <div className="relative w-32 h-32">
             <img 
               src={avatarUrl} 
               alt="Profile" 
               className="w-full h-full rounded-full object-cover border-4 border-slate-700 shadow-lg"
             />
-            <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-              <span className="material-icons text-white">photo_camera</span>
-              <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={loading} />
-            </label>
           </div>
-          <p className="text-xs text-slate-400">Clic para cambiar foto</p>
+          <label className="cursor-pointer bg-surface-dark border border-slate-700 hover:bg-slate-700 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors flex items-center gap-2 shadow-sm">
+            <span className="material-icons text-[16px]">add_a_photo</span>
+            Cambiar Foto
+            <input type="file" className="hidden" accept="image/*" onChange={handleAvatarChange} disabled={loading} />
+          </label>
         </div>
 
         {/* Profile Info Form */}
@@ -183,7 +185,17 @@ export default function ProfileSettings({ profile, email, dict }: { profile: any
                 />
               </div>
             </div>
-            <div className="md:col-span-2">
+            <div>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ubicación (Ciudad, País)</label>
+              <input 
+                type="text" 
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+                placeholder="Ej: Villarrica, Chile"
+                className="w-full bg-surface-darkest border border-slate-700/50 rounded-lg px-4 py-3 text-slate-200 focus:outline-none focus:border-mosque focus:ring-1 focus:ring-mosque transition-colors"
+              />
+            </div>
+            <div className="md:col-span-1">
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Correo Electrónico</label>
               <input 
                 type="email" 

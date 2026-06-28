@@ -97,7 +97,7 @@ export default function LoginForm({ dict }: { dict: any }) {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        window.location.href = '/';
+        window.location.replace('/');
       }
     }
     setLoadingEmail(false);

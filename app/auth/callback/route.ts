@@ -10,8 +10,25 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
+    const { error, data } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error && data?.user) {
+      const user = data.user;
+      const { createAdminClient } = await import('@/utils/supabase/admin');
+      const adminSupabase = createAdminClient();
+      
+      const { data: profile } = await adminSupabase.from('user_profiles').select('full_name, avatar_url').eq('id', user.id).single();
+      
+      const updates: any = { last_login: new Date().toISOString() };
+      
+      // Sync Google/OAuth metadata if missing in DB
+      const authName = user.user_metadata?.full_name || user.user_metadata?.name;
+      const authAvatar = user.user_metadata?.avatar_url || user.user_metadata?.picture;
+      
+      if ((!profile?.full_name || profile?.full_name === 'Usuario') && authName) updates.full_name = authName;
+      if (!profile?.avatar_url && authAvatar) updates.avatar_url = authAvatar;
+      
+      await adminSupabase.from('user_profiles').update(updates).eq('id', user.id);
+
       const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === 'development'
       if (isLocalEnv) {
