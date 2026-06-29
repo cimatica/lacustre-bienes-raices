@@ -1,16 +1,35 @@
 # Lacustre - Bienes Raíces
-Plataforma de gestión y catálogo inmobiliario integral. Provee un entorno B2C para exploración de propiedades y un CRM multi-rol (B2B) para administración, agentes y vendedores.
+Plataforma de gestión y catálogo inmobiliario integral. Provee un entorno para exploración de propiedades y 3 paneles de administración, agentes y vendedores. 
 ---
 
 ## Descripción
-Sistema inmobiliario fullstack desarrollado para gestionar el ciclo completo de bienes raíces. Permite a los usuarios finales explorar catálogos, guardar favoritos y agendar visitas, mientras provee paneles de control segregados para que vendedores y agentes gestionen sus portafolios de propiedades y leads. Todo el sistema está respaldado por arquitecturas serverless y control de acceso basado en roles (RBAC).
+Sistema inmobiliario fullstack utilizando tecnologías modernas. Permite a los usuarios finales explorar catálogos, guardar favoritos y agendar visitas, mientras provee paneles de control para que vendedores y agentes gestionen sus portafolios de propiedades y leads.
 
 ## Capturas de pantalla
-*Pendiente de documentar. (Agrega aquí imágenes de la aplicación)*
-<!-- Ejemplo de uso:
-![Página de Inicio](./public/img/screenshot-home.png)
-![Dashboard](./public/img/screenshot-dashboard.png)
--->
+
+<table align="center">
+  <tr>
+    <td align="center">
+      <img src="./public/img/screenshot-home-1.png" alt="Página de Inicio (Hero)" width="100%" />
+      <br /><em>Página de Inicio</em>
+    </td>
+    <td align="center">
+      <img src="./public/img/screenshot-home-2.png" alt="Página de Inicio (Catálogo)" width="100%" />
+      <br /><em>Exploración de Catálogo</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="./public/img/screenshot-properties.png" alt="Página de Propiedades" width="100%" />
+      <br /><em>Detalle de Propiedad</em>
+    </td>
+    <td align="center">
+      <img src="./public/img/screenshot-dashboard.png" alt="Dashboard de Administración" width="100%" />
+      <br /><em>Dashboard de Administración</em>
+    </td>
+  </tr>
+</table>
+
 
 ## Características
 * Catálogo público de propiedades con motor de búsqueda y filtros avanzados.
@@ -84,15 +103,6 @@ El esquema asume la existencia de las siguientes entidades principales (esquemas
 | Desarrollo | `npm run dev` |
 | Construcción | `npm run build` |
 | Producción | `npm run start` |
-
-## Scripts disponibles
-
-| Script | Descripción |
-| --- | --- |
-| `dev` | Inicia el servidor de desarrollo de Next.js (Turbopack/Hot-reload) |
-| `build` | Compila la aplicación para producción generando optimizaciones estáticas |
-| `start` | Inicia el servidor de producción con los archivos pre-compilados |
-| `lint` | Ejecuta ESLint para análisis de código estático y detección de errores |
 
 ## Estructura del proyecto
 ```text
