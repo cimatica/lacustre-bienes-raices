@@ -106,8 +106,8 @@ export default function AdminFilters({
   };
 
   return (
-    <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6 space-y-4">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+    <div className="bg-white p-3 rounded-xl shadow-sm border border-gray-200 mb-4 space-y-3">
+      <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
         {/* Search Input */}
         <div className="relative w-full md:flex-1">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -155,7 +155,7 @@ export default function AdminFilters({
       </div>
 
       {/* Bottom Filters */}
-      <div className={`grid grid-cols-1 ${showPersonnelFilters ? 'sm:grid-cols-3' : 'sm:grid-cols-1'} gap-4 pt-4 border-t border-gray-100`}>
+      <div className={`grid grid-cols-1 ${showPersonnelFilters ? 'sm:grid-cols-3' : 'sm:grid-cols-1'} gap-3 pt-3 border-t border-gray-100`}>
         {showPersonnelFilters && (
           <>
             <div className="relative">

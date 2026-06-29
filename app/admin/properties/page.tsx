@@ -133,73 +133,73 @@ export default async function AdminPropertiesPage({
   return (
     <main className="flex-grow max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#19322F] tracking-tight">Directorio de Propiedades</h1>
-          <p className="text-gray-500 mt-1">Administra todas las propiedades registradas en la plataforma.</p>
+          <h1 className="text-2xl font-bold text-[#19322F] tracking-tight">Directorio de Propiedades</h1>
+          <p className="text-sm text-gray-500 mt-1">Administra todas las propiedades registradas en la plataforma.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-5 py-2.5 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
+          <Link href="/admin/properties/create" className="bg-[#006655] hover:bg-[#004d40] text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md shadow-[#006655]/20 transition-all transform hover:-translate-y-0.5 inline-flex items-center gap-2">
             <span className="material-icons text-base">add</span> Nueva Propiedad
           </Link>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
-        <Link href="/admin/properties" className={`bg-white p-4 rounded-xl border ${(status === 'all' && commercialStatus === 'all') ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Total</p>
-            <div className="h-8 w-8 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
-              <span className="material-icons text-sm">apartment</span>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-4">
+        <Link href="/admin/properties" className={`bg-white p-3 rounded-xl border ${(status === 'all' && commercialStatus === 'all') ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Total</p>
+            <div className="h-6 w-6 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-[12px]">apartment</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{totalListings || 0}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{totalListings || 0}</p>
         </Link>
-        <Link href="/admin/properties?status=active" className={`bg-white p-4 rounded-xl border ${status === 'active' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Activas</p>
-            <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
-              <span className="material-icons text-sm">visibility</span>
+        <Link href="/admin/properties?status=active" className={`bg-white p-3 rounded-xl border ${status === 'active' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Activas</p>
+            <div className="h-6 w-6 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-[12px]">visibility</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{activeProperties !== null ? activeProperties : (totalListings || 0)}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Disponible" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Disponible' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Disponibles</p>
-            <div className="h-8 w-8 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
-              <span className="material-icons text-sm">check_circle</span>
+        <Link href="/admin/properties?commercial_status=Disponible" className={`bg-white p-3 rounded-xl border ${commercialStatus === 'Disponible' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Disponibles</p>
+            <div className="h-6 w-6 rounded-full bg-[#D9ECC8] flex items-center justify-center text-[#006655]">
+              <span className="material-icons text-[12px]">check_circle</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Disponible']}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{statusCounts['Disponible']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Vendida" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Vendida' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Vendidas</p>
-            <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-              <span className="material-icons text-sm">sell</span>
+        <Link href="/admin/properties?commercial_status=Vendida" className={`bg-white p-3 rounded-xl border ${commercialStatus === 'Vendida' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Vendidas</p>
+            <div className="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+              <span className="material-icons text-[12px]">sell</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Vendida']}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{statusCounts['Vendida']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Arrendada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Arrendada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Arrendadas</p>
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
-              <span className="material-icons text-sm">key</span>
+        <Link href="/admin/properties?commercial_status=Arrendada" className={`bg-white p-3 rounded-xl border ${commercialStatus === 'Arrendada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Arrendadas</p>
+            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+              <span className="material-icons text-[12px]">key</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Arrendada']}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{statusCounts['Arrendada']}</p>
         </Link>
-        <Link href="/admin/properties?commercial_status=Reservada" className={`bg-white p-4 rounded-xl border ${commercialStatus === 'Reservada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs sm:text-sm font-medium text-gray-500">Reservadas</p>
-            <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
-              <span className="material-icons text-sm">schedule</span>
+        <Link href="/admin/properties?commercial_status=Reservada" className={`bg-white p-3 rounded-xl border ${commercialStatus === 'Reservada' ? 'border-[#006655] shadow-md ring-1 ring-[#006655]/20' : 'border-[#006655]/10 shadow-sm hover:border-[#006655]/30 hover:shadow-md'} transition-all flex flex-col justify-between h-full`}>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-xs font-medium text-gray-500">Reservadas</p>
+            <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center text-orange-700">
+              <span className="material-icons text-[12px]">schedule</span>
             </div>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-[#19322F]">{statusCounts['Reservada']}</p>
+          <p className="text-lg sm:text-xl font-bold text-[#19322F]">{statusCounts['Reservada']}</p>
         </Link>
       </div>
 
@@ -208,7 +208,7 @@ export default async function AdminPropertiesPage({
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {/* Table Header */}
-        <div className="hidden md:grid grid-cols-12 gap-6 px-6 py-4 bg-gray-50/50 rounded-t-xl border-b border-gray-100 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        <div className="hidden md:grid grid-cols-12 gap-4 px-5 py-3 bg-gray-50/50 rounded-t-xl border-b border-gray-100 text-[11px] font-semibold text-gray-500 uppercase tracking-wider">
           <div className="col-span-4">Detalles de la Propiedad</div>
           <div className="col-span-2">Precio</div>
           <div className="col-span-2">Estado</div>
@@ -218,10 +218,10 @@ export default async function AdminPropertiesPage({
 
         {/* List Items */}
         {properties?.map((prop: any, index: number) => (
-          <div key={prop.id} className={`group grid grid-cols-1 md:grid-cols-12 gap-6 px-6 py-6 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center ${index === properties.length - 1 ? 'rounded-b-xl border-b-0' : ''}`}>
+          <div key={prop.id} className={`group grid grid-cols-1 md:grid-cols-12 gap-4 px-5 py-3 border-b border-gray-100 hover:bg-[#EEF6F6] transition-colors items-center ${index === properties.length - 1 ? 'rounded-b-xl border-b-0' : ''}`}>
             {/* Property Details */}
-            <div className="col-span-12 md:col-span-4 flex gap-4 items-center">
-              <div className="relative h-20 w-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
+            <div className="col-span-12 md:col-span-4 flex gap-3 items-center">
+              <div className="relative h-14 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
                 {prop.image_url ? (
                   <img src={prop.image_url} alt={prop.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
@@ -231,9 +231,9 @@ export default async function AdminPropertiesPage({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <h3 className="text-lg font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer truncate" title={prop.title}>{prop.title}</h3>
-                <p className="text-sm text-gray-500 truncate" title={`${prop.property_types?.name || 'Propiedad'} en ${prop.location}`}>{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
-                <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-400 truncate">
+                <h3 className="text-sm font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer truncate" title={prop.title}>{prop.title}</h3>
+                <p className="text-xs text-gray-500 truncate mt-0.5" title={`${prop.property_types?.name || 'Propiedad'} en ${prop.location}`}>{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
+                <div className="flex items-center gap-1.5 mt-1 text-[10px] text-gray-400 truncate">
                   <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">king_bed</span> {prop.beds || 0} Camas</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0"></span>
                   <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">bathtub</span> {prop.baths || 0} Baños</span>
@@ -247,8 +247,8 @@ export default async function AdminPropertiesPage({
 
             {/* Price */}
             <div className="col-span-6 md:col-span-2">
-              <div className="text-base font-semibold text-[#19322F]">{formatUF(prop.price)}</div>
-              <div className="text-xs text-gray-400">{prop.sale_type}</div>
+              <div className="text-sm font-semibold text-[#19322F]">{formatUF(prop.price)}</div>
+              <div className="text-[11px] text-gray-400">{prop.sale_type}</div>
             </div>
 
             {/* Status */}

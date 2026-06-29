@@ -142,7 +142,7 @@ export default function AdminNavbar({ user, userRole, initialProfile }: { user: 
                 <>
                   <div className="flex flex-col items-end hidden sm:flex cursor-pointer">
                     <span className="text-sm font-semibold text-[#19322F]">
-                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                      {editName || user.email?.split('@')[0]}
                     </span>
                     <span className="text-xs text-gray-500 capitalize">{userRole}</span>
                   </div>
