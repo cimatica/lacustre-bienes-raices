@@ -102,7 +102,10 @@ export default async function AdminPropertiesPage({
       .select('role_types(name)')
       .eq('id', user.id)
       .maybeSingle();
-    currentUserRole = roleData?.role_types?.name || 'usuario';
+    
+    // Typecast to any to fix TS inference issue where it thinks role_types is an array
+    const roleTypes: any = roleData?.role_types;
+    currentUserRole = roleTypes?.name || 'usuario';
   }
 
   // Overall stats
