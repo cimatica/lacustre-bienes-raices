@@ -31,12 +31,9 @@ export function PropertyActions({ property, currentUserRole = 'administrador', b
     if (isConfirmed) {
       startTransition(async () => {
         try {
-          const result = await deleteProperty(property.id);
-          if (result?.error) {
-            showAlert("Error", "No tienes permisos o hubo un error al eliminar la propiedad.", "error");
-          }
-        } catch (err) {
-          showAlert("Error", "Error al eliminar la propiedad", "error");
+          await deleteProperty(property.id);
+        } catch (err: any) {
+          showAlert("Error", err.message || "Error al eliminar la propiedad", "error");
         }
       });
     }
