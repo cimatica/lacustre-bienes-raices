@@ -17,7 +17,9 @@ export async function updateUserRole(userId: string, newRole: string) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+  const roleTypes: any = roleData?.role_types;
+  const roleName = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) : null;
+  if (!roleName || roleName !== 'administrador') {
     return { error: 'No autorizado' };
   }
 
@@ -76,7 +78,9 @@ export async function createUserByAdmin(formData: FormData) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+  const roleTypes: any = roleData?.role_types;
+  const roleName = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) : null;
+  if (!roleName || roleName !== 'administrador') {
     return { error: 'No autorizado' };
   }
 
@@ -148,7 +152,9 @@ export async function deleteUserByAdmin(userId: string) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+  const roleTypes: any = roleData?.role_types;
+  const roleName = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) : null;
+  if (!roleName || roleName !== 'administrador') {
     return { error: 'No autorizado' };
   }
 
@@ -178,7 +184,9 @@ export async function updateUserProfile(userId: string, data: { full_name: strin
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+  const roleTypes: any = roleData?.role_types;
+  const roleName = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) : null;
+  if (!roleName || roleName !== 'administrador') {
     return { error: 'No autorizado' };
   }
 
@@ -209,7 +217,9 @@ export async function updateUserStatus(userId: string, status: string) {
     .eq('id', user.id)
     .maybeSingle();
 
-  if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+  const roleTypes: any = roleData?.role_types;
+  const roleName = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) : null;
+  if (!roleName || roleName !== 'administrador') {
     return { error: 'No autorizado' };
   }
 

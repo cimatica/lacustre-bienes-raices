@@ -18,7 +18,8 @@ export default async function AdminLayout({
       .eq('id', user.id)
       .maybeSingle();
     if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+      const roleTypes: any = roleData.role_types;
+      userRole = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
     }
     const { data: profile } = await supabase.from('user_profiles').select('*').eq('id', user.id).single();
     if (profile) initialProfile = profile;

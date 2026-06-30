@@ -25,7 +25,8 @@ export default async function VendedorLayout({
       .maybeSingle();
       
     if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+      const roleTypes: any = roleData.role_types;
+      userRole = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
     }
     
     // Solo permitir acceso si es vendedor (o administrador, si queremos que el admin pueda ver cómo luce el portal de vendedor, pero la regla dice "Solo las personas con Rol vendedor pueden acceder a esta página")

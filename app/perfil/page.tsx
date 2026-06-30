@@ -30,7 +30,8 @@ export default async function UserProfilePage() {
       .eq('id', user.id)
       .maybeSingle();
     if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+      const roleTypes: any = roleData.role_types;
+      userRole = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
     }
   }
 

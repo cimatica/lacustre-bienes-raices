@@ -61,7 +61,8 @@ export default async function PropertyPage({ params }: Props) {
       .eq('id', user.id)
       .maybeSingle();
     if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+      const roleTypes: any = roleData.role_types;
+      userRole = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
     }
     const favorites = await getUserFavorites(user.id, token);
     isFavorite = favorites.some((f: any) => f.property_id === property.id);

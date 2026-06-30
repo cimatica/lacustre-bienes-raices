@@ -108,9 +108,11 @@ export default async function AdminUsersPage({
         let role = 'usuario';
         if (u.user_roles) {
           if (Array.isArray(u.user_roles)) {
-            role = u.user_roles.length > 0 && u.user_roles[0].role_types ? u.user_roles[0].role_types.name : 'usuario';
+            const roleTypes: any = u.user_roles.length > 0 ? u.user_roles[0].role_types : null;
+            role = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) || 'usuario' : 'usuario';
           } else {
-            role = u.user_roles.role_types ? u.user_roles.role_types.name : 'usuario';
+            const roleTypes: any = u.user_roles.role_types;
+            role = roleTypes ? (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) || 'usuario' : 'usuario';
           }
         }
         

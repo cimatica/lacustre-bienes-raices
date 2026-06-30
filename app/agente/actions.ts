@@ -81,9 +81,11 @@ export async function updateVisitStatus(visitId: string, status: 'scheduled' | '
     .maybeSingle();
 
   if (visitData && process.env.RESEND_API_KEY) {
-    const userEmail = visitData.user_profiles?.email;
-    const userName = visitData.user_profiles?.full_name || 'Cliente';
-    const propTitle = visitData.properties?.title || 'Propiedad';
+    const userProfiles: any = visitData.user_profiles;
+    const propDetails: any = visitData.properties;
+    const userEmail = Array.isArray(userProfiles) ? userProfiles[0]?.email : userProfiles?.email;
+    const userName = (Array.isArray(userProfiles) ? userProfiles[0]?.full_name : userProfiles?.full_name) || 'Cliente';
+    const propTitle = (Array.isArray(propDetails) ? propDetails[0]?.title : propDetails?.title) || 'Propiedad';
     const visitDate = new Date(visitData.visit_date).toLocaleString('es-CL');
     
     let subject = '';
@@ -156,11 +158,17 @@ export async function rescheduleVisit(visitId: string, newDate: string) {
       day: '2-digit', month: 'short', year: 'numeric',
       hour: '2-digit', minute: '2-digit'
     });
+    const userProfiles: any = visitData.user_profiles;
+    const propDetails: any = visitData.properties;
+    const userEmail = Array.isArray(userProfiles) ? userProfiles[0]?.email : userProfiles?.email;
+    const userName = Array.isArray(userProfiles) ? userProfiles[0]?.full_name : userProfiles?.full_name;
+    const propTitle = Array.isArray(propDetails) ? propDetails[0]?.title : propDetails?.title;
+    
     console.log(`\n\n======================================`);
     console.log(`📩 ENVIANDO NOTIFICACIÓN POR EMAIL`);
-    console.log(`Para: ${visitData.user_profiles?.email}`);
-    console.log(`Asunto: Visita Reprogramada - ${visitData.properties?.title}`);
-    console.log(`Mensaje: Hola ${visitData.user_profiles?.full_name}, tu visita ha sido reprogramada exitosamente para el ${formattedDate}.`);
+    console.log(`Para: ${userEmail}`);
+    console.log(`Asunto: Visita Reprogramada - ${propTitle}`);
+    console.log(`Mensaje: Hola ${userName}, tu visita ha sido reprogramada exitosamente para el ${formattedDate}.`);
     console.log(`======================================\n\n`);
   }
 
