@@ -80,7 +80,8 @@ export async function updateSession(request: NextRequest) {
       .eq('id', user.id)
       .single()
 
-    const roleName = roleData?.role_types?.name || 'usuario';
+    const roleTypes: any = roleData?.role_types;
+    const roleName = (Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name) || 'usuario';
 
     if (pathname.startsWith('/admin') && roleName !== 'administrador') {
       const url = request.nextUrl.clone()

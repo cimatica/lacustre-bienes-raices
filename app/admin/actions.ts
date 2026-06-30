@@ -17,7 +17,9 @@ export async function togglePropertyStatus(id: string, currentStatus: boolean) {
 
   // Verificamos permisos manualmente antes de usar adminSupabase
   const { data: roleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
-  const isAdmin = roleData?.role_types?.name === 'administrador';
+  const roleTypes: any = roleData?.role_types;
+  const roleName = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
+  const isAdmin = roleName === 'administrador';
 
   let hasPermission = isAdmin;
   if (!hasPermission) {
@@ -66,7 +68,9 @@ export async function deleteProperty(id: string) {
       .select('role_types(name)')
       .eq('id', user.id)
       .maybeSingle();
-    if (roleData?.role_types?.name === 'vendedor') {
+    const roleTypes: any = roleData?.role_types;
+    const roleName = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
+    if (roleName === 'vendedor') {
       throw new Error('Los vendedores no tienen permiso para eliminar propiedades.');
     }
   }
@@ -147,7 +151,8 @@ export async function assignPropertyUser(propertyId: string, userId: string, rol
   if (!user) throw new Error("No autenticado");
 
   const { data: callerRoleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
-  const callerRole = callerRoleData?.role_types?.name;
+  const callerRoleTypes: any = callerRoleData?.role_types;
+  const callerRole = Array.isArray(callerRoleTypes) ? callerRoleTypes[0]?.name : callerRoleTypes?.name;
 
   if (callerRole !== 'administrador' && callerRole !== 'vendedor') {
     throw new Error('No autorizado para asignar usuarios');
@@ -193,7 +198,8 @@ export async function unassignPropertyUser(propertyId: string, roleTypeName: 've
   if (!user) throw new Error("No autenticado");
 
   const { data: callerRoleData } = await supabase.from('user_roles').select('role_types(name)').eq('id', user.id).maybeSingle();
-  const callerRole = callerRoleData?.role_types?.name;
+  const callerRoleTypes: any = callerRoleData?.role_types;
+  const callerRole = Array.isArray(callerRoleTypes) ? callerRoleTypes[0]?.name : callerRoleTypes?.name;
 
   if (callerRole !== 'administrador' && callerRole !== 'vendedor') {
     throw new Error('No autorizado para desasignar usuarios');
