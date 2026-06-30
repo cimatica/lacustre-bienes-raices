@@ -126,23 +126,18 @@ El esquema asume la existencia de las siguientes entidades principales (esquemas
 └── next.config.ts         # Configuración del servidor y optimización de imágenes (Remote Patterns)
 ```
 
-## API
-En lugar de una API REST convencional, el proyecto interactúa con el backend mediante dos canales directos:
-1.  **PostgREST (SDK de Supabase):** Los Server Components leen datos directamente desde la base de datos invocando el cliente tipado de Supabase.
-2.  **Server Actions (`actions.ts`):** Las escrituras (POST/PUT/DELETE) se ejecutan a través de funciones de servidor RPC (Remote Procedure Call) integradas en React. Retornan un formato de respuesta estándar: `{ error: string | null, data?: any }`.
-
 ## Flujo de la aplicación
-1. Los visitantes sin autenticación acceden a las vistas estáticas y de listado (página de inicio, catálogo de propiedades).
-2. Para acceder a funcionalidades interactivas (Favoritos, Visitas), el usuario debe crear cuenta o iniciar sesión.
-3. El `middleware.ts` intercepta la navegación hacia directorios protegidos (`/admin`, `/agente`, `/vendedor`) consultando el rol del usuario en la tabla `user_roles`.
-4. Si el acceso es autorizado, los Server Components de la vista recuperan los datos correspondientes en SSR basándose en el ID de usuario activo (`auth.getUser()`), aislando la visibilidad de datos mediante políticas en la base de datos.
+1. **Exploración Pública:** Cualquier visitante puede navegar por la página de inicio, explorar el catálogo completo de propiedades y utilizar los filtros de búsqueda sin necesidad de registrarse.
+2. **Interacción del Usuario:** Para guardar propiedades como favoritas o agendar visitas, los visitantes deben crear una cuenta o iniciar sesión en la plataforma.
+3. **Gestión de Perfiles:** Dependiendo del tipo de cuenta (Administrador, Agente, Vendedor o Usuario regular), la plataforma redirige automáticamente al usuario a su panel de control correspondiente.
+4. **Privacidad de Datos:** Cada usuario (ya sea agente, vendedor o cliente) solo tiene acceso a la información, propiedades y contactos que le corresponden de forma exclusiva, garantizando un entorno privado y organizado.
 
 ## Seguridad
-*   **Autenticación:** Gestionada íntegramente por Supabase Auth. Las credenciales nunca tocan lógicas propias del servidor de Next.js.
-*   **Sesiones:** Administradas por SSR Cookies securizadas que previenen accesos no autorizados. 
-*   **Autorización Backend (RLS):** Las tablas en PostgreSQL cuentan con Row Level Security habilitado. Un Agente o Vendedor no puede visualizar datos ni manipular entidades (aunque intercepte el endpoint) sin coincidir con los permisos exactos evaluados a nivel motor de BD.
-*   **Autorización Frontend:** Protección de sub-rutas mediante validación estricta de estado en `middleware.ts` para prevención de redireccionamientos cíclicos.
-*   **Sanitización de Datos:** Patrones estrictos (Regex) impuestos tanto en frontend como en el nivel de validación de Server Actions.
+La plataforma incorpora múltiples capas de protección para garantizar la integridad y confidencialidad de la información:
+*   **Gestión de Identidades:** El registro e inicio de sesión se delegan a un proveedor de grado empresarial, asegurando que las credenciales se manejen bajo los más altos estándares de seguridad.
+*   **Protección de Accesos:** Se implementan sesiones seguras para prevenir ingresos no autorizados a los paneles de administración y gestión.
+*   **Aislamiento de Información:** Las reglas de acceso a los datos están configuradas de tal manera que es imposible que un usuario visualice o modifique registros que no le pertenezcan.
+*   **Validación de Entradas:** Todos los formularios y datos ingresados en la plataforma son estrictamente validados y limpiados para prevenir vulnerabilidades comunes de la web.
 
 ## Estado del proyecto
 El proyecto se encuentra en etapa de **MVP en escalamiento de funcionalidades**, preparado para entornos de producción iniciales y retroalimentación de usuarios beta.
