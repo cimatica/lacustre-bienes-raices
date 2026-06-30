@@ -235,7 +235,7 @@ export default async function AdminPropertiesPage({
               </div>
               <div className="min-w-0 flex-1">
                 <h3 className="text-sm font-bold text-[#19322F] group-hover:text-[#006655] transition-colors cursor-pointer truncate" title={prop.title}>{prop.title}</h3>
-                <p className="text-xs text-gray-500 truncate mt-0.5" title={`${prop.property_types?.name || 'Propiedad'} en ${prop.location}`}>{prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
+                <p className="text-xs text-gray-500 truncate mt-0.5" title={`${Array.isArray(prop.property_types) ? prop.property_types[0]?.name : prop.property_types?.name || 'Propiedad'} en ${prop.location}`}>{Array.isArray(prop.property_types) ? prop.property_types[0]?.name : prop.property_types?.name || 'Propiedad'} en {prop.location}</p>
                 <div className="flex items-center gap-1.5 mt-1 text-[10px] text-gray-400 truncate">
                   <span className="flex items-center gap-1 flex-shrink-0"><span className="material-icons text-[14px]">king_bed</span> {prop.beds || 0} Camas</span>
                   <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0"></span>

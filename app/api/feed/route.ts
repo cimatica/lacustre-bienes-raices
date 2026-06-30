@@ -45,7 +45,7 @@ export async function GET(request: Request) {
       xml += `    <property_data>\n`;
       xml += `      <id>${prop.id}</id>\n`;
       xml += `      <title><![CDATA[${prop.title}]]></title>\n`;
-      xml += `      <type>${prop.property_types?.name || 'Propiedad'}</type>\n`;
+      xml += `      <type>${Array.isArray(prop.property_types) ? prop.property_types[0]?.name : (prop.property_types as any)?.name || 'Propiedad'}</type>\n`;
       xml += `      <operation>${prop.sale_type}</operation>\n`;
       xml += `      <price currency="UF">${prop.price}</price>\n`;
       xml += `      <location><![CDATA[${prop.location}]]></location>\n`;

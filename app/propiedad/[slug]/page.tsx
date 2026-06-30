@@ -98,7 +98,11 @@ export default async function PropertyPage({ params }: Props) {
           <div className="lg:col-span-8 space-y-4">
             <div className="mb-6">
               <div className="flex items-center gap-2 text-mosque font-medium mb-2 uppercase tracking-wide text-sm">
-                <span>{property.property_types?.name ? (dict.hero?.types?.[property.property_types.name] || property.property_types.name) : ""}</span>
+                <span>{(() => {
+                  const pTypes: any = property.property_types;
+                  const typeName = Array.isArray(pTypes) ? pTypes[0]?.name : pTypes?.name;
+                  return typeName ? (dict.hero?.types?.[typeName as keyof typeof dict.hero.types] || typeName) : "";
+                })()}</span>
                 {property.sale_type && (
                   <>
                     <span className="w-1.5 h-1.5 rounded-full bg-mosque/40"></span>
