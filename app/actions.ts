@@ -90,7 +90,8 @@ export async function scheduleVisitAction(propertyId: string, visitDate: string,
   
   if (propData && process.env.RESEND_API_KEY) {
      const agentAssignment = propData.property_assignments?.find((a:any) => a.role_types?.name === 'agente');
-     const agentEmail = agentAssignment?.user_profiles?.email;
+     const userProfiles: any = agentAssignment?.user_profiles;
+     const agentEmail = Array.isArray(userProfiles) ? userProfiles[0]?.email : userProfiles?.email;
      const userEmail = user.email;
 
      try {
