@@ -8,6 +8,7 @@ import { formatUF, formatCLP } from '@/lib/currency';
 import { useRouter } from 'next/navigation';
 import { useAlert } from '@/app/components/ui/AlertProvider';
 import Script from 'next/script';
+import { getRelation } from '@/utils/getRelation';
 
 type Props = {
   property: Property;
@@ -26,8 +27,8 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const turnstileRef = useRef<HTMLDivElement>(null);
-  const agentAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'agente');
-  const sellerAssignment = property.property_assignments?.find((a: any) => a.role_types?.name === 'vendedor');
+  const agentAssignment = property.property_assignments?.find((a: any) => getRelation(a.role_types)?.name === 'agente');
+  const sellerAssignment = property.property_assignments?.find((a: any) => getRelation(a.role_types)?.name === 'vendedor');
   const hasResponsible = !!agentAssignment || !!sellerAssignment;
   
   const handleConfirm = async () => {
@@ -235,11 +236,11 @@ export default function ScheduleVisitClient({ property, clpPrice, dict, userId }
               <img 
                 alt="Agent" 
                 className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-slate-700 shadow-sm" 
-                src={agentAssignment.user_profiles.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(agentAssignment.user_profiles.full_name)} 
+                src={getRelation(agentAssignment.user_profiles)?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(getRelation(agentAssignment.user_profiles)?.full_name || '')} 
               />
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Agente Asignado</p>
-                <p className="text-nordic dark:text-white font-semibold">{agentAssignment.user_profiles.full_name}</p>
+                <p className="text-nordic dark:text-white font-semibold">{getRelation(agentAssignment.user_profiles)?.full_name}</p>
               </div>
             </div>
           ) : (

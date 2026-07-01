@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import AgenteNavbar from './AgenteNavbar';
 import { createClient } from '@/utils/supabase/server';
+import { getRelation } from '@/utils/getRelation';
 
 export default async function AgenteLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -21,7 +22,7 @@ export default async function AgenteLayout({ children }: { children: React.React
       .maybeSingle();
       
     if (roleData && roleData.role_types) {
-      userRole = roleData.role_types.name;
+      userRole = getRelation(roleData.role_types)?.name || userRole;
     }
     
     if (userRole !== 'agente' && userRole !== 'administrador') {

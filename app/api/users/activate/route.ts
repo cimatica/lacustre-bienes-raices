@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getRelation } from '@/utils/getRelation';
 
 export async function POST(request: Request) {
   try {
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
       .eq('id', user.id)
       .maybeSingle();
 
-    if (!roleData || !roleData.role_types || roleData.role_types.name !== 'administrador') {
+    if (!roleData || !roleData.role_types || getRelation(roleData.role_types)?.name !== 'administrador') {
       return NextResponse.json({ error: 'Acceso denegado: Se requiere rol de administrador' }, { status: 403 });
     }
 

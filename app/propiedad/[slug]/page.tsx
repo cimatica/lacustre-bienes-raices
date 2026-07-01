@@ -13,6 +13,7 @@ import { getDictionary } from '@/lib/i18n';
 import { getUfValue, formatUF, formatCLP } from '@/lib/currency';
 import { createClient } from '@/utils/supabase/server';
 import { getUserFavorites } from '@/lib/supabase';
+import { getRelation } from '@/utils/getRelation';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -61,15 +62,14 @@ export default async function PropertyPage({ params }: Props) {
       .eq('id', user.id)
       .maybeSingle();
     if (roleData && roleData.role_types) {
-      const roleTypes: any = roleData.role_types;
-      userRole = Array.isArray(roleTypes) ? roleTypes[0]?.name : roleTypes?.name;
+      userRole = getRelation(roleData.role_types)?.name || userRole;
     }
     const favorites = await getUserFavorites(user.id, token);
     isFavorite = favorites.some((f: any) => f.property_id === property.id);
   }
 
   const isOwner = user ? property.property_assignments?.some(
-    (a: any) => a.user_id === user.id && a.role_types?.name === 'vendedor'
+    (a: any) => a.user_id === user.id && getRelation(a.role_types)?.name === 'vendedor'
   ) : false;
 
   // Always include the main image url, and append gallery images if they exist
@@ -99,8 +99,7 @@ export default async function PropertyPage({ params }: Props) {
             <div className="mb-6">
               <div className="flex items-center gap-2 text-mosque font-medium mb-2 uppercase tracking-wide text-sm">
                 <span>{(() => {
-                  const pTypes: any = property.property_types;
-                  const typeName = Array.isArray(pTypes) ? pTypes[0]?.name : pTypes?.name;
+                  const typeName = getRelation(property.property_types)?.name;
                   return typeName ? (dict.hero?.types?.[typeName as keyof typeof dict.hero.types] || typeName) : "";
                 })()}</span>
                 {property.sale_type && (

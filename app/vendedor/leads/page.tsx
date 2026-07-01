@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import LeadList from './LeadList';
+import { getRelation } from '@/utils/getRelation';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export default async function VendedorLeadsPage() {
     // Fetch role_type_id for 'agente' dynamically inside or outside, but we don't have it here, so we look at the joined role_types(name)
     // Wait, let's fix the query on line 33 first. It was:
     // properties!inner(id, title, image_url, location, property_assignments(role_type_id, user_profiles(id, full_name)))
-    const agentAssignment = lead.properties.property_assignments.find((a: any) => a.role_types?.name === 'agente');
+    const agentAssignment = lead.properties.property_assignments.find((a: any) => getRelation(a.role_types)?.name === 'agente');
     
     return {
       id: lead.id,

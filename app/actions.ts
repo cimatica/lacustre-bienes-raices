@@ -2,6 +2,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
+import { getRelation } from '@/utils/getRelation';
 
 export async function toggleFavoriteAction(propertyId: string, isCurrentlyFavorite: boolean) {
   const supabase = await createClient();
@@ -89,9 +90,8 @@ export async function scheduleVisitAction(propertyId: string, visitDate: string,
      .single();
   
   if (propData && process.env.RESEND_API_KEY) {
-     const agentAssignment = propData.property_assignments?.find((a:any) => a.role_types?.name === 'agente');
-     const userProfiles: any = agentAssignment?.user_profiles;
-     const agentEmail = Array.isArray(userProfiles) ? userProfiles[0]?.email : userProfiles?.email;
+     const agentAssignment = propData.property_assignments?.find((a:any) => getRelation(a.role_types)?.name === 'agente');
+     const agentEmail = getRelation(agentAssignment?.user_profiles)?.email;
      const userEmail = user.email;
 
      try {

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { getRelation } from "@/utils/getRelation";
 import { formatUF, formatCLP } from "@/lib/currency";
 import { useAlert } from "@/app/components/ui/AlertProvider";
 
@@ -22,8 +23,8 @@ export default function ContactCard({ price, clpPrice, location, slug, isOwner, 
   const isAvailable = !commercialStatus || commercialStatus === 'Disponible';
 
   // Extract agent and seller from assignments
-  const agentAssignment = assignments?.find(a => a.role_types?.name === 'agente');
-  const sellerAssignment = assignments?.find(a => a.role_types?.name === 'vendedor');
+  const agentAssignment = assignments?.find(a => getRelation(a.role_types)?.name === 'agente');
+  const sellerAssignment = assignments?.find(a => getRelation(a.role_types)?.name === 'vendedor');
   
   const { showAlert } = useAlert();
 
@@ -76,15 +77,15 @@ export default function ContactCard({ price, clpPrice, location, slug, isOwner, 
           <div className="flex items-center gap-4">
             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-slate-800 shadow-sm">
               <Image
-                src={agentAssignment.user_profiles.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(agentAssignment.user_profiles.full_name)}
-                alt={agentAssignment.user_profiles.full_name}
+                src={getRelation(agentAssignment.user_profiles)?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(getRelation(agentAssignment.user_profiles)?.full_name || '')}
+                alt={getRelation(agentAssignment.user_profiles)?.full_name || 'Agente'}
                 fill
                 unoptimized
                 className="object-cover"
               />
             </div>
             <div>
-              <h3 className="font-semibold text-white">{agentAssignment.user_profiles.full_name}</h3>
+              <h3 className="font-semibold text-white">{getRelation(agentAssignment.user_profiles)?.full_name}</h3>
               <div className="flex items-center gap-1 text-xs text-mosque font-medium">
                 <span className="material-icons text-[14px]">support_agent</span>
                 <span>Agente</span>
@@ -119,15 +120,15 @@ export default function ContactCard({ price, clpPrice, location, slug, isOwner, 
           <div className="flex items-center gap-4">
             <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-slate-800 shadow-sm">
               <Image
-                src={sellerAssignment.user_profiles.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(sellerAssignment.user_profiles.full_name)}
-                alt={sellerAssignment.user_profiles.full_name}
+                src={getRelation(sellerAssignment.user_profiles)?.avatar_url || "https://ui-avatars.com/api/?name=" + encodeURIComponent(getRelation(sellerAssignment.user_profiles)?.full_name || '')}
+                alt={getRelation(sellerAssignment.user_profiles)?.full_name || 'Vendedor'}
                 fill
                 unoptimized
                 className="object-cover"
               />
             </div>
             <div>
-              <h3 className="font-semibold text-white">{sellerAssignment.user_profiles.full_name}</h3>
+              <h3 className="font-semibold text-white">{getRelation(sellerAssignment.user_profiles)?.full_name}</h3>
               <div className="flex items-center gap-1 text-xs text-blue-400 font-medium">
                 <span className="material-icons text-[14px]">person</span>
                 <span>Vendedor</span>

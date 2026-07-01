@@ -3,6 +3,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { getRelation } from '@/utils/getRelation';
 
 function extractPathFromUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -238,11 +239,11 @@ export async function getAvailablePersonnel() {
   if (!roleUsers) return { sellers: [], agents: [] };
 
   const sellers = roleUsers
-    .filter((ru: any) => ru.role_types?.name === 'vendedor')
-    .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+    .filter((ru: any) => getRelation(ru.role_types)?.name === 'vendedor')
+    .map((ru: any) => ({ id: getRelation(ru.user_profiles)?.id, name: getRelation(ru.user_profiles)?.full_name }));
   const agents = roleUsers
-    .filter((ru: any) => ru.role_types?.name === 'agente')
-    .map((ru: any) => ({ id: ru.user_profiles.id, name: ru.user_profiles.full_name }));
+    .filter((ru: any) => getRelation(ru.role_types)?.name === 'agente')
+    .map((ru: any) => ({ id: getRelation(ru.user_profiles)?.id, name: getRelation(ru.user_profiles)?.full_name }));
 
   return { sellers, agents };
 }

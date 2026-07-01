@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { assignPropertyUser, unassignPropertyUser, getAvailablePersonnel } from "@/app/admin/actions";
 import { useAlert } from "@/app/components/ui/AlertProvider";
+import { getRelation } from "@/utils/getRelation";
 
 type Assignment = {
   user_id: string;
@@ -32,8 +33,8 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
   useEffect(() => {
     if (isModalOpen) {
       // Sync local state when modal opens
-      const seller = assignments.find((a: any) => a.role_types?.name === 'vendedor');
-      const agent = assignments.find((a: any) => a.role_types?.name === 'agente');
+      const seller = assignments.find((a: any) => getRelation(a.role_types)?.name === 'vendedor');
+      const agent = assignments.find((a: any) => getRelation(a.role_types)?.name === 'agente');
       setVendedorId(seller?.user_id || "");
       setAgenteId(agent?.user_id || "");
 
@@ -51,8 +52,8 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
     }
   }, [isModalOpen, assignments]);
 
-  const seller = assignments.find((a: any) => a.role_types?.name === 'vendedor');
-  const agent = assignments.find((a: any) => a.role_types?.name === 'agente');
+  const seller = assignments.find((a: any) => getRelation(a.role_types)?.name === 'vendedor');
+  const agent = assignments.find((a: any) => getRelation(a.role_types)?.name === 'agente');
 
   const handleSave = async () => {
     if (!vendedorId) {
@@ -105,7 +106,7 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
             <span className="material-icons text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-[#006655]">edit</span>
           </div>
           <div className="text-xs font-semibold text-[#19322F] truncate">
-            {seller ? seller.user_profiles?.full_name : <span className="text-red-400">Sin asignar</span>}
+            {seller ? getRelation(seller.user_profiles)?.full_name : <span className="text-red-400">Sin asignar</span>}
           </div>
         </button>
       )}
@@ -119,7 +120,7 @@ export default function PropertyAssignments({ propertyId, initialAssignments, cu
           <span className="material-icons text-[12px] opacity-0 group-hover:opacity-100 transition-opacity text-[#006655]">edit</span>
         </div>
         <div className="text-xs font-semibold text-[#19322F] truncate">
-          {agent ? agent.user_profiles?.full_name : <span className="text-gray-400 italic">No asignado</span>}
+          {agent ? getRelation(agent.user_profiles)?.full_name : <span className="text-gray-400 italic">No asignado</span>}
         </div>
       </button>
 

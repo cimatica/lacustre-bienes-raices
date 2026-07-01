@@ -2,6 +2,7 @@ import PropertyForm from '@/app/admin/properties/components/PropertyForm';
 import { createClient } from '@/utils/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { getRelation } from '@/utils/getRelation';
 
 export default async function VendedorEditPropertyPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -25,7 +26,7 @@ export default async function VendedorEditPropertyPage({ params }: { params: Pro
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) notFound();
 
-  const isMyProperty = property.property_assignments?.some((a: any) => a.user_id === user.id && a.role_types?.name === 'vendedor');
+  const isMyProperty = property.property_assignments?.some((a: any) => a.user_id === user.id && getRelation(a.role_types)?.name === 'vendedor');
   if (!isMyProperty) {
     // Return notFound or unauthorized if this property does not belong to the seller
     notFound();

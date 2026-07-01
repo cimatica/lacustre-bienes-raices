@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { updateVisitStatus, rescheduleVisit, deleteVisit } from '@/app/agente/actions';
 import { useAlert } from '@/app/components/ui/AlertProvider';
 import RescheduleModal from '@/app/components/visits/RescheduleModal';
+import { getRelation } from '@/utils/getRelation';
 
 type Visit = {
   id: string;
@@ -109,13 +110,13 @@ export default function VisitsList({ visits }: { visits: Visit[] }) {
               <p className="text-xs text-gray-500 mb-1 uppercase font-semibold tracking-wider">Interesado</p>
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-sm shrink-0">
-                  {visit.user_profiles.full_name?.charAt(0).toUpperCase()}
+                  {getRelation(visit.user_profiles)?.full_name?.charAt(0).toUpperCase()}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-[#19322F] truncate">{visit.user_profiles.full_name}</p>
+                  <p className="text-sm font-bold text-[#19322F] truncate">{getRelation(visit.user_profiles)?.full_name}</p>
                   <div className="flex items-center gap-2 mt-0.5">
-                    {visit.user_profiles.phone ? (
-                      <a href={formatWhatsAppUrl(visit.user_profiles.phone) || '#'} target="_blank" className="text-xs text-[#25D366] hover:underline flex items-center gap-1">
+                    {getRelation(visit.user_profiles)?.phone ? (
+                      <a href={formatWhatsAppUrl(getRelation(visit.user_profiles)?.phone || null) || '#'} target="_blank" className="text-xs text-[#25D366] hover:underline flex items-center gap-1">
                         <span className="material-icons text-[12px]">whatsapp</span>
                         Contactar
                       </a>

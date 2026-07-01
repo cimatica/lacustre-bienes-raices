@@ -7,6 +7,7 @@ import type { Property, PropertyImage } from "@/lib/supabase";
 import { assignPropertyUser, unassignPropertyUser, getAvailablePersonnel } from "@/app/admin/actions";
 import dynamic from "next/dynamic";
 import { useAlert } from "@/app/components/ui/AlertProvider";
+import { getRelation } from "@/utils/getRelation";
 
 // Dynamically import LocationPicker to prevent SSR issues with Leaflet
 const LocationPicker = dynamic(() => import("./LocationPicker"), { ssr: false });
@@ -101,7 +102,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
           .select('role_types(name)')
           .eq('id', user.id)
           .maybeSingle();
-        const role = roleData?.role_types?.name || 'usuario';
+        const role = getRelation(roleData?.role_types)?.name || 'usuario';
         setCurrentUser({ id: user.id, role });
 
         if (!propertyId && role === 'vendedor') {
@@ -116,8 +117,8 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
           .select('user_id, role_types(name)')
           .eq('property_id', propertyId);
         if (assignments) {
-          const seller = assignments.find((a: any) => a.role_types.name === 'vendedor');
-          const agent = assignments.find((a: any) => a.role_types.name === 'agente');
+          const seller = assignments.find((a: any) => getRelation(a.role_types)?.name === 'vendedor');
+          const agent = assignments.find((a: any) => getRelation(a.role_types)?.name === 'agente');
           if (seller) setVendedorId(seller.user_id);
           if (agent) setAgenteId(agent.user_id);
         }

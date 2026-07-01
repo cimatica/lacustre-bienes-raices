@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDictionary, getCurrentLanguage } from "../../lib/i18n";
 import LanguageSelector from "./LanguageSelector";
 import { createClient } from "@/utils/supabase/server";
+import { getRelation } from "@/utils/getRelation";
 
 export default async function Navbar() {
   const dict = await getDictionary();
@@ -20,7 +21,7 @@ export default async function Navbar() {
     ]);
 
     if (roleRes.data?.role_types) {
-      userRole = roleRes.data.role_types.name;
+      userRole = getRelation(roleRes.data.role_types)?.name || userRole;
     }
     
     if (profileRes.data?.full_name) {

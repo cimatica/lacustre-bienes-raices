@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import Link from 'next/link';
+import { getRelation } from '@/utils/getRelation';
 
 export const dynamic = 'force-dynamic';
 
@@ -125,10 +126,10 @@ export default async function AgenteDashboard() {
                 {latestLeads.map((lead, idx) => (
                   <li key={idx} className="p-4 hover:bg-gray-50 transition-colors flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-[#006655]/10 flex items-center justify-center text-[#006655] font-bold">
-                      {lead.user_profiles?.full_name?.charAt(0) || '?'}
+                      {getRelation(lead.user_profiles)?.full_name?.charAt(0) || '?'}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-[#19322F]">{lead.user_profiles?.full_name}</p>
+                      <p className="text-sm font-semibold text-[#19322F]">{getRelation(lead.user_profiles)?.full_name}</p>
                       <p className="text-xs text-gray-500 truncate max-w-[200px]">Interesado en: {lead.properties?.title}</p>
                     </div>
                   </li>
@@ -164,7 +165,7 @@ export default async function AgenteDashboard() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-[#19322F] truncate">{visit.properties?.title}</p>
-                        <p className="text-xs text-gray-500">Con {visit.user_profiles?.full_name} a las {d.toLocaleString('es', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <p className="text-xs text-gray-500">Con {getRelation(visit.user_profiles)?.full_name} a las {d.toLocaleString('es', { hour: '2-digit', minute: '2-digit' })}</p>
                       </div>
                     </li>
                   )

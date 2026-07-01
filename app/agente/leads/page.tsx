@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import LeadList from '@/app/vendedor/leads/LeadList';
+import { getRelation } from '@/utils/getRelation';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export default async function AgenteLeadsPage() {
   const processedLeads = leads.map(lead => {
     const userVisits = visits.filter(v => v.user_id === lead.user_id && v.property_id === lead.property_id);
     // Find agent for this property
-    const agentAssignment = lead.properties.property_assignments.find((a: any) => a.role_types?.name === 'agente');
+    const agentAssignment = lead.properties.property_assignments.find((a: any) => getRelation(a.role_types)?.name === 'agente');
     
     return {
       id: lead.id,
