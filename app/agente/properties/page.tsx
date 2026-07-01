@@ -187,7 +187,7 @@ export default async function AgentePropertiesPage({
         </Link>
       </div>
 
-      <AdminFilters basePath="/agente/properties" showPersonnelFilters={false} />
+      <AdminFilters showPersonnelFilters={false} />
 
       {/* Property List Container */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
