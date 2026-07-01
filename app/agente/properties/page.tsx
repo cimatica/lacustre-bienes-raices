@@ -275,7 +275,7 @@ export default async function AgentePropertiesPage({
         )}
       </div>
       
-      <AdminPagination currentPage={page} totalPages={totalPages} totalItems={count || 0} basePath="/agente/properties" />
+      <AdminPagination currentPage={page} totalPages={totalPages} totalItems={count || 0} />
     </main>
   );
 }
