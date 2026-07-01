@@ -304,7 +304,7 @@ export default function PropertyForm({ initialData, propertyId, basePath = "/adm
     setError(null);
 
     try {
-      const actualPropertyId = isEditing ? propertyId : crypto.randomUUID();
+      const actualPropertyId = isEditing ? (propertyId as string) : crypto.randomUUID();
       let mainImageUrl = initialData?.image_url || "";
 
       // 1. Upload new main image OR use swapped URL
