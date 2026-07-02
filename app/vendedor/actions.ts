@@ -19,7 +19,7 @@ export async function updateOwnProfile(data: { full_name: string, phone: string,
   if (error) {
     // Fallback to service key if RLS blocked it
     const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
-    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
     if (serviceKey) {
       const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
       const { error: adminError } = await supabaseAdmin

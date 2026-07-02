@@ -84,7 +84,7 @@ export async function createUserByAdmin(formData: FormData) {
     return { error: 'No autorizado' };
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   if (!serviceKey) {
     return { error: 'Falta la clave SUPABASE_SERVICE_ROLE_KEY en el servidor' };
   }
@@ -158,7 +158,7 @@ export async function deleteUserByAdmin(userId: string) {
     return { error: 'No autorizado' };
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   if (!serviceKey) return { error: 'Falta clave maestra' };
 
   const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
@@ -190,7 +190,7 @@ export async function updateUserProfile(userId: string, data: { full_name: strin
     return { error: 'No autorizado' };
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   if (!serviceKey) return { error: 'Falta clave maestra' };
 
   const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
@@ -223,7 +223,7 @@ export async function updateUserStatus(userId: string, status: string) {
     return { error: 'No autorizado' };
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
   if (!serviceKey) return { error: 'Falta clave maestra' };
 
   const supabaseAdmin = createSupabaseClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceKey);
