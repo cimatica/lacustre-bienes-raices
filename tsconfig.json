@@ -35,6 +35,8 @@
     "check_error.ts",
     "update_type.ts",
     "fetch_error.js",
-    "setup_db.js"
+    "setup_db.js",
+    "scratch",
+    "antigravity"
   ]
 }
