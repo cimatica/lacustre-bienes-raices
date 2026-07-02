@@ -30,5 +30,11 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "check_error.ts",
+    "update_type.ts",
+    "fetch_error.js",
+    "setup_db.js"
+  ]
 }
